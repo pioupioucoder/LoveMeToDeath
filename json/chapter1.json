@@ -13,30 +13,30 @@
     "id": "s_cafe_2",
       "bg": "images/backgrounds/dazaicafethink.webp",
     "character": null,
-   "charImg": "images/characters/dazaicafethink.webp",
+   "charImg": null,
     "speaker": null,
     "text": "Des années ont passé depuis notre rencontre, et pourtant aujourd’hui… son regard vide vers la fenêtre, le sourire éteint, sans un bruit. Je ne sais pas ce qui le tracasse.",
-    "music": null,
+     "music": "music/normal.mp3",
     "next": "s_cafe_2b"
   },
   {
     "id": "s_cafe_2b",
-    "bg": "images/backgrounds/sseat.png",
+    "bg": "images/backgrounds/dazaicafethink.webp",
     "character": null,
-   "charImg": "images/characters/dazaidistract.webp",
+   "charImg": null,
     "speaker": null,
     "text": "Une question me trouble : est-ce que je le connais vraiment ?",
-    "music": null,
+   "music": "music/normal.mp3",
     "next": "s_cafe_3"
   },
   {
     "id": "s_cafe_3",
-    "bg": "images/backgrounds/sseat.png",
+    "bg": "images/backgrounds/dazaiwatch.webp",
     "character": "Dazai",
-    "charImg": "images/characters/dazai_idle.webp",
+    "charImg": null,
     "speaker": "Dazai",
     "text": "Atsushi-kun… Je sens ton regard peser sur moi depuis un moment. Tu veux me dire quelque chose ?",
-    "music": null,
+   "music": "music/normal.mp3",
     "choices": [
       {
         "text": "Je me demandais simplement à quoi tu pensais.",
@@ -57,7 +57,7 @@
   },
   {
     "id": "s_choix1_pensee",
-    "bg": "images/backgrounds/cafetaria.webp",
+    "bg": "images/backgrounds/cafesurprise.webp",
     "character": "Atsushi",
     "charImg": "images/characters/atsushi_idle.webp",
     "speaker": "Atsushi",
@@ -67,7 +67,7 @@
   },
   {
     "id": "s_reponse_dazai_1",
-    "bg": "images/backgrounds/cafetaria.webp",
+    "bg": "images/backgrounds/cafespeak.webp",
     "character": "Dazai",
     "charImg": "images/characters/dazai_idle.webp",
     "speaker": "Dazai",
@@ -77,7 +77,7 @@
   },
   {
     "id": "s_choix2_inconnu",
-    "bg": "images/backgrounds/cafetaria.webp",
+    "bg": "images/backgrounds/cafesmile.webp",
     "character": "Atsushi",
     "charImg": "images/characters/atsushi_idle.webp",
     "speaker": "Atsushi",
@@ -87,7 +87,7 @@
   },
   {
     "id": "s_dazai_perplexe",
-    "bg": "images/backgrounds/cafetaria.webp",
+    "bg": "images/backgrounds/cafespeak.webp",
     "character": "Dazai",
     "charImg": "images/characters/dazai_perplexe.webp",
     "speaker": "Dazai",
@@ -97,27 +97,47 @@
   },
   {
     "id": "s_atsushi_hesite",
-    "bg": "images/backgrounds/cafetaria.webp",
+    "bg": "images/backgrounds/cafesmile.webp",
+    "character": "Atsushi",
+    "charImg": "images/characters/atsushi_hesitant.webp",
+    "speaker": null,
+    "text": "J'hésite un instant",
+    "music": null,
+    "next": "s_dazai_hesitee"
+  },
+   {
+    "id": "s_dazai_hesitee",
+    "bg": "images/backgrounds/cafesmile.webp",
     "character": "Atsushi",
     "charImg": "images/characters/atsushi_hesitant.webp",
     "speaker": "Atsushi",
-    "text": "J'hésite un instant. Des fois, j'ignore ce qui te préoccupe. Comme en ce moment.",
+    "text": "J'ignore ce qui te préoccupe. Comme en ce moment.",
     "music": null,
     "next": "s_dazai_sourire"
   },
   {
     "id": "s_dazai_sourire",
-    "bg": "images/backgrounds/cafetaria.webp",
+    "bg": "images/backgrounds/caferieur.webp",
+    "character": "Dazai",
+    "charImg": "images/characters/dazai_sourire.webp",
+    "speaker": null,
+    "text": "Il hausse les épaules, un léger sourire aux lèvres.",
+    "music": null,
+    "next": "s_dazai_souriree"
+  },
+  {
+    "id": "s_dazai_souriree",
+    "bg": "images/backgrounds/cafespeak.webp",
     "character": "Dazai",
     "charImg": "images/characters/dazai_sourire.webp",
     "speaker": "Dazai",
-    "text": "Il hausse les épaules, un léger sourire aux lèvres. Oh, je pensais simplement à ce qu’on va manger ce soir.",
+    "text": "Oh, je pensais simplement à ce qu’on va manger ce soir.",
     "music": null,
     "next": "s_proposition_diner"
   },
   {
     "id": "s_choix3_rien",
-    "bg": "images/backgrounds/cafetaria.webp",
+    "bg": "images/backgrounds/cafesmile.webp",
     "character": "Atsushi",
     "charImg": "images/characters/atsushi_idle.webp",
     "speaker": "Atsushi",
@@ -127,27 +147,38 @@
   },
   {
     "id": "s_dazai_evasif",
-    "bg": "images/backgrounds/cafetaria.webp",
+    "bg": "images/backgrounds/caferieur.webp",
     "character": "Dazai",
     "charImg": "images/characters/dazai_evasif.webp",
     "speaker": "Dazai",
-    "text": "Je vois... Il détourne son regard, évasif. Je me demande ce qu’on va manger ce soir.",
+    "text": "Je vois...Je me demande ce qu’on va manger ce soir.",
+    "music": null,
+    "next": "s_dazai_evasiff"
+  },
+  {
+    "id": "s_dazai_evasiff",
+    "bg": "images/backgrounds/dazaicafethink.webp",
+    "character": "Dazai",
+    "charImg": "images/characters/dazai_evasif.webp",
+    "speaker": "Dazai",
+    "text": "Il détourne son regard, évasif",
     "music": null,
     "next": "s_proposition_diner"
   },
+
   {
     "id": "s_proposition_diner",
-    "bg": "images/backgrounds/cafetaria.webp",
+    "bg": "images/backgrounds/dazaicafethink.webp",
     "character": null,
     "charImg": null,
     "speaker": null,
-    "text": "Je devrais peut-être suggérer qu’on prépare le dîner ensemble. C’est une bonne occasion d’apprendre plus sur lui.",
+    "text": "Je devrais peut-être suggérer qu’on prépare le dîner ensemble. C’est une bonne occasion d’apprendre plus sur lui en dehors du travail.",
     "music": null,
     "next": "s_atsushi_propose"
   },
   {
     "id": "s_atsushi_propose",
-    "bg": "images/backgrounds/cafetaria.webp",
+    "bg": "images/backgrounds/dazaiwatch.webp",
     "character": "Atsushi",
     "charImg": "images/characters/atsushi_idle.webp",
     "speaker": "Atsushi",
@@ -157,9 +188,9 @@
   },
   {
     "id": "s_dazai_surpris",
-    "bg": "images/backgrounds/cafetaria.webp",
+    "bg": "images/backgrounds/thinkspeak.webp",
     "character": "Dazai",
-    "charImg": "images/characters/dazai_surpris.webp",
+    "charImg": null,
     "speaker": "Dazai",
     "text": "Ce n’est pas vraiment notre rôle, tu es sûr de toi ?",
     "music": null,
@@ -183,9 +214,9 @@
   },
   {
     "id": "s_mission_ok",
-    "bg": "images/backgrounds/cafetaria.webp",
+    "bg": "images/backgrounds/caferieur.webp",
     "character": "Dazai",
-    "charImg": "images/characters/dazai_idle.webp",
+    "charImg": "images/characters/cafe.webp",
     "speaker": "Dazai",
     "text": "Effectivement, aucun compte à rendre. Alors autant profiter pour faire autre chose.",
     "music": null,
@@ -193,7 +224,7 @@
   },
   {
     "id": "s_cuisiniere_malade",
-    "bg": "images/backgrounds/cafetaria.webp",
+    "bg": "images/backgrounds/caferieur.webp",
     "character": "Dazai",
     "charImg": "images/characters/dazai_idle.webp",
     "speaker": "Dazai",
@@ -203,7 +234,7 @@
   },
   {
     "id": "s_envie_gouter",
-    "bg": "images/backgrounds/cafetaria.webp",
+    "bg": "images/backgrounds/caferieur.webp",
     "character": "Dazai",
     "charImg": "images/characters/dazai_amuse.webp",
     "speaker": "Dazai",
@@ -213,7 +244,7 @@
   },
   {
     "id": "s_transition_marche",
-    "bg": "images/backgrounds/cafetaria.webp",
+    "bg": "images/backgrounds/cafesmile.webp",
     "character": "Dazai",
     "charImg": "images/characters/dazai_depart.webp",
     "speaker": "Dazai",
