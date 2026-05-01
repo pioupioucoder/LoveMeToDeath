@@ -2,18 +2,28 @@
   {
     "id": "s_cafe_1",
     "bg": "images/backgrounds/cafetaria.webp",
-    "character": null,
+    "character": "Dazai",
     "charImg": null,
     "speaker": null,
-    "text": "Comme chaque matin, je retrouve Dazai à la cafétéria. L’odeur du café caresse délicatement mes narines. Des années ont passé depuis notre rencontre, et pourtant aujourd’hui… son regard vide vers la fenêtre, le sourire éteint, sans un bruit. Je ne sais pas ce qui le tracasse.",
+    "text": "Comme chaque matin, je retrouve Dazai à la cafétéria. L’odeur du café caresse délicatement mes narines.",
     "music": "music/normal.mp3",
     "next": "s_cafe_2"
   },
   {
     "id": "s_cafe_2",
-    "bg": "images/backgrounds/cafetaria.webp",
+      "bg": "images/backgrounds/dazaicafethink.webp",
     "character": null,
-    "charImg": null,
+   "charImg": "images/characters/dazaicafethink.webp",
+    "speaker": null,
+    "text": "Des années ont passé depuis notre rencontre, et pourtant aujourd’hui… son regard vide vers la fenêtre, le sourire éteint, sans un bruit. Je ne sais pas ce qui le tracasse.",
+    "music": null,
+    "next": "s_cafe_2b"
+  },
+  {
+    "id": "s_cafe_2b",
+    "bg": "images/backgrounds/sseat.png",
+    "character": null,
+   "charImg": "images/characters/dazaidistract.webp",
     "speaker": null,
     "text": "Une question me trouble : est-ce que je le connais vraiment ?",
     "music": null,
@@ -21,7 +31,7 @@
   },
   {
     "id": "s_cafe_3",
-    "bg": "images/backgrounds/cafetaria.webp",
+    "bg": "images/backgrounds/sseat.png",
     "character": "Dazai",
     "charImg": "images/characters/dazai_idle.webp",
     "speaker": "Dazai",
