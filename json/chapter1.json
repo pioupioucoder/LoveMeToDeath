@@ -6,27 +6,32 @@
     "charImg": null,
     "speaker": null,
     "text": "Comme chaque matin, je retrouve Dazai à la cafétéria. L’odeur du café caresse délicatement mes narines.",
+    "typeSpeed": 50,
     "music": "music/normal.mp3",
     "next": "s_cafe_2"
   },
   {
     "id": "s_cafe_2",
-      "bg": "images/backgrounds/dazaicafethink.webp",
+    "bg": "images/backgrounds/dazaicafethink.webp",
     "character": null,
-   "charImg": null,
+    "charImg": null,
     "speaker": null,
     "text": "Des années ont passé depuis notre rencontre, et pourtant aujourd’hui… son regard vide vers la fenêtre, le sourire éteint, sans un bruit. Je ne sais pas ce qui le tracasse.",
-     "music": "music/normal.mp3",
+    "typeSpeed": 60,
+    "music": "music/normal.mp3",
+    "waitForClick": true,
     "next": "s_cafe_2b"
   },
   {
     "id": "s_cafe_2b",
     "bg": "images/backgrounds/dazaicafethink.webp",
     "character": null,
-   "charImg": null,
+    "charImg": null,
     "speaker": null,
     "text": "Une question me trouble : est-ce que je le connais vraiment ?",
-   "music": "music/normal.mp3",
+    "typeSpeed": 55,
+    "music": "music/normal.mp3",
+    "waitForClick": true,
     "next": "s_cafe_3"
   },
   {
@@ -36,7 +41,8 @@
     "charImg": null,
     "speaker": "Dazai",
     "text": "Atsushi-kun… Je sens ton regard peser sur moi depuis un moment. Tu veux me dire quelque chose ?",
-   "music": "music/normal.mp3",
+    "typeSpeed": 50,
+    "music": "music/normal.mp3",
     "choices": [
       {
         "text": "Je me demandais simplement à quoi tu pensais.",
@@ -62,6 +68,7 @@
     "charImg": null,
     "speaker": "Atsushi",
     "text": "Je me demandais simplement à quoi tu pensais.",
+    "typeSpeed": 45,
     "music": null,
     "next": "s_reponse_dazai_1"
   },
@@ -72,6 +79,7 @@
     "charImg": null,
     "speaker": "Dazai",
     "text": "Je pensais à ce qu’on va manger ce soir.",
+    "typeSpeed": 45,
     "music": null,
     "next": "s_proposition_diner"
   },
@@ -82,6 +90,7 @@
     "charImg": null,
     "speaker": "Atsushi",
     "text": "Parfois, j’ai l’impression de ne pas te connaître.",
+    "typeSpeed": 60,
     "music": null,
     "next": "s_dazai_perplexe"
   },
@@ -92,6 +101,7 @@
     "charImg": null,
     "speaker": "Dazai",
     "text": "Pourquoi penses-tu cela ?",
+    "typeSpeed": 40,
     "music": null,
     "next": "s_atsushi_hesite"
   },
@@ -99,19 +109,21 @@
     "id": "s_atsushi_hesite",
     "bg": "images/backgrounds/cafesmile.webp",
     "character": "Atsushi",
-   "charImg": null,
+    "charImg": null,
     "speaker": null,
     "text": "J'hésite un instant",
+    "typeSpeed": 80,
     "music": null,
     "next": "s_dazai_hesitee"
   },
-   {
+  {
     "id": "s_dazai_hesitee",
     "bg": "images/backgrounds/cafesmile.webp",
     "character": "Atsushi",
-   "charImg": null,
+    "charImg": null,
     "speaker": "Atsushi",
     "text": "J'ignore ce qui te préoccupe. Comme en ce moment.",
+    "typeSpeed": 55,
     "music": null,
     "next": "s_dazai_sourire"
   },
@@ -122,6 +134,7 @@
     "charImg": null,
     "speaker": null,
     "text": "Il hausse les épaules, un léger sourire aux lèvres.",
+    "typeSpeed": 50,
     "music": null,
     "next": "s_dazai_souriree"
   },
@@ -132,6 +145,7 @@
     "charImg": null,
     "speaker": "Dazai",
     "text": "Oh, je pensais simplement à ce qu’on va manger ce soir.",
+    "typeSpeed": 45,
     "music": null,
     "next": "s_proposition_diner"
   },
@@ -142,6 +156,7 @@
     "charImg": null,
     "speaker": "Atsushi",
     "text": "Rien d'important.",
+    "typeSpeed": 35,
     "music": null,
     "next": "s_dazai_evasif"
   },
@@ -149,9 +164,10 @@
     "id": "s_dazai_evasif",
     "bg": "images/backgrounds/caferieur.webp",
     "character": "Dazai",
-   "charImg": null,
+    "charImg": null,
     "speaker": "Dazai",
     "text": "Je vois...Je me demande ce qu’on va manger ce soir.",
+    "typeSpeed": 50,
     "music": null,
     "next": "s_dazai_evasiff"
   },
@@ -159,13 +175,13 @@
     "id": "s_dazai_evasiff",
     "bg": "images/backgrounds/dazaicafethink.webp",
     "character": "Dazai",
-   "charImg": null,
+    "charImg": null,
     "speaker": "Dazai",
     "text": "Il détourne son regard, évasif",
+    "typeSpeed": 50,
     "music": null,
     "next": "s_proposition_diner"
   },
-
   {
     "id": "s_proposition_diner",
     "bg": "images/backgrounds/dazaicafethink.webp",
@@ -173,6 +189,7 @@
     "charImg": null,
     "speaker": null,
     "text": "Je devrais peut-être suggérer qu’on prépare le dîner ensemble. C’est une bonne occasion d’apprendre plus sur lui en dehors du travail.",
+    "typeSpeed": 65,
     "music": null,
     "next": "s_atsushi_propose"
   },
@@ -183,6 +200,7 @@
     "charImg": null,
     "speaker": "Atsushi",
     "text": "Je ne crois pas que quelqu’un ait prévu quoi que ce soit pour ce soir. Et si c’était nous qui le préparions ?",
+    "typeSpeed": 50,
     "music": null,
     "next": "s_dazai_surpris"
   },
@@ -193,6 +211,7 @@
     "charImg": null,
     "speaker": "Dazai",
     "text": "Ce n’est pas vraiment notre rôle, tu es sûr de toi ?",
+    "typeSpeed": 45,
     "music": null,
     "choices": [
       {
@@ -219,6 +238,7 @@
     "charImg": "images/characters/cafe.webp",
     "speaker": "Dazai",
     "text": "Effectivement, aucun compte à rendre. Alors autant profiter pour faire autre chose.",
+    "typeSpeed": 50,
     "music": null,
     "next": "s_transition_marche"
   },
@@ -229,6 +249,7 @@
     "charImg": "images/characters/dazai_idle.webp",
     "speaker": "Dazai",
     "text": "Dans ce cas, on n’a pas le choix. Sauvons le dîner, Atsushi-kun.",
+    "typeSpeed": 45,
     "music": null,
     "next": "s_transition_marche"
   },
@@ -239,6 +260,7 @@
     "charImg": "images/characters/dazai_amuse.webp",
     "speaker": "Dazai",
     "text": "Haha, je ne sais pas cuisiner, Atsushi-kun, mais à nous deux ça ne devrait pas être terrible.",
+    "typeSpeed": 40,
     "music": null,
     "next": "s_transition_marche"
   },
@@ -249,6 +271,7 @@
     "charImg": "images/characters/dazai_depart.webp",
     "speaker": "Dazai",
     "text": "Pas de dîner sans courses. Allez, direction le marché.",
+    "typeSpeed": 40,
     "music": null,
     "next": "s_quitter_table"
   },
@@ -259,6 +282,7 @@
     "charImg": null,
     "speaker": null,
     "text": "Nous quittons notre table, laissant l’odeur du café derrière nous.",
+    "typeSpeed": 50,
     "music": null,
     "next": "s_marche_arrivee"
   },
@@ -269,16 +293,29 @@
     "charImg": null,
     "speaker": null,
     "text": "Nous arrivons devant les étals. L'odeur des légumes frais et des épices nous entoure.",
+    "typeSpeed": 50,
     "music": "music/marche_ambiance.mp3",
-    "next": "s_marche_dazai"
+    "next": "s_marche_daza"
   },
   {
+    "id": "s_marche_daza",
+    "bg": "images/backgrounds/marche.webp",
+    "character": "Dazai",
+    "charImg": "images/characters/marchecrabe.webp",
+    "speaker": null,
+    "text": "Dazai plisse les yeux en regardant les crustacés et se tourne vers moi. ",
+    "typeSpeed": 55,
+    "music": null,
+     "next": "s_marche_dazai"
+ },
+     {
     "id": "s_marche_dazai",
     "bg": "images/backgrounds/marche.webp",
     "character": "Dazai",
-    "charImg": "images/characters/dazai_plisse_yeux.webp",
+    "charImg": "images/characters/marchecrabe.webp",
     "speaker": "Dazai",
-    "text": "Il plisse les yeux en regardant les crustacés et se tourne vers moi. Bon, Atsushi-kun. C'est toi qui as proposé qu'on cuisine. Alors, qu'est-ce qu'on prépare ce soir ?",
+    "text": "Bon, Atsushi-kun. C'est toi qui as proposé qu'on cuisine. Alors, qu'est-ce qu'on prépare ce soir ?",
+    "typeSpeed": 55,
     "music": null,
     "choices": [
       {
@@ -305,6 +342,7 @@
     "charImg": "images/characters/dazai_content.webp",
     "speaker": "Dazai",
     "text": "Tu tombes bien. J’adore ça.",
+    "typeSpeed": 35,
     "music": null,
     "next": "s_atsushi_partant"
   },
@@ -315,6 +353,7 @@
     "charImg": "images/characters/dazai_regard.webp",
     "speaker": "Dazai",
     "text": "Je ne vois pas d’épices ici. Par contre, le crabe, il est juste là.",
+    "typeSpeed": 45,
     "music": null,
     "next": "s_atsushi_partant"
   },
@@ -325,6 +364,7 @@
     "charImg": "images/characters/dazai_taquin.webp",
     "speaker": "Dazai",
     "text": "Sauf qu’on en mange tout le temps à l’agence. Regarde ce crabe, il est magnifique. On prend ça ?",
+    "typeSpeed": 50,
     "music": null,
     "next": "s_atsushi_partant"
   },
@@ -335,6 +375,7 @@
     "charImg": "images/characters/atsushi_sourire.webp",
     "speaker": "Atsushi",
     "text": "Je suis partant pour le crabe.",
+    "typeSpeed": 35,
     "music": null,
     "next": "__ending__"
   }
