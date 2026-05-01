@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Love Me To Death</title>
+
+<!--
+  ╔══════════════════════════════════════════════════════════╗
+  ║  STRUCTURE DES FICHIERS ATTENDUE                        ║
+  ║                                                          ║
+  ║  index.html                 ← ce fichier                ║
+  ║  json/                                                   ║
+  ║    chapter1.json            ← scènes chapitre 1         ║
+  ║    chapter2.json            ← scènes chapitre 2, etc.   ║
+  ║  images/                                                 ║
+  ║    characters/                                           ║
+  ║      dorian_idle.webp                                    ║
+  ║      dorian_surprised.webp                               ║
+  ║      dorian_amused.webp  …                               ║
+  ║    backgrounds/                                          ║
+  ║      manor_gate.webp                                     ║
+  ║      manor_hall.webp     …                               ║
+  ║  music/                                                  ║
+  ║    intro.mp3              ← musique écran titre          ║
+  ║    theme_main.mp3                                        ║
+  ║    theme_interior.mp3    …                               ║
+  ║  minigames/                                              ║
+  ║    symbol_puzzle.js       ← chargé dynamiquement        ║
+  ╚══════════════════════════════════════════════════════════╝
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+
+<!-- Préchargement des assets critiques -->
+<link rel="preload" href="music/intro.mp3" as="audio">
+
+<style>
+:root {
+  --blood: #8B0000;
+  --crimson: #DC143C;
+  --rose: #FF6B8A;
+  --petal: #FFD6E0;
+  --obsidian: #0A0A0F;
+  --midnight: #12121A;
+  --dusk: #1E1E2E;
+  --twilight: #2A2A3E;
+  --mist: #C8B8D0;
+  --silver: #E8DDF0;
+  --gold: #C9A84C;
+  --affinity-pos: #DC143C;
+  --affinity-neg: #6B21A8;
+  --text-main: #F0E8F5;
+  --text-dim: #9B8FAA;
+  --box-bg: rgba(10,10,15,0.88);
+  --box-border: rgba(200,160,200,0.25);
+  --choice-bg: rgba(20,10,30,0.85);
+  --choice-hover: rgba(139,0,0,0.4);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%; height: 100%;
+  background: var(--obsidian);
+  font-family: 'Cormorant Garamond', serif;
+  color: var(--text-main);
+  overflow: hidden;
+  user-select: none;
+}
+
+/* ── SCREENS ── */
+.screen {
+  position: fixed; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.8s ease;
+  z-index: 10;
+}
+.screen.active { opacity: 1; pointer-events: all; }
+
+/* ── NOISE OVERLAY ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 9999; opacity: 0.3;
+}
+
+/* ── PARTICLES ── */
+#particles { position: fixed; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+.particle {
+  position: absolute; width: 3px; height: 3px;
+  border-radius: 50%; background: var(--crimson);
+  opacity: 0; animation: floatUp linear infinite;
+}
+@keyframes floatUp {
+  0%   { transform: translateY(100vh) scale(0); opacity: 0; }
+  10%  { opacity: 0.6; }
+  90%  { opacity: 0.3; }
+  100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
+}
+
+/* ══════════════════════════════════════════
+   TITLE SCREEN
+══════════════════════════════════════════ */
+#title-screen {
+  background: radial-gradient(ellipse at 50% 30%, #1a0510 0%, var(--obsidian) 70%);
+}
+.title-bg-roses {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(circle at 20% 80%, rgba(139,0,0,0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(139,0,0,0.10) 0%, transparent 40%);
+  pointer-events: none;
+}
+.title-deco {
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 1px; height: 30%;
+  background: linear-gradient(to bottom, transparent, var(--blood));
+}
+.title-deco::after {
+  content: '✦';
+  position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%);
+  color: var(--blood); font-size: 12px;
+}
+.title-wrap { position: relative; text-align: center; z-index: 2; }
+.title-sub {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(0.55rem, 1.5vw, 0.8rem);
+  letter-spacing: 0.5em; color: var(--blood);
+  text-transform: uppercase; margin-bottom: 1.2rem;
+  opacity: 0; animation: fadeIn 1.5s 0.5s forwards;
+}
+.title-main {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(2.5rem, 8vw, 6rem);
+  font-weight: 600; color: var(--silver); line-height: 1;
+  text-shadow: 0 0 60px rgba(220,20,60,0.4), 0 0 120px rgba(220,20,60,0.2);
+  opacity: 0; animation: titleReveal 2s 0.8s forwards;
+}
+.title-main span { color: var(--crimson); }
+
+@keyframes titleReveal {
+  0%   { opacity: 0; transform: translateY(20px); filter: blur(8px); }
+  100% { opacity: 1; transform: translateY(0);    filter: blur(0);   }
+}
+@keyframes fadeIn { to { opacity: 1; } }
+
+.title-line {
+  display: flex; align-items: center; gap: 1rem;
+  margin: 1.5rem 0 2.5rem;
+  opacity: 0; animation: fadeIn 1.5s 1.5s forwards;
+}
+.title-line::before, .title-line::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(to right, transparent, var(--blood));
+}
+.title-line::after { background: linear-gradient(to left, transparent, var(--blood)); }
+.title-line-icon { color: var(--crimson); font-size: 1rem; }
+
+.btn-start {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(0.8rem, 2vw, 1rem);
+  letter-spacing: 0.3em; color: var(--silver);
+  background: transparent;
+  border: 1px solid rgba(220,20,60,0.5);
+  padding: 1rem 3rem; cursor: pointer;
+  position: relative; overflow: hidden;
+  transition: all 0.4s ease;
+  opacity: 0; animation: fadeIn 1.5s 2s forwards;
+}
+.btn-start::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, var(--blood), transparent);
+  opacity: 0; transition: opacity 0.4s;
+}
+.btn-start:hover { border-color: var(--crimson); color: white; letter-spacing: 0.4em; box-shadow: 0 0 30px rgba(220,20,60,0.3); }
+.btn-start:hover::before { opacity: 1; }
+
+/* ══════════════════════════════════════════
+   LANGUAGE SCREEN
+══════════════════════════════════════════ */
+#lang-screen { background: radial-gradient(ellipse at 50% 50%, #0d0515 0%, var(--obsidian) 80%); }
+.lang-title  { font-family: 'Cinzel', serif; font-size: clamp(1.2rem, 4vw, 2rem); color: var(--silver); margin-bottom: 0.5rem; text-align: center; }
+.lang-sub    { font-size: clamp(0.75rem, 2vw, 0.95rem); color: var(--text-dim); font-style: italic; margin-bottom: 3rem; text-align: center; }
+.lang-choices { display: flex; gap: 2rem; flex-wrap: wrap; justify-content: center; }
+.lang-btn {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 1rem; padding: 2rem 2.5rem;
+  background: rgba(30,20,40,0.8);
+  border: 1px solid var(--box-border);
+  cursor: pointer; transition: all 0.3s ease;
+  position: relative; overflow: hidden; min-width: 160px;
+}
+.lang-btn:hover { border-color: var(--crimson); transform: translateY(-4px); box-shadow: 0 10px 30px rgba(220,20,60,0.2); }
+.lang-flag { font-size: 3.5rem; line-height: 1; }
+.lang-name { font-family: 'Cinzel', serif; font-size: 0.9rem; letter-spacing: 0.2em; color: var(--silver); }
+
+/* ══════════════════════════════════════════
+   POLICY SCREEN
+══════════════════════════════════════════ */
+#policy-screen { background: var(--obsidian); padding: 1rem; }
+.policy-container {
+  width: 100%; max-width: 700px;
+  display: flex; flex-direction: column;
+  height: 100vh; max-height: 100vh;
+  padding: 2rem 1.5rem 1.5rem;
+}
+.policy-header {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(1rem, 3vw, 1.5rem);
+  color: var(--silver); text-align: center;
+  border-bottom: 1px solid var(--box-border);
+  padding-bottom: 1rem; margin-bottom: 1.2rem; flex-shrink: 0;
+}
+.policy-scroll {
+  flex: 1; overflow-y: auto;
+  font-size: clamp(0.75rem, 1.8vw, 0.9rem);
+  line-height: 1.9; color: var(--mist);
+  padding-right: 0.5rem; scroll-behavior: smooth;
+}
+.policy-scroll::-webkit-scrollbar { width: 3px; }
+.policy-scroll::-webkit-scrollbar-thumb { background: var(--blood); border-radius: 2px; }
+.policy-scroll h3 { font-family: 'Cinzel', serif; color: var(--crimson); font-size: 0.85rem; letter-spacing: 0.15em; margin: 1.5rem 0 0.5rem; }
+.policy-scroll p  { margin-bottom: 0.8rem; }
+.policy-scroll .credits { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--box-border); font-style: italic; font-size: 0.8rem; color: var(--text-dim); }
+.policy-progress { height: 2px; background: rgba(255,255,255,0.05); margin: 0.8rem 0; flex-shrink: 0; }
+.policy-progress-bar { height: 100%; background: var(--blood); width: 0%; transition: width 0.1s; }
+.policy-footer {
+  display: flex; align-items: center; gap: 1rem;
+  padding-top: 1rem; flex-shrink: 0;
+  border-top: 1px solid var(--box-border);
+  flex-wrap: wrap; justify-content: center;
+}
+.policy-hint  { font-size: 0.75rem; color: var(--text-dim); font-style: italic; flex: 1; min-width: 150px; }
+.btn-accept {
+  font-family: 'Cinzel', serif; font-size: 0.8rem;
+  letter-spacing: 0.2em; background: var(--blood);
+  color: white; border: none; padding: 0.8rem 2rem;
+  cursor: pointer; opacity: 0.4; transition: all 0.3s; pointer-events: none;
+}
+.btn-accept.ready { opacity: 1; pointer-events: all; }
+.btn-accept.ready:hover { background: var(--crimson); box-shadow: 0 0 20px rgba(220,20,60,0.4); }
+
+/* ══════════════════════════════════════════
+   LOADING SCREEN
+══════════════════════════════════════════ */
+#loading-screen { background: var(--obsidian); z-index: 50; }
+.loading-inner { text-align: center; }
+.loading-title { font-family: 'Cinzel', serif; font-size: 1rem; letter-spacing: 0.4em; color: var(--blood); margin-bottom: 2rem; text-transform: uppercase; }
+.loading-bar-outer { width: 280px; height: 2px; background: rgba(255,255,255,0.08); border-radius: 1px; overflow: hidden; margin: 0 auto 1rem; }
+.loading-bar-inner { height: 100%; background: var(--crimson); width: 0%; transition: width 0.3s ease; border-radius: 1px; }
+.loading-pct { font-family: 'Cinzel', serif; font-size: 0.7rem; color: var(--text-dim); letter-spacing: 0.3em; }
+
+/* ══════════════════════════════════════════
+   GAME SCREEN
+══════════════════════════════════════════ */
+#game-screen { background: var(--obsidian); padding: 0; }
+
+#game-bg {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center;
+  transition: opacity 0.8s ease; z-index: 0;
+}
+#game-bg::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0.4) 100%);
+}
+#game-bg-prev {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center;
+  z-index: 0; opacity: 0;
+}
+
+#char-wrap {
+  position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+  z-index: 2; max-height: 85%;
+  display: flex; align-items: flex-end; justify-content: center;
+  transition: opacity 0.5s ease; pointer-events: none;
+}
+#char-img {
+  max-height: 100%; max-width: 60vw;
+  object-fit: contain;
+  filter: drop-shadow(0 0 30px rgba(0,0,0,0.8));
+}
+@media (max-width: 600px) {
+  #char-img  { max-width: 90vw; }
+  #char-wrap { max-height: 70%; }
+}
+
+/* HUD */
+#hud {
+  position: absolute; top: 0; left: 0; right: 0;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.8rem 1.2rem; z-index: 10;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent);
+}
+.hud-left, .hud-right { display: flex; align-items: center; gap: 0.8rem; }
+
+#affinity-wrap { display: flex; align-items: center; gap: 0.5rem; }
+.affinity-icon {
+  font-size: 1.1rem;
+  filter: drop-shadow(0 0 4px var(--crimson));
+  transition: filter 0.5s;
+}
+#affinity-bar-outer {
+  width: 80px; height: 6px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 3px; overflow: hidden; position: relative;
+}
+#affinity-bar {
+  height: 100%; width: 50%; border-radius: 3px;
+  background: linear-gradient(to right, var(--affinity-neg), var(--affinity-pos));
+  transition: width 0.6s cubic-bezier(0.4,0,0.2,1), background 0.6s;
+  position: absolute; left: 0;
+}
+#affinity-val {
+  font-family: 'Cinzel', serif; font-size: 0.7rem;
+  color: var(--mist); min-width: 2.5rem; text-align: center; transition: color 0.5s;
+}
+
+.hud-btn {
+  background: rgba(10,10,15,0.7);
+  border: 1px solid var(--box-border);
+  color: var(--mist); cursor: pointer;
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.95rem; transition: all 0.2s; border-radius: 2px;
+}
+.hud-btn:hover { border-color: var(--crimson); color: var(--silver); }
+
+/* Dialogue box */
+#dialogue-wrap {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  z-index: 10; padding: 0 1rem 1rem;
+}
+#dialogue-box {
+  background: var(--box-bg);
+  border: 1px solid var(--box-border);
+  border-radius: 2px;
+  backdrop-filter: blur(12px);
+  overflow: hidden;
+}
+#speaker-bar {
+  padding: 0.4rem 1.2rem;
+  border-bottom: 1px solid var(--box-border);
+  display: flex; align-items: center; gap: 0.5rem;
+}
+#speaker-name {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(0.75rem, 2vw, 0.9rem);
+  color: var(--crimson); letter-spacing: 0.15em;
+}
+.speaker-deco { color: var(--blood); font-size: 0.6rem; }
+
+#dialogue-text {
+  padding: 1rem 1.2rem;
+  font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+  font-family: 'IM Fell English', serif;
+  line-height: 1.7; color: var(--text-main);
+  min-height: 5em;
+}
+
+/* ─── Barre de navigation dialogue ─── */
+#dialogue-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.3rem 1.2rem 0.6rem;
+  border-top: 1px solid rgba(200,160,200,0.08);
+}
+#btn-back-dialogue {
+  font-family: 'Cinzel', serif; font-size: 0.65rem;
+  letter-spacing: 0.15em; color: var(--text-dim);
+  background: transparent; border: 1px solid rgba(200,160,200,0.15);
+  padding: 0.25rem 0.7rem; cursor: pointer; transition: all 0.2s;
+  border-radius: 2px;
+  opacity: 0; pointer-events: none;
+}
+#btn-back-dialogue.visible { opacity: 1; pointer-events: all; }
+#btn-back-dialogue:hover { border-color: var(--crimson); color: var(--rose); }
+
+#dialogue-continue {
+  color: var(--blood); font-size: 0.75rem;
+  animation: blink 1.5s infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+/* Choices */
+#choices-wrap {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  z-index: 11; padding: 0 1rem 1rem;
+  display: none; flex-direction: column; gap: 0.6rem;
+}
+.choice-btn {
+  background: var(--choice-bg);
+  border: 1px solid var(--box-border);
+  color: var(--silver);
+  padding: 0.9rem 1.5rem;
+  font-family: 'IM Fell English', serif;
+  font-size: clamp(0.85rem, 2.2vw, 1rem);
+  cursor: pointer; text-align: left;
+  transition: all 0.25s ease;
+  backdrop-filter: blur(10px);
+  border-radius: 2px;
+  position: relative; overflow: hidden;
+}
+.choice-btn::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: var(--crimson); transform: scaleY(0); transition: transform 0.2s;
+}
+.choice-btn:hover { background: var(--choice-hover); border-color: rgba(220,20,60,0.5); transform: translateX(4px); }
+.choice-btn:hover::before { transform: scaleY(1); }
+
+/* History overlay */
+#history-overlay {
+  position: fixed; inset: 0; z-index: 50;
+  background: rgba(5,5,10,0.95);
+  display: none; flex-direction: column;
+  backdrop-filter: blur(8px);
+}
+.history-header {
+  padding: 1.2rem 1.5rem;
+  border-bottom: 1px solid var(--box-border);
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: 'Cinzel', serif; font-size: 0.9rem;
+  color: var(--mist); letter-spacing: 0.2em;
+}
+#history-list { flex: 1; overflow-y: auto; padding: 1rem 1.5rem; }
+#history-list::-webkit-scrollbar { width: 3px; }
+#history-list::-webkit-scrollbar-thumb { background: var(--blood); }
+.history-entry { margin-bottom: 1.2rem; font-family: 'IM Fell English', serif; font-size: clamp(0.85rem, 2vw, 1rem); line-height: 1.7; color: var(--text-dim); }
+.history-entry .h-name   { color: var(--crimson); font-family: 'Cinzel', serif; font-size: 0.8rem; letter-spacing: 0.1em; margin-bottom: 0.2rem; }
+.history-entry .h-choice { color: var(--rose); font-style: italic; }
+
+/* Pause modal */
+#pause-modal {
+  position: fixed; inset: 0; z-index: 60;
+  background: rgba(5,5,10,0.92);
+  display: none; flex-direction: column;
+  align-items: center; justify-content: center;
+  backdrop-filter: blur(12px);
+}
+.pause-panel {
+  background: rgba(15,10,20,0.95);
+  border: 1px solid var(--box-border);
+  padding: 2.5rem 3rem; min-width: 280px; max-width: 400px; width: 90%;
+  display: flex; flex-direction: column; gap: 0.8rem;
+}
+.pause-title {
+  font-family: 'Cinzel', serif; font-size: 1.1rem;
+  color: var(--silver); text-align: center; letter-spacing: 0.3em; margin-bottom: 0.5rem;
+  border-bottom: 1px solid var(--box-border); padding-bottom: 0.8rem;
+}
+.pause-btn {
+  font-family: 'Cinzel', serif; font-size: 0.8rem;
+  letter-spacing: 0.2em; background: transparent;
+  border: 1px solid var(--box-border); color: var(--mist);
+  padding: 0.9rem; cursor: pointer; transition: all 0.2s; text-align: center;
+}
+.pause-btn:hover { border-color: var(--crimson); color: var(--silver); background: rgba(139,0,0,0.15); }
+.pause-btn.danger { color: #ff6b6b; border-color: rgba(255,107,107,0.3); }
+.pause-btn.danger:hover { background: rgba(200,0,0,0.15); border-color: #ff6b6b; }
+
+.volume-row {
+  display: flex; align-items: center; gap: 0.8rem;
+  padding: 0.5rem 0; border-top: 1px solid var(--box-border); margin-top: 0.5rem;
+}
+.vol-label { font-family: 'Cinzel', serif; font-size: 0.7rem; color: var(--text-dim); letter-spacing: 0.15em; min-width: 60px; }
+#vol-slider { flex: 1; accent-color: var(--crimson); cursor: pointer; }
+.vol-mute { background: none; border: 1px solid var(--box-border); color: var(--mist); cursor: pointer; padding: 0.3rem 0.6rem; font-size: 0.8rem; transition: all 0.2s; }
+.vol-mute:hover { border-color: var(--crimson); color: var(--silver); }
+
+/* Help overlay */
+#help-overlay {
+  position: fixed; inset: 0; z-index: 55;
+  background: rgba(5,5,10,0.9);
+  display: none; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 1rem; backdrop-filter: blur(8px);
+}
+.help-panel {
+  background: rgba(15,10,20,0.98); border: 1px solid var(--box-border);
+  padding: 2rem; max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto;
+}
+.help-panel h2 { font-family: 'Cinzel', serif; color: var(--silver); font-size: 1rem; letter-spacing: 0.25em; margin-bottom: 1.5rem; border-bottom: 1px solid var(--box-border); padding-bottom: 0.8rem; }
+.help-row { display: flex; gap: 1rem; margin-bottom: 1rem; font-size: 0.85rem; line-height: 1.5; }
+.help-key { min-width: 80px; color: var(--crimson); font-family: 'Cinzel', serif; font-size: 0.75rem; letter-spacing: 0.1em; }
+.help-val { color: var(--mist); }
+
+/* Minigame overlay */
+#minigame-overlay {
+  position: fixed; inset: 0; z-index: 50;
+  background: rgba(5,5,10,0.95);
+  display: none; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 1rem; backdrop-filter: blur(12px);
+}
+
+/* Ending screen */
+#ending-screen { background: var(--obsidian); flex-direction: column; gap: 1.5rem; text-align: center; padding: 2rem; }
+.ending-type  { font-family: 'Cinzel', serif; font-size: 0.7rem; letter-spacing: 0.5em; color: var(--blood); text-transform: uppercase; }
+.ending-title { font-family: 'Cinzel', serif; font-size: clamp(1.5rem, 5vw, 3rem); color: var(--silver); text-shadow: 0 0 40px rgba(220,20,60,0.4); }
+.ending-text  { font-family: 'IM Fell English', serif; font-size: clamp(0.9rem, 2.2vw, 1.1rem); color: var(--mist); max-width: 500px; line-height: 1.8; font-style: italic; }
+.btn-restart  { font-family: 'Cinzel', serif; font-size: 0.8rem; letter-spacing: 0.3em; color: var(--silver); background: transparent; border: 1px solid rgba(220,20,60,0.5); padding: 0.9rem 2.5rem; cursor: pointer; transition: all 0.3s; margin-top: 1rem; }
+.btn-restart:hover { border-color: var(--crimson); background: rgba(139,0,0,0.2); }
+
+/* Affinity delta popup */
+#affinity-delta {
+  position: fixed; top: 60px; right: 1rem;
+  font-family: 'Cinzel', serif; font-size: 1rem;
+  opacity: 0; pointer-events: none; z-index: 20;
+  transition: opacity 0.3s; text-shadow: 0 0 10px currentColor;
+}
+#affinity-delta.show { animation: deltaAnim 1.5s ease forwards; }
+@keyframes deltaAnim {
+  0%   { opacity: 0; transform: translateY(0); }
+  20%  { opacity: 1; }
+  80%  { opacity: 1; transform: translateY(-20px); }
+  100% { opacity: 0; transform: translateY(-30px); }
+}
+
+/* Transition fade */
+#fade-overlay {
+  position: fixed; inset: 0; z-index: 40;
+  background: var(--obsidian); opacity: 0;
+  pointer-events: none; transition: opacity 0.5s;
+}
+#fade-overlay.fade-in { opacity: 1; pointer-events: all; }
+
+/* Click ripple */
+.ripple {
+  position: fixed; border-radius: 50%;
+  width: 20px; height: 20px;
+  background: rgba(220,20,60,0.3);
+  pointer-events: none; z-index: 9000;
+  transform: translate(-50%,-50%) scale(0);
+  animation: rippleAnim 0.6s ease forwards;
+}
+@keyframes rippleAnim { to { transform: translate(-50%,-50%) scale(8); opacity: 0; } }
+
+/* Responsive */
+@media (max-width: 480px) {
+  .pause-panel { padding: 1.5rem 1.2rem; }
+  #hud { padding: 0.6rem 0.8rem; }
+  #dialogue-wrap, #choices-wrap { padding: 0 0.5rem 0.5rem; }
+  #affinity-bar-outer { width: 60px; }
+}
+</style>
+</head>
+<body>
+
+<div id="particles"></div>
+<div id="fade-overlay"></div>
+<div id="affinity-delta"></div>
+
+<!-- ══════════════════════════════════════════
+     LOADING SCREEN
+══════════════════════════════════════════ -->
+<div id="loading-screen" class="screen active">
+  <div class="loading-inner">
+    <div class="loading-title">Chargement</div>
+    <div class="loading-bar-outer"><div class="loading-bar-inner" id="loading-bar"></div></div>
+    <div class="loading-pct" id="loading-pct">0%</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     TITLE SCREEN
+══════════════════════════════════════════ -->
+<div id="title-screen" class="screen">
+  <div class="title-bg-roses"></div>
+  <div class="title-deco"></div>
+  <div class="title-wrap">
+    <div class="title-sub">— un roman visuel —</div>
+    <div class="title-main">Love Me<br>To <span>Death</span></div>
+    <div class="title-line"><span class="title-line-icon">✦</span></div>
+    <button class="btn-start" id="btn-start">COMMENCER</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     LANGUAGE SCREEN
+══════════════════════════════════════════ -->
+<div id="lang-screen" class="screen">
+  <div class="lang-title">Choose Your Language</div>
+  <div class="lang-sub">Choisissez votre langue</div>
+  <div class="lang-choices">
+    <button class="lang-btn" data-lang="en">
+      <span class="lang-flag">🇬🇧</span>
+      <span class="lang-name">ENGLISH</span>
+    </button>
+    <button class="lang-btn" data-lang="fr">
+      <span class="lang-flag">🇫🇷</span>
+      <span class="lang-name">FRANÇAIS</span>
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     POLICY SCREEN
+══════════════════════════════════════════ -->
+<div id="policy-screen" class="screen">
+  <div class="policy-container">
+    <div class="policy-header" id="policy-header">Conditions, Confidentialité & Crédits</div>
+    <div class="policy-scroll" id="policy-scroll">
+      <h3>POLITIQUE DE CONFIDENTIALITÉ</h3>
+      <p>Love Me To Death (le « Jeu ») est un roman visuel jouable dans le navigateur. En jouant, vous acceptez que les données de progression soient enregistrées localement sur votre appareil à des fins de sauvegarde.</p>
+      <p>Aucune donnée personnelle n'est collectée, transmise ou partagée avec des tiers. Toutes les données de sauvegarde sont stockées exclusivement dans le localStorage de votre navigateur. Vous pouvez les supprimer à tout moment en effaçant le stockage de votre navigateur.</p>
+
+      <h3>DONNÉES COLLECTÉES</h3>
+      <p>Les données suivantes sont stockées localement : votre préférence de langue, votre progression actuelle, votre score d'affinité, et l'historique de vos dialogues. Aucun cookie, outil d'analyse ou service externe n'est utilisé.</p>
+
+      <h3>CONDITIONS D'UTILISATION</h3>
+      <p>Ce jeu est destiné à un public âgé de 16 ans et plus. Il contient des thèmes de romance, de mystère et de dark fantasy douce. Le Jeu est fourni à des fins de divertissement uniquement. Tous les personnages, scénarios et événements sont fictifs.</p>
+      <p>Vous ne pouvez pas reproduire, modifier, distribuer ou vendre une partie de ce Jeu sans autorisation écrite. Les créations de fans non commerciales sont les bienvenues.</p>
+
+      <h3>AVERTISSEMENT DE CONTENU</h3>
+      <p>Love Me To Death explore des thèmes d'amour, d'obsession, de mortalité et de romance surnaturelle. Certaines scènes peuvent contenir : des images d'horreur légère, des dialogues émotionnellement intenses et des choix narratifs à conséquences.</p>
+
+      <h3>INFORMATIONS DE JEU</h3>
+      <p>Vos choix affectent le compteur d'affinité affiché en haut de l'écran. Ce niveau influencera la fin que vous obtiendrez. La sauvegarde est automatique à chaque transition de scène. Vous pouvez revoir les dialogues passés via le bouton historique.</p>
+      <p>Des mini-jeux peuvent apparaître entre les scènes. Le son peut être ajusté dans le menu pause.</p>
+
+      <h3>CRÉDITS</h3>
+      <div class="credits">
+        <p>Histoire & Direction — Game Director</p>
+        <p>Art des personnages — Artistes originaux</p>
+        <p>Décors — Équipe visuelle</p>
+        <p>Musique & Son — Compositeurs</p>
+        <p>Développement — Équipe de développement</p>
+        <p>Remerciements spéciaux — À chaque joueur qui a choisi l'amour en sachant le prix à payer.</p>
+        <p style="margin-top:1rem; color: var(--crimson);">♥ Love Me To Death — Version 1.0 ♥</p>
+      </div>
+    </div>
+    <div class="policy-progress"><div class="policy-progress-bar" id="policy-bar"></div></div>
+    <div class="policy-footer">
+      <span class="policy-hint" id="policy-hint">Faites défiler jusqu'en bas pour accepter</span>
+      <button class="btn-accept" id="btn-accept">ACCEPTER & JOUER</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     GAME SCREEN
+══════════════════════════════════════════ -->
+<div id="game-screen" class="screen">
+  <div id="game-bg-prev"></div>
+  <div id="game-bg"></div>
+  <div id="char-wrap"><img id="char-img" src="" alt="" onerror="this.style.display='none'"></div>
+
+  <!-- HUD -->
+  <div id="hud">
+    <div class="hud-left">
+      <div id="affinity-wrap">
+        <span class="affinity-icon" id="aff-icon">♥</span>
+        <div id="affinity-bar-outer"><div id="affinity-bar"></div></div>
+        <span id="affinity-val">0</span>
+      </div>
+    </div>
+    <div class="hud-right">
+      <button class="hud-btn" id="btn-history" title="Historique">📜</button>
+      <button class="hud-btn" id="btn-help" title="Comment jouer">?</button>
+      <button class="hud-btn" id="btn-pause" title="Pause">⏸</button>
+    </div>
+  </div>
+
+  <!-- Dialogue -->
+  <div id="dialogue-wrap">
+    <div id="dialogue-box">
+      <div id="speaker-bar">
+        <span class="speaker-deco">◆</span>
+        <span id="speaker-name"></span>
+      </div>
+      <div id="dialogue-text"></div>
+      <div id="dialogue-nav">
+        <!--
+          ▲ BOUTON RETOUR DIALOGUE
+          Visible uniquement à partir du 2e dialogue
+          Permet de revenir à la scène précédente
+        -->
+        <button id="btn-back-dialogue" title="Scène précédente">◂ RETOUR</button>
+        <span id="dialogue-continue">▾</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Choices -->
+  <div id="choices-wrap"></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     ENDING SCREEN
+══════════════════════════════════════════ -->
+<div id="ending-screen" class="screen">
+  <div class="ending-type"  id="ending-type"></div>
+  <div class="ending-title" id="ending-title"></div>
+  <div class="ending-text"  id="ending-text"></div>
+  <button class="btn-restart" id="btn-restart-end">RECOMMENCER</button>
+</div>
+
+<!-- ══════════════════════════════════════════
+     HISTORY OVERLAY
+══════════════════════════════════════════ -->
+<div id="history-overlay">
+  <div class="history-header">
+    <span>HISTORIQUE DES DIALOGUES</span>
+    <button class="hud-btn" id="btn-close-history">✕</button>
+  </div>
+  <div id="history-list"></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PAUSE MODAL
+══════════════════════════════════════════ -->
+<div id="pause-modal">
+  <div class="pause-panel">
+    <div class="pause-title">— PAUSE —</div>
+    <button class="pause-btn" id="btn-resume">REPRENDRE</button>
+    <button class="pause-btn" id="btn-save-quit">SAUVEGARDER & QUITTER</button>
+    <button class="pause-btn danger" id="btn-restart-game">RECOMMENCER DEPUIS LE DÉBUT</button>
+    <div class="volume-row">
+      <span class="vol-label">MUSIQUE</span>
+      <input type="range" id="vol-slider" min="0" max="1" step="0.01" value="0.7">
+      <button class="vol-mute" id="btn-mute">🔊</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     HELP OVERLAY
+══════════════════════════════════════════ -->
+<div id="help-overlay">
+  <div class="help-panel">
+    <h2>COMMENT JOUER</h2>
+    <div class="help-row"><span class="help-key">TAP / CLIC</span><span class="help-val">Avancer le dialogue. Passe l'effet machine à écrire si en cours.</span></div>
+    <div class="help-row"><span class="help-key">CHOIX</span><span class="help-val">Sélectionnez une option. Votre choix peut affecter l'affinité.</span></div>
+    <div class="help-row"><span class="help-key">♥ AFFINITÉ</span><span class="help-val">Votre lien avec le personnage. Monte ou descend selon vos choix. Détermine votre fin.</span></div>
+    <div class="help-row"><span class="help-key">◂ RETOUR</span><span class="help-val">Revenir à la scène précédente (hors choix).</span></div>
+    <div class="help-row"><span class="help-key">📜 HISTORIQUE</span><span class="help-val">Revoir les dialogues passés à tout moment.</span></div>
+    <div class="help-row"><span class="help-key">⏸ PAUSE</span><span class="help-val">Régler le volume, sauvegarder ou recommencer.</span></div>
+    <div class="help-row"><span class="help-key">SAUVEGARDE AUTO</span><span class="help-val">La progression est sauvegardée automatiquement à chaque scène.</span></div>
+    <div class="help-row"><span class="help-key">MINI-JEUX</span><span class="help-val">Des moments interactifs spéciaux peuvent apparaître entre les scènes.</span></div>
+    <button class="pause-btn" id="btn-close-help" style="margin-top:1rem">FERMER</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MINIGAME OVERLAY
+══════════════════════════════════════════ -->
+<div id="minigame-overlay">
+  <div id="minigame-content"></div>
+</div>
+
+<!-- Audio -->
+<audio id="bgm" loop></audio>
+
+<!-- ══════════════════════════════════════════
+     MOTEUR DE JEU
+══════════════════════════════════════════ -->
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════════
+// CONFIGURATION — modifiez ici les chapitres
+// ═══════════════════════════════════════════════
+const GAME_CONFIG = {
+  // Liste des fichiers JSON à charger dans l'ordre
+  chapters: [
+    'json/chapter1.json'
+    // 'json/chapter2.json',  // ← décommentez pour ajouter
+    // 'json/chapter3.json',
+  ],
+  // Musique de l'écran titre (intro)
+  introMusic: 'music/intro.mp3',
+  // Assets critiques à précharger avant de lancer le titre
+  // Ajoutez ici vos backgrounds et personnages fréquents
+  preloadImages: [
+    'images/backgrounds/manor_gate.webp',
+    'images/backgrounds/manor_hall.webp',
+    'images/backgrounds/manor_library.webp',
+    'images/backgrounds/manor_night.webp',
+    'images/characters/dorian_idle.webp',
+  ],
+  preloadAudio: [
+    'music/intro.mp3',
+    'music/theme_main.mp3',
+  ]
+};
+
+// ─────────────────────────────────────────────
+// FINS — définies ici, pas dans le JSON
+// ─────────────────────────────────────────────
+const ENDING_RANGES = [
+  { min: 51,  max: 100, endingId: 'true_love'   },
+  { min: 1,   max: 50,  endingId: 'bittersweet' },
+  { min: -50, max: 0,   endingId: 'bad_end_1'   },
+  { min: -100,max: -51, endingId: 'bad_end_2'   }
+];
+const ENDINGS = {
+  true_love: {
+    type: 'FIN VRAIE',
+    title: 'Éternellement Vôtre',
+    text: 'Il prend votre visage entre ses mains froides, et pour la première fois ses yeux portent quelque chose d\'autre que les ténèbres. « Vous êtes resté(e), » murmure-t-il. « Tous les autres ont fui. » Vous posez votre main sur sa poitrine — aucun battement, et pourtant vous ne vous êtes jamais senti(e) aussi vivant(e). Cet amour survivra à la mort elle-même.'
+  },
+  bittersweet: {
+    type: 'FIN DOUCE-AMÈRE',
+    title: 'Une Belle Blessure',
+    text: 'Il vous laisse partir à l\'aube, pressant une rose noire dans vos mains. « Vous méritiez mieux qu\'un monstre, » murmure-t-il. Vous le regardez se dissoudre dans la brume, portant le souvenir de ses yeux pour le reste de votre vie. Certains amours ne sont pas faits pour durer — seulement pour vous transformer.'
+  },
+  bad_end_1: {
+    type: 'MAUVAISE FIN',
+    title: 'L\'Obscurité Gagne',
+    text: 'La chaleur s\'éteint dans son regard. « Vous ne m\'avez jamais compris(e), » dit-il doucement, et il se détourne vers la nuit éternelle. Vous restez au seuil — ni dans son monde, ni de retour dans le vôtre. La porte se ferme. Vous êtes seul(e).',
+    isBad: true
+  },
+  bad_end_2: {
+    type: 'MAUVAISE FIN — ABÎME',
+    title: 'Consumé(e)',
+    text: 'Il sourit, et ça n\'atteint pas ses yeux. « Vous pensiez pouvoir me résister. » Les ténèbres se propagent de ses doigts comme de l\'encre dans l\'eau. Votre dernière pensée est que vous auriez dû écouter les avertissements gravés dans les murs du manoir. Trop tard.',
+    isBad: true
+  }
+};
+
+// ═══════════════════════════════════════════════
+// ÉTAT DU JEU
+// ═══════════════════════════════════════════════
+const LS_KEY = 'lmtd_save_v2';
+
+const state = {
+  lang: 'fr',
+  firstTime: true,
+  sceneIndex: 0,
+  scenes: [],
+  // Pile de navigation pour le bouton retour
+  // Stocke les index de scènes visitées (hors choix)
+  navStack: [],
+  affinity: 0,
+  history: [],
+  muted: false,
+  volume: 0.7,
+  currentMusic: null,
+  isTyping: false,
+  typing: null,
+  awaitingChoice: false,
+};
+
+// Registre des minigames (rempli par les fichiers JS externes)
+window.LMTD = {
+  minigames: {},
+  registerMinigame(id, obj) { this.minigames[id] = obj; }
+};
+
+// ═══════════════════════════════════════════════
+// PRÉCHARGEMENT DES ASSETS
+// ═══════════════════════════════════════════════
+async function preloadAssets() {
+  const bar   = document.getElementById('loading-bar');
+  const label = document.getElementById('loading-pct');
+  const total = GAME_CONFIG.preloadImages.length + GAME_CONFIG.preloadAudio.length;
+  let loaded = 0;
+
+  function tick() {
+    loaded++;
+    const pct = Math.round((loaded / total) * 100);
+    bar.style.width = pct + '%';
+    label.textContent = pct + '%';
+  }
+
+  // Images
+  const imgPromises = GAME_CONFIG.preloadImages.map(src => new Promise(res => {
+    const img = new Image();
+    img.onload = img.onerror = () => { tick(); res(); };
+    img.src = src;
+  }));
+
+  // Audio (on tente juste un chargement partiel)
+  const audioPromises = GAME_CONFIG.preloadAudio.map(src => new Promise(res => {
+    const a = new Audio();
+    a.addEventListener('canplaythrough', () => { tick(); res(); }, { once: true });
+    a.addEventListener('error', () => { tick(); res(); }, { once: true });
+    a.preload = 'auto';
+    a.src = src;
+  }));
+
+  await Promise.allSettled([...imgPromises, ...audioPromises]);
+}
+
+// ═══════════════════════════════════════════════
+// CHARGEMENT DES SCÈNES JSON
+// ═══════════════════════════════════════════════
+async function loadChapters() {
+  let all = [];
+  for (const path of GAME_CONFIG.chapters) {
+    try {
+      const res = await fetch(path);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      all = all.concat(data);
+    } catch (e) {
+      console.warn(`Impossible de charger ${path}:`, e.message);
+    }
+  }
+  // Si aucun JSON disponible, on utilise les scènes de démonstration intégrées
+  if (all.length === 0) {
+    console.warn('Aucun JSON chargé — utilisation des scènes de démo intégrées.');
+    all = FALLBACK_SCENES;
+  }
+  state.scenes = all;
+}
+
+// ═══════════════════════════════════════════════
+// CHARGEMENT DYNAMIQUE DES MINIGAMES EXTERNES
+// ═══════════════════════════════════════════════
+function loadMinigameScript(path) {
+  return new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = path;
+    s.onload  = res;
+    s.onerror = () => { console.warn('Minigame introuvable:', path); res(); };
+    document.head.appendChild(s);
+  });
+}
+
+// Précharge tous les minigames référencés dans les scènes
+async function preloadMinigames() {
+  const files = new Set();
+  state.scenes.forEach(sc => {
+    if (sc.minigameFile) files.add(sc.minigameFile);
+  });
+  for (const f of files) await loadMinigameScript(f);
+}
+
+// ═══════════════════════════════════════════════
+// SAVE / LOAD
+// ═══════════════════════════════════════════════
+function saveGame() {
+  const data = {
+    lang: state.lang, firstTime: false,
+    sceneIndex: state.sceneIndex,
+    navStack: state.navStack.slice(-30),
+    affinity: state.affinity,
+    history: state.history.slice(-60),
+    volume: state.volume, muted: state.muted,
+    currentMusic: state.currentMusic
+  };
+  try { localStorage.setItem(LS_KEY, JSON.stringify(data)); } catch(e) {}
+}
+
+function loadSave() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return false;
+    const d = JSON.parse(raw);
+    state.lang        = d.lang        || 'fr';
+    state.firstTime   = d.firstTime   !== false;
+    state.sceneIndex  = d.sceneIndex  || 0;
+    state.navStack    = d.navStack    || [];
+    state.affinity    = d.affinity    || 0;
+    state.history     = d.history     || [];
+    state.volume      = d.volume      !== undefined ? d.volume : 0.7;
+    state.muted       = d.muted       || false;
+    state.currentMusic = d.currentMusic || null;
+    return true;
+  } catch { return false; }
+}
+
+function resetGame() {
+  try { localStorage.removeItem(LS_KEY); } catch(e) {}
+  location.reload();
+}
+
+// ═══════════════════════════════════════════════
+// ÉCRANS
+// ═══════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function fadeTransition(cb) {
+  const fo = document.getElementById('fade-overlay');
+  fo.classList.add('fade-in');
+  setTimeout(() => { cb(); setTimeout(() => fo.classList.remove('fade-in'), 100); }, 500);
+}
+
+// ═══════════════════════════════════════════════
+// AFFINITÉ
+// ═══════════════════════════════════════════════
+function updateAffinity(delta) {
+  if (!delta) return;
+  state.affinity = Math.max(-100, Math.min(100, state.affinity + delta));
+  renderAffinity();
+  showAffinityDelta(delta);
+}
+
+function renderAffinity() {
+  const aff = state.affinity;
+  const bar = document.getElementById('affinity-bar');
+  const val = document.getElementById('affinity-val');
+  const ico = document.getElementById('aff-icon');
+  bar.style.width = ((aff + 100) / 200 * 100) + '%';
+  val.textContent = aff > 0 ? '+' + aff : String(aff);
+  const t = (aff + 100) / 200;
+  const r = Math.round(107 + (220-107)*t);
+  const g = Math.round(33  + (20-33)*t);
+  const b = Math.round(168 + (60-168)*t);
+  bar.style.background = `rgb(${r},${g},${b})`;
+  val.style.color = aff >= 0 ? 'var(--rose)' : 'var(--affinity-neg)';
+  ico.style.filter = aff >= 0 ? 'drop-shadow(0 0 4px var(--crimson))' : 'drop-shadow(0 0 4px #6B21A8)';
+}
+
+function showAffinityDelta(delta) {
+  const el = document.getElementById('affinity-delta');
+  el.className = '';
+  el.textContent = (delta > 0 ? '+ ' : '− ') + Math.abs(delta);
+  el.style.color = delta > 0 ? 'var(--crimson)' : '#9333ea';
+  void el.offsetWidth;
+  el.className = 'show';
+}
+
+// ═══════════════════════════════════════════════
+// AUDIO
+// ═══════════════════════════════════════════════
+const bgm = document.getElementById('bgm');
+
+function playMusic(src) {
+  if (!src || state.currentMusic === src) return;
+  state.currentMusic = src;
+  bgm.src = src;
+  bgm.volume = state.muted ? 0 : state.volume;
+  bgm.play().catch(() => {
+    // Autoplay bloqué : on attendra un geste utilisateur
+    const resume = () => { bgm.play().catch(()=>{}); document.removeEventListener('click', resume); };
+    document.addEventListener('click', resume);
+  });
+}
+
+function applyVolume() { bgm.volume = state.muted ? 0 : state.volume; }
+
+// Musique d'intro (titre)
+function playIntroMusic() { playMusic(GAME_CONFIG.introMusic); }
+
+// ═══════════════════════════════════════════════
+// BACKGROUND
+// ═══════════════════════════════════════════════
+let lastBg = null;
+function setBg(src) {
+  const cur  = document.getElementById('game-bg');
+  const prev = document.getElementById('game-bg-prev');
+  if (!src || src === lastBg) return;
+  prev.style.backgroundImage = cur.style.backgroundImage;
+  prev.style.opacity = '1';
+  cur.style.backgroundImage = `url('${src}')`;
+  cur.style.opacity = '0';
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    cur.style.opacity = '1';
+    prev.style.opacity = '0';
+  }));
+  lastBg = src;
+}
+
+// ═══════════════════════════════════════════════
+// PERSONNAGE
+// ═══════════════════════════════════════════════
+function setCharacter(charImg) {
+  const wrap = document.getElementById('char-wrap');
+  const img  = document.getElementById('char-img');
+  if (!charImg) { wrap.style.opacity = '0'; return; }
+  img.src = charImg;
+  img.style.display = '';
+  wrap.style.opacity = '1';
+}
+
+// ═══════════════════════════════════════════════
+// TYPEWRITER
+// ═══════════════════════════════════════════════
+function typeText(el, text, onDone) {
+  el.textContent = '';
+  state.isTyping = true;
+  let i = 0;
+  if (state.typing) clearInterval(state.typing);
+  state.typing = setInterval(() => {
+    el.textContent += text[i++];
+    if (i >= text.length) {
+      clearInterval(state.typing);
+      state.typing = null;
+      state.isTyping = false;
+      if (onDone) onDone();
+    }
+  }, 22);
+}
+
+function skipTyping(text) {
+  if (state.typing) { clearInterval(state.typing); state.typing = null; }
+  state.isTyping = false;
+  document.getElementById('dialogue-text').textContent = text;
+}
+
+// ═══════════════════════════════════════════════
+// HISTORIQUE
+// ═══════════════════════════════════════════════
+function addToHistory(speaker, text, isChoice) {
+  state.history.push({ speaker, text, isChoice });
+}
+
+function renderHistory() {
+  const list = document.getElementById('history-list');
+  list.innerHTML = '';
+  state.history.forEach(entry => {
+    const div = document.createElement('div');
+    div.className = 'history-entry';
+    div.innerHTML = entry.isChoice
+      ? `<div class="h-choice">▸ ${entry.text}</div>`
+      : `<div class="h-name">${entry.speaker}</div><div>${entry.text}</div>`;
+    list.appendChild(div);
+  });
+  list.scrollTop = list.scrollHeight;
+}
+
+// ═══════════════════════════════════════════════
+// BOUTON RETOUR DIALOGUE
+// ═══════════════════════════════════════════════
+function updateBackBtn() {
+  const btn = document.getElementById('btn-back-dialogue');
+  // Visible si on n'est pas à la première scène et qu'il n'y a pas de choix actif
+  if (state.navStack.length > 0 && !state.awaitingChoice) {
+    btn.classList.add('visible');
+  } else {
+    btn.classList.remove('visible');
+  }
+}
+
+document.getElementById('btn-back-dialogue').addEventListener('click', () => {
+  if (state.awaitingChoice) return;
+  if (state.navStack.length === 0) return;
+
+  // Annuler le typage en cours
+  if (state.typing) { clearInterval(state.typing); state.typing = null; }
+  state.isTyping = false;
+
+  const prevIdx = state.navStack.pop();
+  state.sceneIndex = prevIdx;
+  renderScene(state.scenes[prevIdx], /* fromBack= */ true);
+});
+
+// ═══════════════════════════════════════════════
+// RENDU DE SCÈNE
+// ═══════════════════════════════════════════════
+function getSceneIndex(id) { return state.scenes.findIndex(s => s.id === id); }
+
+function renderScene(scene, fromBack = false) {
+  if (!scene) { triggerEnding(); return; }
+
+  if (scene.bg)      setBg(scene.bg);
+  setCharacter(scene.charImg || null);
+  if (scene.music)   playMusic(scene.music);
+
+  document.getElementById('speaker-name').textContent = scene.speaker || '';
+
+  const cw = document.getElementById('choices-wrap');
+  cw.style.display = 'none';
+  document.getElementById('dialogue-wrap').style.display = '';
+  document.getElementById('dialogue-continue').style.display = '';
+  state.awaitingChoice = false;
+
+  addToHistory(scene.speaker || '', scene.text, false);
+
+  const textEl = document.getElementById('dialogue-text');
+
+  if (scene.choices) {
+    typeText(textEl, scene.text, () => renderChoices(scene.choices));
+  } else {
+    typeText(textEl, scene.text, null);
+  }
+
+  updateBackBtn();
+  saveGame();
+}
+
+function advance() {
+  if (state.awaitingChoice) return;
+  const scene = state.scenes[state.sceneIndex];
+  if (!scene) return;
+
+  if (state.isTyping) {
+    skipTyping(scene.text);
+    if (scene.choices) renderChoices(scene.choices);
+    return;
+  }
+
+  if (scene.choices && document.getElementById('choices-wrap').style.display !== 'none') return;
+
+  if (scene.next === '__ending__') { triggerEnding(); return; }
+
+  if (scene.minigame) {
+    triggerMinigame(scene, () => navigateTo(scene.next));
+    return;
+  }
+
+  if (scene.next) navigateTo(scene.next);
+}
+
+function navigateTo(id) {
+  if (!id || id === '__ending__') { triggerEnding(); return; }
+  const idx = getSceneIndex(id);
+  if (idx === -1) { triggerEnding(); return; }
+
+  // Empiler l'index actuel pour le bouton retour
+  state.navStack.push(state.sceneIndex);
+
+  state.sceneIndex = idx;
+  renderScene(state.scenes[idx]);
+}
+
+function renderChoices(choices) {
+  state.awaitingChoice = true;
+  updateBackBtn();
+
+  const cw = document.getElementById('choices-wrap');
+  document.getElementById('dialogue-continue').style.display = 'none';
+  cw.innerHTML = '';
+  cw.style.display = 'flex';
+
+  choices.forEach(ch => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = ch.text;
+    btn.addEventListener('click', () => {
+      addToHistory('Vous', ch.text, true);
+      if (ch.affinityDelta) updateAffinity(ch.affinityDelta);
+      cw.style.display = 'none';
+      state.awaitingChoice = false;
+      document.getElementById('dialogue-continue').style.display = '';
+      // Les choix ne sont PAS empilés dans navStack (on ne peut pas revenir sur un choix)
+      if (ch.next === '__ending__') { triggerEnding(); return; }
+      navigateTo(ch.next);
+    });
+    cw.appendChild(btn);
+  });
+}
+
+// ═══════════════════════════════════════════════
+// FIN DE JEU
+// ═══════════════════════════════════════════════
+function triggerEnding() {
+  const aff = state.affinity;
+  let endingId = 'bad_end_2';
+  for (const r of ENDING_RANGES) {
+    if (aff >= r.min && aff <= r.max) { endingId = r.endingId; break; }
+  }
+  const ending = ENDINGS[endingId];
+  document.getElementById('ending-type').textContent  = ending.type;
+  document.getElementById('ending-title').textContent = ending.title;
+  document.getElementById('ending-text').textContent  = ending.text;
+  document.getElementById('ending-type').style.color  = ending.isBad ? '#ff6b6b' : 'var(--blood)';
+  fadeTransition(() => showScreen('ending-screen'));
+  playMusic(ending.isBad ? 'music/bad_ending.mp3' : 'music/true_ending.mp3');
+}
+
+// ═══════════════════════════════════════════════
+// MINI-JEUX
+// ═══════════════════════════════════════════════
+async function triggerMinigame(scene, onComplete) {
+  const id = scene.minigame;
+  // Chargement à la volée si pas encore chargé
+  if (!window.LMTD.minigames[id] && scene.minigameFile) {
+    await loadMinigameScript(scene.minigameFile);
+  }
+  const mg = window.LMTD.minigames[id];
+  if (!mg) { console.warn('Minigame inconnu:', id); onComplete(); return; }
+
+  const overlay = document.getElementById('minigame-overlay');
+  const content = document.getElementById('minigame-content');
+  overlay.style.display = 'flex';
+  mg.render(content, () => {
+    overlay.style.display = 'none';
+    onComplete();
+  });
+}
+
+// ═══════════════════════════════════════════════
+// DÉMARRAGE DU JEU
+// ═══════════════════════════════════════════════
+function startGame(fromIdx = 0) {
+  state.sceneIndex = fromIdx;
+  showScreen('game-screen');
+  renderAffinity();
+  renderScene(state.scenes[fromIdx]);
+}
+
+// ═══════════════════════════════════════════════
+// BOOT — séquence de chargement
+// ═══════════════════════════════════════════════
+async function boot() {
+  // 1. Précharger assets visuels/audio critiques
+  await preloadAssets();
+
+  // 2. Charger les scènes JSON
+  await loadChapters();
+
+  // 3. Précharger les scripts de minigames référencés
+  await preloadMinigames();
+
+  // 4. Lancer la musique d'intro
+  playIntroMusic();
+
+  // 5. Afficher l'écran titre
+  fadeTransition(() => showScreen('title-screen'));
+}
+
+// ──────────────────────────────────────────
+// ÉVÉNEMENTS — Bouton démarrer
+// ──────────────────────────────────────────
+document.getElementById('btn-start').addEventListener('click', () => {
+  const saved = loadSave();
+  if (saved && !state.firstTime) {
+    // Joueur de retour : reprendre
+    fadeTransition(() => { showScreen('game-screen'); renderAffinity(); renderScene(state.scenes[state.sceneIndex] || state.scenes[0]); });
+  } else {
+    fadeTransition(() => showScreen('lang-screen'));
+  }
+});
+
+// Langue
+document.querySelectorAll('.lang-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    state.lang = btn.dataset.lang;
+    fadeTransition(() => showScreen('policy-screen'));
+  });
+});
+
+// Policy scroll
+const policyScroll = document.getElementById('policy-scroll');
+const policyBar    = document.getElementById('policy-bar');
+const btnAccept    = document.getElementById('btn-accept');
+policyScroll.addEventListener('scroll', () => {
+  const { scrollTop, scrollHeight, clientHeight } = policyScroll;
+  const pct = scrollTop / (scrollHeight - clientHeight);
+  policyBar.style.width = Math.min(100, pct * 100) + '%';
+  if (pct >= 0.98) btnAccept.classList.add('ready');
+});
+btnAccept.addEventListener('click', () => {
+  if (!btnAccept.classList.contains('ready')) return;
+  state.firstTime = false;
+  saveGame();
+  fadeTransition(() => startGame(0));
+});
+
+// Avancer le dialogue
+document.getElementById('dialogue-box').addEventListener('click', e => {
+  if (e.target.id === 'btn-back-dialogue') return; // ne pas avancer si on clique sur retour
+  advance();
+});
+document.getElementById('game-bg').addEventListener('click',   advance);
+document.getElementById('char-wrap').addEventListener('click', advance);
+
+// Historique
+document.getElementById('btn-history').addEventListener('click', () => {
+  renderHistory();
+  document.getElementById('history-overlay').style.display = 'flex';
+});
+document.getElementById('btn-close-history').addEventListener('click', () => {
+  document.getElementById('history-overlay').style.display = 'none';
+});
+
+// Aide
+document.getElementById('btn-help').addEventListener('click', () => {
+  document.getElementById('help-overlay').style.display = 'flex';
+});
+document.getElementById('btn-close-help').addEventListener('click', () => {
+  document.getElementById('help-overlay').style.display = 'none';
+});
+
+// Pause
+document.getElementById('btn-pause').addEventListener('click', () => {
+  saveGame();
+  document.getElementById('pause-modal').style.display = 'flex';
+});
+document.getElementById('btn-resume').addEventListener('click', () => {
+  document.getElementById('pause-modal').style.display = 'none';
+});
+document.getElementById('btn-save-quit').addEventListener('click', () => {
+  saveGame();
+  fadeTransition(() => {
+    document.getElementById('pause-modal').style.display = 'none';
+    showScreen('title-screen');
+    playIntroMusic();
+  });
+});
+document.getElementById('btn-restart-game').addEventListener('click', () => {
+  if (confirm('Recommencer depuis le début ? Votre progression sera perdue.')) resetGame();
+});
+document.getElementById('btn-restart-end').addEventListener('click', () => {
+  if (confirm('Recommencer le jeu ?')) resetGame();
+});
+
+// Volume
+const volSlider = document.getElementById('vol-slider');
+const btnMute   = document.getElementById('btn-mute');
+volSlider.value = state.volume;
+volSlider.addEventListener('input', () => { state.volume = parseFloat(volSlider.value); applyVolume(); saveGame(); });
+btnMute.addEventListener('click', () => {
+  state.muted = !state.muted;
+  btnMute.textContent = state.muted ? '🔇' : '🔊';
+  applyVolume(); saveGame();
+});
+
+// Particules
+(function spawnParticles() {
+  const container = document.getElementById('particles');
+  const colors = ['#DC143C','#8B0000','#FF6B8A','#C9A84C'];
+  for (let i = 0; i < 20; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.cssText = `left:${Math.random()*100}%;animation-duration:${6+Math.random()*10}s;animation-delay:${Math.random()*8}s;width:${2+Math.random()*3}px;height:${2+Math.random()*3}px;background:${colors[i%colors.length]};`;
+    container.appendChild(p);
+  }
+})();
+
+// Ripple au clic
+document.addEventListener('click', e => {
+  const r = document.createElement('div');
+  r.className = 'ripple';
+  r.style.left = e.clientX + 'px';
+  r.style.top  = e.clientY + 'px';
+  document.body.appendChild(r);
+  setTimeout(() => r.remove(), 600);
+});
+
+// Clavier
+document.addEventListener('keydown', e => {
+  if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); advance(); }
+  if (e.key === 'Backspace' && !state.awaitingChoice) {
+    document.getElementById('btn-back-dialogue').click();
+  }
+  if (e.key === 'Escape') {
+    const histOpen  = document.getElementById('history-overlay').style.display === 'flex';
+    const helpOpen  = document.getElementById('help-overlay').style.display    === 'flex';
+    const pauseOpen = document.getElementById('pause-modal').style.display     === 'flex';
+    if (histOpen)  document.getElementById('history-overlay').style.display = 'none';
+    else if (helpOpen)  document.getElementById('help-overlay').style.display = 'none';
+    else if (pauseOpen) document.getElementById('pause-modal').style.display  = 'none';
+    else if (document.getElementById('game-screen').classList.contains('active'))
+      document.getElementById('pause-modal').style.display = 'flex';
+  }
+});
+
+// ══════════════════════════════════════════════════
+// SCÈNES DE DÉMO (fallback si les JSON sont absents)
+// ══════════════════════════════════════════════════
+const FALLBACK_SCENES = [
+  {
+    id: 's_demo',
+    bg: null, character: null, charImg: null,
+    speaker: '— Système —',
+    text: 'Aucun fichier JSON trouvé dans json/chapter1.json. Placez vos fichiers de scènes dans le dossier json/ pour commencer. Consultez json/chapter1.json comme exemple.',
+    music: null,
+    next: '__ending__'
+  }
+];
+
+// Lancer le boot
+boot();
+</script>
+</body>
+</html>
