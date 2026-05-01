@@ -28,14 +28,17 @@
   ║  minigames/                                              ║
   ║    symbol_puzzle.js       ← chargé dynamiquement        ║
   ╚══════════════════════════════════════════════════════════╝
+
+  NOTES JSON — typeSpeed :
+  Ajoutez "typeSpeed": 30 dans une scène pour ralentir l'écriture (défaut: 22ms).
+  Ex: { "id": "…", "typeSpeed": 40, "text": "…", … }
 -->
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
 
-<!-- Préchargement des assets critiques -->
-<link rel="preload" href="music/intro.mp3" as="audio">
+<!-- NOTE: Pas de <link rel="preload"> pour l'audio car `as="audio"` est mal supporté -->
 
 <style>
 :root {
@@ -140,12 +143,15 @@ body::before {
   font-size: clamp(2.5rem, 8vw, 6rem);
   font-weight: 600; color: var(--silver); line-height: 1;
   text-shadow: 0 0 60px rgba(220,20,60,0.4), 0 0 120px rgba(220,20,60,0.2);
-  opacity: 0; animation: titleReveal 2s 0.8s forwards;
+  /* Animation allongée à 5 secondes */
+  opacity: 0; animation: titleReveal 5s 0.8s forwards;
 }
 .title-main span { color: var(--crimson); }
 
 @keyframes titleReveal {
-  0%   { opacity: 0; transform: translateY(20px); filter: blur(8px); }
+  0%   { opacity: 0; transform: translateY(30px); filter: blur(12px); }
+  20%  { opacity: 0.3; transform: translateY(15px); filter: blur(6px); }
+  60%  { opacity: 0.85; transform: translateY(4px); filter: blur(1px); }
   100% { opacity: 1; transform: translateY(0);    filter: blur(0);   }
 }
 @keyframes fadeIn { to { opacity: 1; } }
@@ -153,7 +159,8 @@ body::before {
 .title-line {
   display: flex; align-items: center; gap: 1rem;
   margin: 1.5rem 0 2.5rem;
-  opacity: 0; animation: fadeIn 1.5s 1.5s forwards;
+  /* Décalé pour s'aligner sur la fin de titleReveal */
+  opacity: 0; animation: fadeIn 1.5s 3.5s forwards;
 }
 .title-line::before, .title-line::after {
   content: ''; flex: 1; height: 1px;
@@ -171,7 +178,8 @@ body::before {
   padding: 1rem 3rem; cursor: pointer;
   position: relative; overflow: hidden;
   transition: all 0.4s ease;
-  opacity: 0; animation: fadeIn 1.5s 2s forwards;
+  /* Décalé également */
+  opacity: 0; animation: fadeIn 1.5s 4.2s forwards;
 }
 .btn-start::before {
   content: ''; position: absolute; inset: 0;
@@ -268,8 +276,6 @@ body::before {
 }
 #game-bg::after {
   content: none;
-  /*content: ''; position: absolute; inset: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0.4) 100%);*/
 }
 #game-bg-prev {
   position: absolute; inset: 0;
@@ -578,6 +584,7 @@ body::before {
     <div class="title-sub">— un roman visuel —</div>
     <div class="title-main">Love Me<br>To <span>Death</span></div>
     <div class="title-line"><span class="title-line-icon">✦</span></div>
+    <!-- Le label COMMENCER/CONTINUER est mis à jour dynamiquement -->
     <button class="btn-start" id="btn-start">COMMENCER</button>
   </div>
 </div>
@@ -624,6 +631,7 @@ body::before {
       <h3>INFORMATIONS DE JEU</h3>
       <p>Vos choix affectent le compteur d'affinité affiché en haut de l'écran. Ce niveau influencera la fin que vous obtiendrez. La sauvegarde est automatique à chaque transition de scène. Vous pouvez revoir les dialogues passés via le bouton historique.</p>
       <p>Des mini-jeux peuvent apparaître entre les scènes. Le son peut être ajusté dans le menu pause.</p>
+      <p>Personnalisation de la vitesse d'écriture : ajoutez "typeSpeed" dans une scène JSON pour modifier la vitesse du texte (ex: "typeSpeed": 40 pour plus lent, "typeSpeed": 10 pour plus rapide, défaut: 22).</p>
 
       <h3>CRÉDITS</h3>
       <div class="credits">
@@ -677,11 +685,6 @@ body::before {
       </div>
       <div id="dialogue-text"></div>
       <div id="dialogue-nav">
-        <!--
-          ▲ BOUTON RETOUR DIALOGUE
-          Visible uniquement à partir du 2e dialogue
-          Permet de revenir à la scène précédente
-        -->
         <button id="btn-back-dialogue" title="Scène précédente">◂ RETOUR</button>
         <span id="dialogue-continue">▾</span>
       </div>
@@ -739,7 +742,7 @@ body::before {
     <div class="help-row"><span class="help-key">TAP / CLIC</span><span class="help-val">Avancer le dialogue. Passe l'effet machine à écrire si en cours.</span></div>
     <div class="help-row"><span class="help-key">CHOIX</span><span class="help-val">Sélectionnez une option. Votre choix peut affecter l'affinité.</span></div>
     <div class="help-row"><span class="help-key">♥ AFFINITÉ</span><span class="help-val">Votre lien avec le personnage. Monte ou descend selon vos choix. Détermine votre fin.</span></div>
-    <div class="help-row"><span class="help-key">◂ RETOUR</span><span class="help-val">Revenir à la scène précédente (hors choix).</span></div>
+    <div class="help-row"><span class="help-key">◂ RETOUR</span><span class="help-val">Revenir à la scène précédente (hors choix). Annule le delta d'affinité du dernier choix.</span></div>
     <div class="help-row"><span class="help-key">📜 HISTORIQUE</span><span class="help-val">Revoir les dialogues passés à tout moment.</span></div>
     <div class="help-row"><span class="help-key">⏸ PAUSE</span><span class="help-val">Régler le volume, sauvegarder ou recommencer.</span></div>
     <div class="help-row"><span class="help-key">SAUVEGARDE AUTO</span><span class="help-val">La progression est sauvegardée automatiquement à chaque scène.</span></div>
@@ -768,16 +771,13 @@ body::before {
 // CONFIGURATION — modifiez ici les chapitres
 // ═══════════════════════════════════════════════
 const GAME_CONFIG = {
-  // Liste des fichiers JSON à charger dans l'ordre
   chapters: [
     'json/chapter1.json'
-    // 'json/chapter2.json',  // ← décommentez pour ajouter
+    // 'json/chapter2.json',
     // 'json/chapter3.json',
   ],
-  // Musique de l'écran titre (intro)
   introMusic: 'music/intro.mp3',
   // Assets critiques à précharger avant de lancer le titre
-  // Ajoutez ici vos backgrounds et personnages fréquents
   preloadImages: [
     'images/backgrounds/manor_gate.webp',
     'images/backgrounds/manor_hall.webp',
@@ -785,14 +785,13 @@ const GAME_CONFIG = {
     'images/backgrounds/manor_night.webp',
     'images/characters/dorian_idle.webp',
   ],
-  preloadAudio: [
-    'music/intro.mp3',
-    'music/theme_main.mp3',
-  ]
+  // NOTE: on ne précharge plus l'audio ici car ça cause des erreurs
+  // Les fichiers audio sont chargés à la demande
+  preloadAudio: []
 };
 
 // ─────────────────────────────────────────────
-// FINS — définies ici, pas dans le JSON
+// FINS
 // ─────────────────────────────────────────────
 const ENDING_RANGES = [
   { min: 51,  max: 100, endingId: 'true_love'   },
@@ -835,8 +834,8 @@ const state = {
   firstTime: true,
   sceneIndex: 0,
   scenes: [],
-  // Pile de navigation pour le bouton retour
-  // Stocke les index de scènes visitées (hors choix)
+  // Pile de navigation : chaque entrée = { sceneIndex, affinityDeltaApplied }
+  // Permet d'annuler le delta d'affinité lors d'un retour
   navStack: [],
   affinity: 0,
   history: [],
@@ -848,20 +847,30 @@ const state = {
   awaitingChoice: false,
 };
 
-// Registre des minigames (rempli par les fichiers JS externes)
+// Registre des minigames
 window.LMTD = {
   minigames: {},
   registerMinigame(id, obj) { this.minigames[id] = obj; }
 };
 
 // ═══════════════════════════════════════════════
-// PRÉCHARGEMENT DES ASSETS
+// PRÉCHARGEMENT DES ASSETS (images seulement)
 // ═══════════════════════════════════════════════
 async function preloadAssets() {
   const bar   = document.getElementById('loading-bar');
   const label = document.getElementById('loading-pct');
-  const total = GAME_CONFIG.preloadImages.length + GAME_CONFIG.preloadAudio.length;
+
+  const images = GAME_CONFIG.preloadImages;
+
+  // Si rien à précharger, passer directement à 100%
+  if (images.length === 0) {
+    bar.style.width = '100%';
+    label.textContent = '100%';
+    return;
+  }
+
   let loaded = 0;
+  const total = images.length;
 
   function tick() {
     loaded++;
@@ -870,23 +879,13 @@ async function preloadAssets() {
     label.textContent = pct + '%';
   }
 
-  // Images
-  const imgPromises = GAME_CONFIG.preloadImages.map(src => new Promise(res => {
+  const imgPromises = images.map(src => new Promise(res => {
     const img = new Image();
     img.onload = img.onerror = () => { tick(); res(); };
     img.src = src;
   }));
 
-  // Audio (on tente juste un chargement partiel)
-  const audioPromises = GAME_CONFIG.preloadAudio.map(src => new Promise(res => {
-    const a = new Audio();
-    a.addEventListener('canplaythrough', () => { tick(); res(); }, { once: true });
-    a.addEventListener('error', () => { tick(); res(); }, { once: true });
-    a.preload = 'auto';
-    a.src = src;
-  }));
-
-  await Promise.allSettled([...imgPromises, ...audioPromises]);
+  await Promise.allSettled(imgPromises);
 }
 
 // ═══════════════════════════════════════════════
@@ -904,7 +903,6 @@ async function loadChapters() {
       console.warn(`Impossible de charger ${path}:`, e.message);
     }
   }
-  // Si aucun JSON disponible, on utilise les scènes de démonstration intégrées
   if (all.length === 0) {
     console.warn('Aucun JSON chargé — utilisation des scènes de démo intégrées.');
     all = FALLBACK_SCENES;
@@ -913,7 +911,7 @@ async function loadChapters() {
 }
 
 // ═══════════════════════════════════════════════
-// CHARGEMENT DYNAMIQUE DES MINIGAMES EXTERNES
+// CHARGEMENT DYNAMIQUE DES MINIGAMES
 // ═══════════════════════════════════════════════
 function loadMinigameScript(path) {
   return new Promise((res, rej) => {
@@ -925,7 +923,6 @@ function loadMinigameScript(path) {
   });
 }
 
-// Précharge tous les minigames référencés dans les scènes
 async function preloadMinigames() {
   const files = new Set();
   state.scenes.forEach(sc => {
@@ -941,6 +938,7 @@ function saveGame() {
   const data = {
     lang: state.lang, firstTime: false,
     sceneIndex: state.sceneIndex,
+    // Sauvegarder la pile de navigation (max 30 entrées)
     navStack: state.navStack.slice(-30),
     affinity: state.affinity,
     history: state.history.slice(-60),
@@ -958,7 +956,10 @@ function loadSave() {
     state.lang        = d.lang        || 'fr';
     state.firstTime   = d.firstTime   !== false;
     state.sceneIndex  = d.sceneIndex  || 0;
-    state.navStack    = d.navStack    || [];
+    // Migration : ancienne save stockait des entiers, nouvelle stocke des objets
+    state.navStack    = (d.navStack || []).map(entry =>
+      typeof entry === 'number' ? { sceneIndex: entry, affinityDelta: 0 } : entry
+    );
     state.affinity    = d.affinity    || 0;
     state.history     = d.history     || [];
     state.volume      = d.volume      !== undefined ? d.volume : 0.7;
@@ -1023,25 +1024,36 @@ function showAffinityDelta(delta) {
 }
 
 // ═══════════════════════════════════════════════
-// AUDIO
+// AUDIO — FIX musique intro/jeu
 // ═══════════════════════════════════════════════
 const bgm = document.getElementById('bgm');
 
+// Joue une musique. Si src est null/undefined → arrête la musique.
 function playMusic(src) {
-  if (!src || state.currentMusic === src) return;
+  if (!src) {
+    // Pas de musique pour cette scène : ne pas changer
+    return;
+  }
+  if (state.currentMusic === src) return;
   state.currentMusic = src;
   bgm.src = src;
   bgm.volume = state.muted ? 0 : state.volume;
   bgm.play().catch(() => {
-    // Autoplay bloqué : on attendra un geste utilisateur
     const resume = () => { bgm.play().catch(()=>{}); document.removeEventListener('click', resume); };
     document.addEventListener('click', resume);
   });
 }
 
+// Arrête complètement la musique
+function stopMusic() {
+  bgm.pause();
+  bgm.src = '';
+  state.currentMusic = null;
+}
+
 function applyVolume() { bgm.volume = state.muted ? 0 : state.volume; }
 
-// Musique d'intro (titre)
+// Musique d'intro
 function playIntroMusic() { playMusic(GAME_CONFIG.introMusic); }
 
 // ═══════════════════════════════════════════════
@@ -1076,13 +1088,16 @@ function setCharacter(charImg) {
 }
 
 // ═══════════════════════════════════════════════
-// TYPEWRITER
+// TYPEWRITER — vitesse personnalisable par scène
 // ═══════════════════════════════════════════════
-function typeText(el, text, onDone) {
+const DEFAULT_TYPE_SPEED = 22; // ms par caractère
+
+function typeText(el, text, speed, onDone) {
   el.textContent = '';
   state.isTyping = true;
   let i = 0;
   if (state.typing) clearInterval(state.typing);
+  const ms = (typeof speed === 'number' && speed > 0) ? speed : DEFAULT_TYPE_SPEED;
   state.typing = setInterval(() => {
     el.textContent += text[i++];
     if (i >= text.length) {
@@ -1091,7 +1106,7 @@ function typeText(el, text, onDone) {
       state.isTyping = false;
       if (onDone) onDone();
     }
-  }, 22);
+  }, ms);
 }
 
 function skipTyping(text) {
@@ -1126,7 +1141,6 @@ function renderHistory() {
 // ═══════════════════════════════════════════════
 function updateBackBtn() {
   const btn = document.getElementById('btn-back-dialogue');
-  // Visible si on n'est pas à la première scène et qu'il n'y a pas de choix actif
   if (state.navStack.length > 0 && !state.awaitingChoice) {
     btn.classList.add('visible');
   } else {
@@ -1138,11 +1152,19 @@ document.getElementById('btn-back-dialogue').addEventListener('click', () => {
   if (state.awaitingChoice) return;
   if (state.navStack.length === 0) return;
 
-  // Annuler le typage en cours
   if (state.typing) { clearInterval(state.typing); state.typing = null; }
   state.isTyping = false;
 
-  const prevIdx = state.navStack.pop();
+  const entry = state.navStack.pop();
+  const prevIdx = entry.sceneIndex;
+
+  // Annuler le delta d'affinité enregistré lors du passage à la scène suivante
+  if (entry.affinityDelta) {
+    state.affinity = Math.max(-100, Math.min(100, state.affinity - entry.affinityDelta));
+    renderAffinity();
+    showAffinityDelta(-entry.affinityDelta);
+  }
+
   state.sceneIndex = prevIdx;
   renderScene(state.scenes[prevIdx], /* fromBack= */ true);
 });
@@ -1170,11 +1192,12 @@ function renderScene(scene, fromBack = false) {
   addToHistory(scene.speaker || '', scene.text, false);
 
   const textEl = document.getElementById('dialogue-text');
+  const speed  = scene.typeSpeed;
 
   if (scene.choices) {
-    typeText(textEl, scene.text, () => renderChoices(scene.choices));
+    typeText(textEl, scene.text, speed, () => renderChoices(scene.choices));
   } else {
-    typeText(textEl, scene.text, null);
+    typeText(textEl, scene.text, speed, null);
   }
 
   updateBackBtn();
@@ -1204,13 +1227,14 @@ function advance() {
   if (scene.next) navigateTo(scene.next);
 }
 
-function navigateTo(id) {
+// navigateTo enregistre le delta d'affinité = 0 (pas de choix ici)
+function navigateTo(id, affinityDeltaFromChoice = 0) {
   if (!id || id === '__ending__') { triggerEnding(); return; }
   const idx = getSceneIndex(id);
   if (idx === -1) { triggerEnding(); return; }
 
-  // Empiler l'index actuel pour le bouton retour
-  state.navStack.push(state.sceneIndex);
+  // Empiler l'index actuel + le delta éventuellement reçu d'un choix
+  state.navStack.push({ sceneIndex: state.sceneIndex, affinityDelta: affinityDeltaFromChoice });
 
   state.sceneIndex = idx;
   renderScene(state.scenes[idx]);
@@ -1231,13 +1255,20 @@ function renderChoices(choices) {
     btn.textContent = ch.text;
     btn.addEventListener('click', () => {
       addToHistory('Vous', ch.text, true);
-      if (ch.affinityDelta) updateAffinity(ch.affinityDelta);
+
+      // Appliquer le delta d'affinité
+      const delta = ch.affinityDelta || 0;
+      if (delta) updateAffinity(delta);
+
       cw.style.display = 'none';
       state.awaitingChoice = false;
       document.getElementById('dialogue-continue').style.display = '';
-      // Les choix ne sont PAS empilés dans navStack (on ne peut pas revenir sur un choix)
+
       if (ch.next === '__ending__') { triggerEnding(); return; }
-      navigateTo(ch.next);
+
+      // Passer le delta au navigateTo pour qu'il soit stocké dans navStack
+      // et puisse être annulé lors d'un retour
+      navigateTo(ch.next, delta);
     });
     cw.appendChild(btn);
   });
@@ -1266,7 +1297,6 @@ function triggerEnding() {
 // ═══════════════════════════════════════════════
 async function triggerMinigame(scene, onComplete) {
   const id = scene.minigame;
-  // Chargement à la volée si pas encore chargé
   if (!window.LMTD.minigames[id] && scene.minigameFile) {
     await loadMinigameScript(scene.minigameFile);
   }
@@ -1283,9 +1313,12 @@ async function triggerMinigame(scene, onComplete) {
 }
 
 // ═══════════════════════════════════════════════
-// DÉMARRAGE DU JEU
+// DÉMARRAGE DU JEU — FIX: stopper la musique intro
 // ═══════════════════════════════════════════════
 function startGame(fromIdx = 0) {
+  // Arrêter la musique d'intro avant de lancer le jeu
+  stopMusic();
+
   state.sceneIndex = fromIdx;
   showScreen('game-screen');
   renderAffinity();
@@ -1296,7 +1329,7 @@ function startGame(fromIdx = 0) {
 // BOOT — séquence de chargement
 // ═══════════════════════════════════════════════
 async function boot() {
-  // 1. Précharger assets visuels/audio critiques
+  // 1. Précharger assets visuels critiques (pas d'audio ici)
   await preloadAssets();
 
   // 2. Charger les scènes JSON
@@ -1305,10 +1338,28 @@ async function boot() {
   // 3. Précharger les scripts de minigames référencés
   await preloadMinigames();
 
-  // 4. Lancer la musique d'intro
+  // 4. Lancer la musique d'intro DÈS que le chargement est terminé
   playIntroMusic();
 
-  // 5. Afficher l'écran titre
+  // 5. Vérifier si une sauvegarde existe pour adapter le bouton
+  const hasSave = (() => {
+    try {
+      const raw = localStorage.getItem(LS_KEY);
+      if (!raw) return false;
+      const d = JSON.parse(raw);
+      return d.firstTime === false;
+    } catch { return false; }
+  })();
+
+  // Mettre à jour le label du bouton
+  const btnStart = document.getElementById('btn-start');
+  if (hasSave) {
+    btnStart.textContent = 'CONTINUER';
+  } else {
+    btnStart.textContent = 'COMMENCER';
+  }
+
+  // 6. Afficher l'écran titre
   fadeTransition(() => showScreen('title-screen'));
 }
 
@@ -1318,8 +1369,13 @@ async function boot() {
 document.getElementById('btn-start').addEventListener('click', () => {
   const saved = loadSave();
   if (saved && !state.firstTime) {
-    // Joueur de retour : reprendre
-    fadeTransition(() => { showScreen('game-screen'); renderAffinity(); renderScene(state.scenes[state.sceneIndex] || state.scenes[0]); });
+    // Joueur de retour : reprendre directement
+    fadeTransition(() => {
+      stopMusic(); // Stopper l'intro avant de reprendre
+      showScreen('game-screen');
+      renderAffinity();
+      renderScene(state.scenes[state.sceneIndex] || state.scenes[0]);
+    });
   } else {
     fadeTransition(() => showScreen('lang-screen'));
   }
@@ -1352,7 +1408,7 @@ btnAccept.addEventListener('click', () => {
 
 // Avancer le dialogue
 document.getElementById('dialogue-box').addEventListener('click', e => {
-  if (e.target.id === 'btn-back-dialogue') return; // ne pas avancer si on clique sur retour
+  if (e.target.id === 'btn-back-dialogue') return;
   advance();
 });
 document.getElementById('game-bg').addEventListener('click',   advance);
@@ -1388,6 +1444,8 @@ document.getElementById('btn-save-quit').addEventListener('click', () => {
   fadeTransition(() => {
     document.getElementById('pause-modal').style.display = 'none';
     showScreen('title-screen');
+    // Remettre le bouton en CONTINUER puisqu'une sauvegarde existe
+    document.getElementById('btn-start').textContent = 'CONTINUER';
     playIntroMusic();
   });
 });
@@ -1457,8 +1515,9 @@ const FALLBACK_SCENES = [
     id: 's_demo',
     bg: null, character: null, charImg: null,
     speaker: '— Système —',
-    text: 'Aucun fichier JSON trouvé dans json/chapter1.json. Placez vos fichiers de scènes dans le dossier json/ pour commencer. Consultez json/chapter1.json comme exemple.',
+    text: 'Aucun fichier JSON trouvé dans json/chapter1.json. Placez vos fichiers de scènes dans le dossier json/ pour commencer.',
     music: null,
+    typeSpeed: 30,
     next: '__ending__'
   }
 ];
