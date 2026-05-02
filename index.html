@@ -1,560 +1,201 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Love Me To Death</title>
 
 <!--
-  ╔══════════════════════════════════════════════════════════╗
-  ║  STRUCTURE DES FICHIERS ATTENDUE                        ║
-  ║                                                          ║
-  ║  index.html                 ← ce fichier                ║
-  ║  json/                                                   ║
-  ║    chapter1.json            ← scènes chapitre 1         ║
-  ║    chapter2.json            ← scènes chapitre 2, etc.   ║
-  ║  images/                                                 ║
-  ║    characters/                                           ║
-  ║      dorian_idle.webp                                    ║
-  ║      dorian_surprised.webp                               ║
-  ║      dorian_amused.webp  …                               ║
-  ║    backgrounds/                                          ║
-  ║      manor_gate.webp                                     ║
-  ║      manor_hall.webp     …                               ║
-  ║  music/                                                  ║
-  ║    intro.mp3              ← musique écran titre          ║
-  ║    theme_main.mp3                                        ║
-  ║    theme_interior.mp3    …                               ║
-  ║  minigames/                                              ║
-  ║    symbol_puzzle.js       ← chargé dynamiquement        ║
-  ╚══════════════════════════════════════════════════════════╝
+  ╔══════════════════════════════════════════════════════════════════╗
+  ║  STRUCTURE DES FICHIERS                                         ║
+  ║                                                                  ║
+  ║  index.html                                                      ║
+  ║  json/                                                           ║
+  ║    en/                                                           ║
+  ║      chapter1.json   ← English scenes                           ║
+  ║      chapter2.json   ← etc.                                     ║
+  ║    fr/                                                           ║
+  ║      chapter1.json   ← Scènes FR                                ║
+  ║      chapter2.json   ← etc.                                     ║
+  ║  images/backgrounds/  images/characters/                        ║
+  ║  music/  minigames/                                              ║
+  ╚══════════════════════════════════════════════════════════════════╝
 
-  NOTES JSON — typeSpeed :
-  Ajoutez "typeSpeed": 30 dans une scène pour ralentir l'écriture (défaut: 22ms).
-  Ex: { "id": "…", "typeSpeed": 40, "text": "…", … }
+  typeSpeed : ajoutez "typeSpeed": 30 dans une scène (défaut: 22ms).
 -->
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
 
-<!-- NOTE: Pas de <link rel="preload"> pour l'audio car `as="audio"` est mal supporté -->
-
 <style>
 :root {
-  --blood: #8B0000;
-  --crimson: #DC143C;
-  --rose: #FF6B8A;
-  --petal: #FFD6E0;
-  --obsidian: #0A0A0F;
-  --midnight: #12121A;
-  --dusk: #1E1E2E;
-  --twilight: #2A2A3E;
-  --mist: #C8B8D0;
-  --silver: #E8DDF0;
-  --gold: #C9A84C;
-  --affinity-pos: #DC143C;
-  --affinity-neg: #6B21A8;
-  --text-main: #F0E8F5;
-  --text-dim: #9B8FAA;
-  --box-bg: rgba(10,10,15,0.88);
-  --box-border: rgba(200,160,200,0.25);
-  --choice-bg: rgba(20,10,30,0.85);
-  --choice-hover: rgba(139,0,0,0.4);
+  --blood:#8B0000;--crimson:#DC143C;--rose:#FF6B8A;--petal:#FFD6E0;
+  --obsidian:#0A0A0F;--midnight:#12121A;--dusk:#1E1E2E;--twilight:#2A2A3E;
+  --mist:#C8B8D0;--silver:#E8DDF0;--gold:#C9A84C;
+  --affinity-pos:#DC143C;--affinity-neg:#6B21A8;
+  --text-main:#F0E8F5;--text-dim:#9B8FAA;
+  --box-bg:rgba(10,10,15,0.88);--box-border:rgba(200,160,200,0.25);
+  --choice-bg:rgba(20,10,30,0.85);--choice-hover:rgba(139,0,0,0.4);
 }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;background:var(--obsidian);font-family:'Cormorant Garamond',serif;color:var(--text-main);overflow:hidden;user-select:none}
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+.screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .8s ease;z-index:10}
+.screen.active{opacity:1;pointer-events:all}
 
-html, body {
-  width: 100%; height: 100%;
-  background: var(--obsidian);
-  font-family: 'Cormorant Garamond', serif;
-  color: var(--text-main);
-  overflow: hidden;
-  user-select: none;
-}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:.3}
 
-/* ── SCREENS ── */
-.screen {
-  position: fixed; inset: 0;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  opacity: 0; pointer-events: none;
-  transition: opacity 0.8s ease;
-  z-index: 10;
-}
-.screen.active { opacity: 1; pointer-events: all; }
+#particles{position:fixed;inset:0;pointer-events:none;z-index:1;overflow:hidden}
+.particle{position:absolute;width:3px;height:3px;border-radius:50%;background:var(--crimson);opacity:0;animation:floatUp linear infinite}
+@keyframes floatUp{0%{transform:translateY(100vh) scale(0);opacity:0}10%{opacity:.6}90%{opacity:.3}100%{transform:translateY(-10vh) scale(1.5);opacity:0}}
 
-/* ── NOISE OVERLAY ── */
-body::before {
-  content: '';
-  position: fixed; inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-  pointer-events: none; z-index: 9999; opacity: 0.3;
-}
+/* TITLE */
+#title-screen{background:radial-gradient(ellipse at 50% 30%,#1a0510 0%,var(--obsidian) 70%)}
+.title-bg-roses{position:absolute;inset:0;background:radial-gradient(circle at 20% 80%,rgba(139,0,0,.15) 0%,transparent 50%),radial-gradient(circle at 80% 20%,rgba(139,0,0,.10) 0%,transparent 40%);pointer-events:none}
+.title-deco{position:absolute;top:0;left:50%;transform:translateX(-50%);width:1px;height:30%;background:linear-gradient(to bottom,transparent,var(--blood))}
+.title-deco::after{content:'✦';position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);color:var(--blood);font-size:12px}
+.title-wrap{position:relative;text-align:center;z-index:2}
+.title-sub{font-family:'Cinzel',serif;font-size:clamp(.55rem,1.5vw,.8rem);letter-spacing:.5em;color:var(--blood);text-transform:uppercase;margin-bottom:1.2rem;opacity:0;animation:fadeIn 1.5s .5s forwards}
+.title-main{font-family:'Cinzel',serif;font-size:clamp(2.5rem,8vw,6rem);font-weight:600;color:var(--silver);line-height:1;text-shadow:0 0 60px rgba(220,20,60,.4),0 0 120px rgba(220,20,60,.2);opacity:0;animation:titleReveal 5s .8s forwards}
+.title-main span{color:var(--crimson)}
+@keyframes titleReveal{0%{opacity:0;transform:translateY(30px);filter:blur(12px)}20%{opacity:.3;transform:translateY(15px);filter:blur(6px)}60%{opacity:.85;transform:translateY(4px);filter:blur(1px)}100%{opacity:1;transform:translateY(0);filter:blur(0)}}
+@keyframes fadeIn{to{opacity:1}}
+.title-line{display:flex;align-items:center;gap:1rem;margin:1.5rem 0 2.5rem;opacity:0;animation:fadeIn 1.5s 3.5s forwards}
+.title-line::before,.title-line::after{content:'';flex:1;height:1px;background:linear-gradient(to right,transparent,var(--blood))}
+.title-line::after{background:linear-gradient(to left,transparent,var(--blood))}
+.title-line-icon{color:var(--crimson);font-size:1rem}
+.btn-start{font-family:'Cinzel',serif;font-size:clamp(.8rem,2vw,1rem);letter-spacing:.3em;color:var(--silver);background:transparent;border:1px solid rgba(220,20,60,.5);padding:1rem 3rem;cursor:pointer;position:relative;overflow:hidden;transition:all .4s ease;opacity:0;animation:fadeIn 1.5s 4.2s forwards}
+.btn-start::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--blood),transparent);opacity:0;transition:opacity .4s}
+.btn-start:hover{border-color:var(--crimson);color:#fff;letter-spacing:.4em;box-shadow:0 0 30px rgba(220,20,60,.3)}
+.btn-start:hover::before{opacity:1}
 
-/* ── PARTICLES ── */
-#particles { position: fixed; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
-.particle {
-  position: absolute; width: 3px; height: 3px;
-  border-radius: 50%; background: var(--crimson);
-  opacity: 0; animation: floatUp linear infinite;
-}
-@keyframes floatUp {
-  0%   { transform: translateY(100vh) scale(0); opacity: 0; }
-  10%  { opacity: 0.6; }
-  90%  { opacity: 0.3; }
-  100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
-}
+/* LANG */
+#lang-screen{background:radial-gradient(ellipse at 50% 50%,#0d0515 0%,var(--obsidian) 80%)}
+.lang-title{font-family:'Cinzel',serif;font-size:clamp(1.2rem,4vw,2rem);color:var(--silver);margin-bottom:.5rem;text-align:center}
+.lang-sub{font-size:clamp(.75rem,2vw,.95rem);color:var(--text-dim);font-style:italic;margin-bottom:3rem;text-align:center}
+.lang-choices{display:flex;gap:2rem;flex-wrap:wrap;justify-content:center}
+.lang-btn{display:flex;flex-direction:column;align-items:center;gap:1rem;padding:2rem 2.5rem;background:rgba(30,20,40,.8);border:1px solid var(--box-border);cursor:pointer;transition:all .3s ease;min-width:160px}
+.lang-btn:hover{border-color:var(--crimson);transform:translateY(-4px);box-shadow:0 10px 30px rgba(220,20,60,.2)}
+.lang-flag{font-size:3.5rem;line-height:1}
+.lang-name{font-family:'Cinzel',serif;font-size:.9rem;letter-spacing:.2em;color:var(--silver)}
 
-/* ══════════════════════════════════════════
-   TITLE SCREEN
-══════════════════════════════════════════ */
-#title-screen {
-  background: radial-gradient(ellipse at 50% 30%, #1a0510 0%, var(--obsidian) 70%);
-}
-.title-bg-roses {
-  position: absolute; inset: 0;
-  background:
-    radial-gradient(circle at 20% 80%, rgba(139,0,0,0.15) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(139,0,0,0.10) 0%, transparent 40%);
-  pointer-events: none;
-}
-.title-deco {
-  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-  width: 1px; height: 30%;
-  background: linear-gradient(to bottom, transparent, var(--blood));
-}
-.title-deco::after {
-  content: '✦';
-  position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%);
-  color: var(--blood); font-size: 12px;
-}
-.title-wrap { position: relative; text-align: center; z-index: 2; }
-.title-sub {
-  font-family: 'Cinzel', serif;
-  font-size: clamp(0.55rem, 1.5vw, 0.8rem);
-  letter-spacing: 0.5em; color: var(--blood);
-  text-transform: uppercase; margin-bottom: 1.2rem;
-  opacity: 0; animation: fadeIn 1.5s 0.5s forwards;
-}
-.title-main {
-  font-family: 'Cinzel', serif;
-  font-size: clamp(2.5rem, 8vw, 6rem);
-  font-weight: 600; color: var(--silver); line-height: 1;
-  text-shadow: 0 0 60px rgba(220,20,60,0.4), 0 0 120px rgba(220,20,60,0.2);
-  /* Animation allongée à 5 secondes */
-  opacity: 0; animation: titleReveal 5s 0.8s forwards;
-}
-.title-main span { color: var(--crimson); }
+/* POLICY */
+#policy-screen{background:var(--obsidian);padding:1rem}
+.policy-container{width:100%;max-width:700px;display:flex;flex-direction:column;height:100vh;max-height:100vh;padding:2rem 1.5rem 1.5rem}
+.policy-header{font-family:'Cinzel',serif;font-size:clamp(1rem,3vw,1.5rem);color:var(--silver);text-align:center;border-bottom:1px solid var(--box-border);padding-bottom:1rem;margin-bottom:1.2rem;flex-shrink:0}
+.policy-scroll{flex:1;overflow-y:auto;font-size:clamp(.75rem,1.8vw,.9rem);line-height:1.9;color:var(--mist);padding-right:.5rem;scroll-behavior:smooth}
+.policy-scroll::-webkit-scrollbar{width:3px}
+.policy-scroll::-webkit-scrollbar-thumb{background:var(--blood);border-radius:2px}
+.policy-scroll h3{font-family:'Cinzel',serif;color:var(--crimson);font-size:.85rem;letter-spacing:.15em;margin:1.5rem 0 .5rem}
+.policy-scroll p{margin-bottom:.8rem}
+.policy-scroll .credits{margin-top:2rem;padding-top:1rem;border-top:1px solid var(--box-border);font-style:italic;font-size:.8rem;color:var(--text-dim)}
+.policy-progress{height:2px;background:rgba(255,255,255,.05);margin:.8rem 0;flex-shrink:0}
+.policy-progress-bar{height:100%;background:var(--blood);width:0%;transition:width .1s}
+.policy-footer{display:flex;align-items:center;gap:1rem;padding-top:1rem;flex-shrink:0;border-top:1px solid var(--box-border);flex-wrap:wrap;justify-content:center}
+.policy-hint{font-size:.75rem;color:var(--text-dim);font-style:italic;flex:1;min-width:150px}
+.btn-accept{font-family:'Cinzel',serif;font-size:.8rem;letter-spacing:.2em;background:var(--blood);color:#fff;border:none;padding:.8rem 2rem;cursor:pointer;opacity:.4;transition:all .3s;pointer-events:none}
+.btn-accept.ready{opacity:1;pointer-events:all}
+.btn-accept.ready:hover{background:var(--crimson);box-shadow:0 0 20px rgba(220,20,60,.4)}
 
-@keyframes titleReveal {
-  0%   { opacity: 0; transform: translateY(30px); filter: blur(12px); }
-  20%  { opacity: 0.3; transform: translateY(15px); filter: blur(6px); }
-  60%  { opacity: 0.85; transform: translateY(4px); filter: blur(1px); }
-  100% { opacity: 1; transform: translateY(0);    filter: blur(0);   }
-}
-@keyframes fadeIn { to { opacity: 1; } }
+/* LOADING */
+#loading-screen{background:var(--obsidian);z-index:50}
+.loading-inner{text-align:center}
+.loading-title{font-family:'Cinzel',serif;font-size:1rem;letter-spacing:.4em;color:var(--blood);margin-bottom:2rem;text-transform:uppercase}
+.loading-bar-outer{width:280px;height:2px;background:rgba(255,255,255,.08);border-radius:1px;overflow:hidden;margin:0 auto 1rem}
+.loading-bar-inner{height:100%;background:var(--crimson);width:0%;transition:width .3s ease;border-radius:1px}
+.loading-pct{font-family:'Cinzel',serif;font-size:.7rem;color:var(--text-dim);letter-spacing:.3em}
 
-.title-line {
-  display: flex; align-items: center; gap: 1rem;
-  margin: 1.5rem 0 2.5rem;
-  /* Décalé pour s'aligner sur la fin de titleReveal */
-  opacity: 0; animation: fadeIn 1.5s 3.5s forwards;
-}
-.title-line::before, .title-line::after {
-  content: ''; flex: 1; height: 1px;
-  background: linear-gradient(to right, transparent, var(--blood));
-}
-.title-line::after { background: linear-gradient(to left, transparent, var(--blood)); }
-.title-line-icon { color: var(--crimson); font-size: 1rem; }
+/* GAME */
+#game-screen{background:var(--obsidian);padding:0}
 
-.btn-start {
-  font-family: 'Cinzel', serif;
-  font-size: clamp(0.8rem, 2vw, 1rem);
-  letter-spacing: 0.3em; color: var(--silver);
-  background: transparent;
-  border: 1px solid rgba(220,20,60,0.5);
-  padding: 1rem 3rem; cursor: pointer;
-  position: relative; overflow: hidden;
-  transition: all 0.4s ease;
-  /* Décalé également */
-  opacity: 0; animation: fadeIn 1.5s 4.2s forwards;
-}
-.btn-start::before {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(135deg, var(--blood), transparent);
-  opacity: 0; transition: opacity 0.4s;
-}
-.btn-start:hover { border-color: var(--crimson); color: white; letter-spacing: 0.4em; box-shadow: 0 0 30px rgba(220,20,60,0.3); }
-.btn-start:hover::before { opacity: 1; }
+/* ── FIX TRANSITIONS NOIRES : deux calques qui se croisent ── */
+#game-bg-prev,#game-bg{position:absolute;inset:0;background-size:cover;background-position:center;z-index:0}
+#game-bg-prev{opacity:1;z-index:0}
+#game-bg{opacity:0;z-index:1;transition:opacity .6s ease}
 
-/* ══════════════════════════════════════════
-   LANGUAGE SCREEN
-══════════════════════════════════════════ */
-#lang-screen { background: radial-gradient(ellipse at 50% 50%, #0d0515 0%, var(--obsidian) 80%); }
-.lang-title  { font-family: 'Cinzel', serif; font-size: clamp(1.2rem, 4vw, 2rem); color: var(--silver); margin-bottom: 0.5rem; text-align: center; }
-.lang-sub    { font-size: clamp(0.75rem, 2vw, 0.95rem); color: var(--text-dim); font-style: italic; margin-bottom: 3rem; text-align: center; }
-.lang-choices { display: flex; gap: 2rem; flex-wrap: wrap; justify-content: center; }
-.lang-btn {
-  display: flex; flex-direction: column; align-items: center;
-  gap: 1rem; padding: 2rem 2.5rem;
-  background: rgba(30,20,40,0.8);
-  border: 1px solid var(--box-border);
-  cursor: pointer; transition: all 0.3s ease;
-  position: relative; overflow: hidden; min-width: 160px;
-}
-.lang-btn:hover { border-color: var(--crimson); transform: translateY(-4px); box-shadow: 0 10px 30px rgba(220,20,60,0.2); }
-.lang-flag { font-size: 3.5rem; line-height: 1; }
-.lang-name { font-family: 'Cinzel', serif; font-size: 0.9rem; letter-spacing: 0.2em; color: var(--silver); }
+#char-wrap{position:absolute;bottom:0;left:50%;transform:translateX(-50%);z-index:2;max-height:85%;display:flex;align-items:flex-end;justify-content:center;transition:opacity .5s ease;pointer-events:none}
+#char-img{max-height:100%;max-width:60vw;object-fit:contain;filter:drop-shadow(0 0 30px rgba(0,0,0,.8))}
+@media(max-width:600px){#char-img{max-width:100vw}#char-wrap{max-height:70%}}
 
-/* ══════════════════════════════════════════
-   POLICY SCREEN
-══════════════════════════════════════════ */
-#policy-screen { background: var(--obsidian); padding: 1rem; }
-.policy-container {
-  width: 100%; max-width: 700px;
-  display: flex; flex-direction: column;
-  height: 100vh; max-height: 100vh;
-  padding: 2rem 1.5rem 1.5rem;
-}
-.policy-header {
-  font-family: 'Cinzel', serif;
-  font-size: clamp(1rem, 3vw, 1.5rem);
-  color: var(--silver); text-align: center;
-  border-bottom: 1px solid var(--box-border);
-  padding-bottom: 1rem; margin-bottom: 1.2rem; flex-shrink: 0;
-}
-.policy-scroll {
-  flex: 1; overflow-y: auto;
-  font-size: clamp(0.75rem, 1.8vw, 0.9rem);
-  line-height: 1.9; color: var(--mist);
-  padding-right: 0.5rem; scroll-behavior: smooth;
-}
-.policy-scroll::-webkit-scrollbar { width: 3px; }
-.policy-scroll::-webkit-scrollbar-thumb { background: var(--blood); border-radius: 2px; }
-.policy-scroll h3 { font-family: 'Cinzel', serif; color: var(--crimson); font-size: 0.85rem; letter-spacing: 0.15em; margin: 1.5rem 0 0.5rem; }
-.policy-scroll p  { margin-bottom: 0.8rem; }
-.policy-scroll .credits { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--box-border); font-style: italic; font-size: 0.8rem; color: var(--text-dim); }
-.policy-progress { height: 2px; background: rgba(255,255,255,0.05); margin: 0.8rem 0; flex-shrink: 0; }
-.policy-progress-bar { height: 100%; background: var(--blood); width: 0%; transition: width 0.1s; }
-.policy-footer {
-  display: flex; align-items: center; gap: 1rem;
-  padding-top: 1rem; flex-shrink: 0;
-  border-top: 1px solid var(--box-border);
-  flex-wrap: wrap; justify-content: center;
-}
-.policy-hint  { font-size: 0.75rem; color: var(--text-dim); font-style: italic; flex: 1; min-width: 150px; }
-.btn-accept {
-  font-family: 'Cinzel', serif; font-size: 0.8rem;
-  letter-spacing: 0.2em; background: var(--blood);
-  color: white; border: none; padding: 0.8rem 2rem;
-  cursor: pointer; opacity: 0.4; transition: all 0.3s; pointer-events: none;
-}
-.btn-accept.ready { opacity: 1; pointer-events: all; }
-.btn-accept.ready:hover { background: var(--crimson); box-shadow: 0 0 20px rgba(220,20,60,0.4); }
+#hud{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:.8rem 1.2rem;z-index:10;background:linear-gradient(to bottom,rgba(0,0,0,.6),transparent)}
+.hud-left,.hud-right{display:flex;align-items:center;gap:.8rem}
+#affinity-wrap{display:flex;align-items:center;gap:.5rem}
+.affinity-icon{font-size:1.1rem;filter:drop-shadow(0 0 4px var(--crimson));transition:filter .5s}
+#affinity-bar-outer{width:80px;height:6px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden;position:relative}
+#affinity-bar{height:100%;width:50%;border-radius:3px;background:linear-gradient(to right,var(--affinity-neg),var(--affinity-pos));transition:width .6s cubic-bezier(.4,0,.2,1),background .6s;position:absolute;left:0}
+#affinity-val{font-family:'Cinzel',serif;font-size:.7rem;color:var(--mist);min-width:2.5rem;text-align:center;transition:color .5s}
+.hud-btn{background:rgba(10,10,15,.7);border:1px solid var(--box-border);color:var(--mist);cursor:pointer;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:.95rem;transition:all .2s;border-radius:2px}
+.hud-btn:hover{border-color:var(--crimson);color:var(--silver)}
 
-/* ══════════════════════════════════════════
-   LOADING SCREEN
-══════════════════════════════════════════ */
-#loading-screen { background: var(--obsidian); z-index: 50; }
-.loading-inner { text-align: center; }
-.loading-title { font-family: 'Cinzel', serif; font-size: 1rem; letter-spacing: 0.4em; color: var(--blood); margin-bottom: 2rem; text-transform: uppercase; }
-.loading-bar-outer { width: 280px; height: 2px; background: rgba(255,255,255,0.08); border-radius: 1px; overflow: hidden; margin: 0 auto 1rem; }
-.loading-bar-inner { height: 100%; background: var(--crimson); width: 0%; transition: width 0.3s ease; border-radius: 1px; }
-.loading-pct { font-family: 'Cinzel', serif; font-size: 0.7rem; color: var(--text-dim); letter-spacing: 0.3em; }
+#dialogue-wrap{position:absolute;bottom:0;left:0;right:0;z-index:10;padding:0 1rem 1rem}
+#dialogue-box{background:var(--box-bg);border:1px solid var(--box-border);border-radius:2px;backdrop-filter:blur(12px);overflow:hidden}
+#speaker-bar{padding:.4rem 1.2rem;border-bottom:1px solid var(--box-border);display:flex;align-items:center;gap:.5rem}
+#speaker-name{font-family:'Cinzel',serif;font-size:clamp(.75rem,2vw,.9rem);color:var(--crimson);letter-spacing:.15em}
+.speaker-deco{color:var(--blood);font-size:.6rem}
+#dialogue-text{padding:1rem 1.2rem;font-size:clamp(.9rem,2.5vw,1.1rem);font-family:'IM Fell English',serif;line-height:1.7;color:var(--text-main);min-height:5em}
+#dialogue-nav{display:flex;align-items:center;justify-content:space-between;padding:.3rem 1.2rem .6rem;border-top:1px solid rgba(200,160,200,.08)}
+#btn-back-dialogue{font-family:'Cinzel',serif;font-size:.65rem;letter-spacing:.15em;color:var(--text-dim);background:transparent;border:1px solid rgba(200,160,200,.15);padding:.25rem .7rem;cursor:pointer;transition:all .2s;border-radius:2px;opacity:0;pointer-events:none}
+#btn-back-dialogue.visible{opacity:1;pointer-events:all}
+#btn-back-dialogue:hover{border-color:var(--crimson);color:var(--rose)}
+#dialogue-continue{color:var(--blood);font-size:.75rem;animation:blink 1.5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
 
-/* ══════════════════════════════════════════
-   GAME SCREEN
-══════════════════════════════════════════ */
-#game-screen { background: var(--obsidian); padding: 0; }
+#choices-wrap{position:absolute;bottom:0;left:0;right:0;z-index:11;padding:0 1rem 1rem;display:none;flex-direction:column;gap:.6rem}
+.choice-btn{background:var(--choice-bg);border:1px solid var(--box-border);color:var(--silver);padding:.9rem 1.5rem;font-family:'IM Fell English',serif;font-size:clamp(.85rem,2.2vw,1rem);cursor:pointer;text-align:left;transition:all .25s ease;backdrop-filter:blur(10px);border-radius:2px;position:relative;overflow:hidden}
+.choice-btn::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--crimson);transform:scaleY(0);transition:transform .2s}
+.choice-btn:hover{background:var(--choice-hover);border-color:rgba(220,20,60,.5);transform:translateX(4px)}
+.choice-btn:hover::before{transform:scaleY(1)}
 
-#game-bg {
-  position: absolute; inset: 0;
-  background-size: cover; background-position: center;
-  transition: opacity 0.8s ease; z-index: 0;
-}
-#game-bg::after {
-  content: none;
-}
-#game-bg-prev {
-  position: absolute; inset: 0;
-  background-size: cover; background-position: center;
-  z-index: 0; opacity: 0;
-}
+#history-overlay{position:fixed;inset:0;z-index:50;background:rgba(5,5,10,.95);display:none;flex-direction:column;backdrop-filter:blur(8px)}
+.history-header{padding:1.2rem 1.5rem;border-bottom:1px solid var(--box-border);display:flex;align-items:center;justify-content:space-between;font-family:'Cinzel',serif;font-size:.9rem;color:var(--mist);letter-spacing:.2em}
+#history-list{flex:1;overflow-y:auto;padding:1rem 1.5rem}
+#history-list::-webkit-scrollbar{width:3px}
+#history-list::-webkit-scrollbar-thumb{background:var(--blood)}
+.history-entry{margin-bottom:1.2rem;font-family:'IM Fell English',serif;font-size:clamp(.85rem,2vw,1rem);line-height:1.7;color:var(--text-dim)}
+.history-entry .h-name{color:var(--crimson);font-family:'Cinzel',serif;font-size:.8rem;letter-spacing:.1em;margin-bottom:.2rem}
+.history-entry .h-choice{color:var(--rose);font-style:italic}
 
-#char-wrap {
-  position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-  z-index: 2; max-height: 85%;
-  display: flex; align-items: flex-end; justify-content: center;
-  transition: opacity 0.5s ease; pointer-events: none;
-}
-#char-img {
-  max-height: 100%; max-width: 60vw;
-  object-fit: contain;
-  filter: drop-shadow(0 0 30px rgba(0,0,0,0.8));
-}
-@media (max-width: 600px) {
-  #char-img  { max-width: 100vw; }
-  #char-wrap { max-height: 70%; }
-}
+#pause-modal{position:fixed;inset:0;z-index:60;background:rgba(5,5,10,.92);display:none;flex-direction:column;align-items:center;justify-content:center;backdrop-filter:blur(12px)}
+.pause-panel{background:rgba(15,10,20,.95);border:1px solid var(--box-border);padding:2.5rem 3rem;min-width:280px;max-width:400px;width:90%;display:flex;flex-direction:column;gap:.8rem}
+.pause-title{font-family:'Cinzel',serif;font-size:1.1rem;color:var(--silver);text-align:center;letter-spacing:.3em;margin-bottom:.5rem;border-bottom:1px solid var(--box-border);padding-bottom:.8rem}
+.pause-btn{font-family:'Cinzel',serif;font-size:.8rem;letter-spacing:.2em;background:transparent;border:1px solid var(--box-border);color:var(--mist);padding:.9rem;cursor:pointer;transition:all .2s;text-align:center}
+.pause-btn:hover{border-color:var(--crimson);color:var(--silver);background:rgba(139,0,0,.15)}
+.pause-btn.danger{color:#ff6b6b;border-color:rgba(255,107,107,.3)}
+.pause-btn.danger:hover{background:rgba(200,0,0,.15);border-color:#ff6b6b}
+.volume-row{display:flex;align-items:center;gap:.8rem;padding:.5rem 0;border-top:1px solid var(--box-border);margin-top:.5rem}
+.vol-label{font-family:'Cinzel',serif;font-size:.7rem;color:var(--text-dim);letter-spacing:.15em;min-width:60px}
+#vol-slider{flex:1;accent-color:var(--crimson);cursor:pointer}
+.vol-mute{background:none;border:1px solid var(--box-border);color:var(--mist);cursor:pointer;padding:.3rem .6rem;font-size:.8rem;transition:all .2s}
+.vol-mute:hover{border-color:var(--crimson);color:var(--silver)}
 
-/* HUD */
-#hud {
-  position: absolute; top: 0; left: 0; right: 0;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0.8rem 1.2rem; z-index: 10;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent);
-}
-.hud-left, .hud-right { display: flex; align-items: center; gap: 0.8rem; }
+#help-overlay{position:fixed;inset:0;z-index:55;background:rgba(5,5,10,.9);display:none;flex-direction:column;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(8px)}
+.help-panel{background:rgba(15,10,20,.98);border:1px solid var(--box-border);padding:2rem;max-width:500px;width:100%;max-height:80vh;overflow-y:auto}
+.help-panel h2{font-family:'Cinzel',serif;color:var(--silver);font-size:1rem;letter-spacing:.25em;margin-bottom:1.5rem;border-bottom:1px solid var(--box-border);padding-bottom:.8rem}
+.help-row{display:flex;gap:1rem;margin-bottom:1rem;font-size:.85rem;line-height:1.5}
+.help-key{min-width:80px;color:var(--crimson);font-family:'Cinzel',serif;font-size:.75rem;letter-spacing:.1em}
+.help-val{color:var(--mist)}
 
-#affinity-wrap { display: flex; align-items: center; gap: 0.5rem; }
-.affinity-icon {
-  font-size: 1.1rem;
-  filter: drop-shadow(0 0 4px var(--crimson));
-  transition: filter 0.5s;
-}
-#affinity-bar-outer {
-  width: 80px; height: 6px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 3px; overflow: hidden; position: relative;
-}
-#affinity-bar {
-  height: 100%; width: 50%; border-radius: 3px;
-  background: linear-gradient(to right, var(--affinity-neg), var(--affinity-pos));
-  transition: width 0.6s cubic-bezier(0.4,0,0.2,1), background 0.6s;
-  position: absolute; left: 0;
-}
-#affinity-val {
-  font-family: 'Cinzel', serif; font-size: 0.7rem;
-  color: var(--mist); min-width: 2.5rem; text-align: center; transition: color 0.5s;
-}
+#minigame-overlay{position:fixed;inset:0;z-index:50;background:rgba(5,5,10,.95);display:none;flex-direction:column;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(12px)}
 
-.hud-btn {
-  background: rgba(10,10,15,0.7);
-  border: 1px solid var(--box-border);
-  color: var(--mist); cursor: pointer;
-  width: 36px; height: 36px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 0.95rem; transition: all 0.2s; border-radius: 2px;
-}
-.hud-btn:hover { border-color: var(--crimson); color: var(--silver); }
+#ending-screen{background:var(--obsidian);flex-direction:column;gap:1.5rem;text-align:center;padding:2rem}
+.ending-type{font-family:'Cinzel',serif;font-size:.7rem;letter-spacing:.5em;color:var(--blood);text-transform:uppercase}
+.ending-title{font-family:'Cinzel',serif;font-size:clamp(1.5rem,5vw,3rem);color:var(--silver);text-shadow:0 0 40px rgba(220,20,60,.4)}
+.ending-text{font-family:'IM Fell English',serif;font-size:clamp(.9rem,2.2vw,1.1rem);color:var(--mist);max-width:500px;line-height:1.8;font-style:italic}
+.btn-restart{font-family:'Cinzel',serif;font-size:.8rem;letter-spacing:.3em;color:var(--silver);background:transparent;border:1px solid rgba(220,20,60,.5);padding:.9rem 2.5rem;cursor:pointer;transition:all .3s;margin-top:1rem}
+.btn-restart:hover{border-color:var(--crimson);background:rgba(139,0,0,.2)}
 
-/* Dialogue box */
-#dialogue-wrap {
-  position: absolute; bottom: 0; left: 0; right: 0;
-  z-index: 10; padding: 0 1rem 1rem;
-}
-#dialogue-box {
-  background: var(--box-bg);
-  border: 1px solid var(--box-border);
-  border-radius: 2px;
-  backdrop-filter: blur(12px);
-  overflow: hidden;
-}
-#speaker-bar {
-  padding: 0.4rem 1.2rem;
-  border-bottom: 1px solid var(--box-border);
-  display: flex; align-items: center; gap: 0.5rem;
-}
-#speaker-name {
-  font-family: 'Cinzel', serif;
-  font-size: clamp(0.75rem, 2vw, 0.9rem);
-  color: var(--crimson); letter-spacing: 0.15em;
-}
-.speaker-deco { color: var(--blood); font-size: 0.6rem; }
+#affinity-delta{position:fixed;top:60px;right:1rem;font-family:'Cinzel',serif;font-size:1rem;opacity:0;pointer-events:none;z-index:20;transition:opacity .3s;text-shadow:0 0 10px currentColor}
+#affinity-delta.show{animation:deltaAnim 1.5s ease forwards}
+@keyframes deltaAnim{0%{opacity:0;transform:translateY(0)}20%{opacity:1}80%{opacity:1;transform:translateY(-20px)}100%{opacity:0;transform:translateY(-30px)}}
 
-#dialogue-text {
-  padding: 1rem 1.2rem;
-  font-size: clamp(0.9rem, 2.5vw, 1.1rem);
-  font-family: 'IM Fell English', serif;
-  line-height: 1.7; color: var(--text-main);
-  min-height: 5em;
-}
+#fade-overlay{position:fixed;inset:0;z-index:40;background:var(--obsidian);opacity:0;pointer-events:none;transition:opacity .5s}
+#fade-overlay.fade-in{opacity:1;pointer-events:all}
 
-/* ─── Barre de navigation dialogue ─── */
-#dialogue-nav {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0.3rem 1.2rem 0.6rem;
-  border-top: 1px solid rgba(200,160,200,0.08);
-}
-#btn-back-dialogue {
-  font-family: 'Cinzel', serif; font-size: 0.65rem;
-  letter-spacing: 0.15em; color: var(--text-dim);
-  background: transparent; border: 1px solid rgba(200,160,200,0.15);
-  padding: 0.25rem 0.7rem; cursor: pointer; transition: all 0.2s;
-  border-radius: 2px;
-  opacity: 0; pointer-events: none;
-}
-#btn-back-dialogue.visible { opacity: 1; pointer-events: all; }
-#btn-back-dialogue:hover { border-color: var(--crimson); color: var(--rose); }
+.ripple{position:fixed;border-radius:50%;width:20px;height:20px;background:rgba(220,20,60,.3);pointer-events:none;z-index:9000;transform:translate(-50%,-50%) scale(0);animation:rippleAnim .6s ease forwards}
+@keyframes rippleAnim{to{transform:translate(-50%,-50%) scale(8);opacity:0}}
 
-#dialogue-continue {
-  color: var(--blood); font-size: 0.75rem;
-  animation: blink 1.5s infinite;
-}
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
-
-/* Choices */
-#choices-wrap {
-  position: absolute; bottom: 0; left: 0; right: 0;
-  z-index: 11; padding: 0 1rem 1rem;
-  display: none; flex-direction: column; gap: 0.6rem;
-}
-.choice-btn {
-  background: var(--choice-bg);
-  border: 1px solid var(--box-border);
-  color: var(--silver);
-  padding: 0.9rem 1.5rem;
-  font-family: 'IM Fell English', serif;
-  font-size: clamp(0.85rem, 2.2vw, 1rem);
-  cursor: pointer; text-align: left;
-  transition: all 0.25s ease;
-  backdrop-filter: blur(10px);
-  border-radius: 2px;
-  position: relative; overflow: hidden;
-}
-.choice-btn::before {
-  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
-  background: var(--crimson); transform: scaleY(0); transition: transform 0.2s;
-}
-.choice-btn:hover { background: var(--choice-hover); border-color: rgba(220,20,60,0.5); transform: translateX(4px); }
-.choice-btn:hover::before { transform: scaleY(1); }
-
-/* History overlay */
-#history-overlay {
-  position: fixed; inset: 0; z-index: 50;
-  background: rgba(5,5,10,0.95);
-  display: none; flex-direction: column;
-  backdrop-filter: blur(8px);
-}
-.history-header {
-  padding: 1.2rem 1.5rem;
-  border-bottom: 1px solid var(--box-border);
-  display: flex; align-items: center; justify-content: space-between;
-  font-family: 'Cinzel', serif; font-size: 0.9rem;
-  color: var(--mist); letter-spacing: 0.2em;
-}
-#history-list { flex: 1; overflow-y: auto; padding: 1rem 1.5rem; }
-#history-list::-webkit-scrollbar { width: 3px; }
-#history-list::-webkit-scrollbar-thumb { background: var(--blood); }
-.history-entry { margin-bottom: 1.2rem; font-family: 'IM Fell English', serif; font-size: clamp(0.85rem, 2vw, 1rem); line-height: 1.7; color: var(--text-dim); }
-.history-entry .h-name   { color: var(--crimson); font-family: 'Cinzel', serif; font-size: 0.8rem; letter-spacing: 0.1em; margin-bottom: 0.2rem; }
-.history-entry .h-choice { color: var(--rose); font-style: italic; }
-
-/* Pause modal */
-#pause-modal {
-  position: fixed; inset: 0; z-index: 60;
-  background: rgba(5,5,10,0.92);
-  display: none; flex-direction: column;
-  align-items: center; justify-content: center;
-  backdrop-filter: blur(12px);
-}
-.pause-panel {
-  background: rgba(15,10,20,0.95);
-  border: 1px solid var(--box-border);
-  padding: 2.5rem 3rem; min-width: 280px; max-width: 400px; width: 90%;
-  display: flex; flex-direction: column; gap: 0.8rem;
-}
-.pause-title {
-  font-family: 'Cinzel', serif; font-size: 1.1rem;
-  color: var(--silver); text-align: center; letter-spacing: 0.3em; margin-bottom: 0.5rem;
-  border-bottom: 1px solid var(--box-border); padding-bottom: 0.8rem;
-}
-.pause-btn {
-  font-family: 'Cinzel', serif; font-size: 0.8rem;
-  letter-spacing: 0.2em; background: transparent;
-  border: 1px solid var(--box-border); color: var(--mist);
-  padding: 0.9rem; cursor: pointer; transition: all 0.2s; text-align: center;
-}
-.pause-btn:hover { border-color: var(--crimson); color: var(--silver); background: rgba(139,0,0,0.15); }
-.pause-btn.danger { color: #ff6b6b; border-color: rgba(255,107,107,0.3); }
-.pause-btn.danger:hover { background: rgba(200,0,0,0.15); border-color: #ff6b6b; }
-
-.volume-row {
-  display: flex; align-items: center; gap: 0.8rem;
-  padding: 0.5rem 0; border-top: 1px solid var(--box-border); margin-top: 0.5rem;
-}
-.vol-label { font-family: 'Cinzel', serif; font-size: 0.7rem; color: var(--text-dim); letter-spacing: 0.15em; min-width: 60px; }
-#vol-slider { flex: 1; accent-color: var(--crimson); cursor: pointer; }
-.vol-mute { background: none; border: 1px solid var(--box-border); color: var(--mist); cursor: pointer; padding: 0.3rem 0.6rem; font-size: 0.8rem; transition: all 0.2s; }
-.vol-mute:hover { border-color: var(--crimson); color: var(--silver); }
-
-/* Help overlay */
-#help-overlay {
-  position: fixed; inset: 0; z-index: 55;
-  background: rgba(5,5,10,0.9);
-  display: none; flex-direction: column;
-  align-items: center; justify-content: center;
-  padding: 1rem; backdrop-filter: blur(8px);
-}
-.help-panel {
-  background: rgba(15,10,20,0.98); border: 1px solid var(--box-border);
-  padding: 2rem; max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto;
-}
-.help-panel h2 { font-family: 'Cinzel', serif; color: var(--silver); font-size: 1rem; letter-spacing: 0.25em; margin-bottom: 1.5rem; border-bottom: 1px solid var(--box-border); padding-bottom: 0.8rem; }
-.help-row { display: flex; gap: 1rem; margin-bottom: 1rem; font-size: 0.85rem; line-height: 1.5; }
-.help-key { min-width: 80px; color: var(--crimson); font-family: 'Cinzel', serif; font-size: 0.75rem; letter-spacing: 0.1em; }
-.help-val { color: var(--mist); }
-
-/* Minigame overlay */
-#minigame-overlay {
-  position: fixed; inset: 0; z-index: 50;
-  background: rgba(5,5,10,0.95);
-  display: none; flex-direction: column;
-  align-items: center; justify-content: center;
-  padding: 1rem; backdrop-filter: blur(12px);
-}
-
-/* Ending screen */
-#ending-screen { background: var(--obsidian); flex-direction: column; gap: 1.5rem; text-align: center; padding: 2rem; }
-.ending-type  { font-family: 'Cinzel', serif; font-size: 0.7rem; letter-spacing: 0.5em; color: var(--blood); text-transform: uppercase; }
-.ending-title { font-family: 'Cinzel', serif; font-size: clamp(1.5rem, 5vw, 3rem); color: var(--silver); text-shadow: 0 0 40px rgba(220,20,60,0.4); }
-.ending-text  { font-family: 'IM Fell English', serif; font-size: clamp(0.9rem, 2.2vw, 1.1rem); color: var(--mist); max-width: 500px; line-height: 1.8; font-style: italic; }
-.btn-restart  { font-family: 'Cinzel', serif; font-size: 0.8rem; letter-spacing: 0.3em; color: var(--silver); background: transparent; border: 1px solid rgba(220,20,60,0.5); padding: 0.9rem 2.5rem; cursor: pointer; transition: all 0.3s; margin-top: 1rem; }
-.btn-restart:hover { border-color: var(--crimson); background: rgba(139,0,0,0.2); }
-
-/* Affinity delta popup */
-#affinity-delta {
-  position: fixed; top: 60px; right: 1rem;
-  font-family: 'Cinzel', serif; font-size: 1rem;
-  opacity: 0; pointer-events: none; z-index: 20;
-  transition: opacity 0.3s; text-shadow: 0 0 10px currentColor;
-}
-#affinity-delta.show { animation: deltaAnim 1.5s ease forwards; }
-@keyframes deltaAnim {
-  0%   { opacity: 0; transform: translateY(0); }
-  20%  { opacity: 1; }
-  80%  { opacity: 1; transform: translateY(-20px); }
-  100% { opacity: 0; transform: translateY(-30px); }
-}
-
-/* Transition fade */
-#fade-overlay {
-  position: fixed; inset: 0; z-index: 40;
-  background: var(--obsidian); opacity: 0;
-  pointer-events: none; transition: opacity 0.5s;
-}
-#fade-overlay.fade-in { opacity: 1; pointer-events: all; }
-
-/* Click ripple */
-.ripple {
-  position: fixed; border-radius: 50%;
-  width: 20px; height: 20px;
-  background: rgba(220,20,60,0.3);
-  pointer-events: none; z-index: 9000;
-  transform: translate(-50%,-50%) scale(0);
-  animation: rippleAnim 0.6s ease forwards;
-}
-@keyframes rippleAnim { to { transform: translate(-50%,-50%) scale(8); opacity: 0; } }
-
-/* Responsive */
-@media (max-width: 480px) {
-  .pause-panel { padding: 1.5rem 1.2rem; }
-  #hud { padding: 0.6rem 0.8rem; }
-  #dialogue-wrap, #choices-wrap { padding: 0 0.5rem 0.5rem; }
-  #affinity-bar-outer { width: 60px; }
-}
+@media(max-width:480px){.pause-panel{padding:1.5rem 1.2rem}#hud{padding:.6rem .8rem}#dialogue-wrap,#choices-wrap{padding:0 .5rem .5rem}#affinity-bar-outer{width:60px}}
 </style>
 </head>
 <body>
@@ -563,104 +204,50 @@ body::before {
 <div id="fade-overlay"></div>
 <div id="affinity-delta"></div>
 
-<!-- ══════════════════════════════════════════
-     LOADING SCREEN
-══════════════════════════════════════════ -->
 <div id="loading-screen" class="screen active">
   <div class="loading-inner">
-    <div class="loading-title">Chargement</div>
+    <div class="loading-title" id="loading-label">Loading</div>
     <div class="loading-bar-outer"><div class="loading-bar-inner" id="loading-bar"></div></div>
     <div class="loading-pct" id="loading-pct">0%</div>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     TITLE SCREEN
-══════════════════════════════════════════ -->
 <div id="title-screen" class="screen">
   <div class="title-bg-roses"></div>
   <div class="title-deco"></div>
   <div class="title-wrap">
-    <div class="title-sub">— un roman visuel —</div>
+    <div class="title-sub" id="title-sub">— a visual novel —</div>
     <div class="title-main">Love Me<br>To <span>Death</span></div>
     <div class="title-line"><span class="title-line-icon">✦</span></div>
-    <!-- Le label COMMENCER/CONTINUER est mis à jour dynamiquement -->
-    <button class="btn-start" id="btn-start">COMMENCER</button>
+    <button class="btn-start" id="btn-start">BEGIN</button>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     LANGUAGE SCREEN
-══════════════════════════════════════════ -->
 <div id="lang-screen" class="screen">
   <div class="lang-title">Choose Your Language</div>
   <div class="lang-sub">Choisissez votre langue</div>
   <div class="lang-choices">
-    <button class="lang-btn" data-lang="en">
-      <span class="lang-flag">🇬🇧</span>
-      <span class="lang-name">ENGLISH</span>
-    </button>
-    <button class="lang-btn" data-lang="fr">
-      <span class="lang-flag">🇫🇷</span>
-      <span class="lang-name">FRANÇAIS</span>
-    </button>
+    <button class="lang-btn" data-lang="en"><span class="lang-flag">🇬🇧</span><span class="lang-name">ENGLISH</span></button>
+    <button class="lang-btn" data-lang="fr"><span class="lang-flag">🇫🇷</span><span class="lang-name">FRANÇAIS</span></button>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     POLICY SCREEN
-══════════════════════════════════════════ -->
 <div id="policy-screen" class="screen">
   <div class="policy-container">
-    <div class="policy-header" id="policy-header">Conditions, Confidentialité & Crédits</div>
-    <div class="policy-scroll" id="policy-scroll">
-      <h3>POLITIQUE DE CONFIDENTIALITÉ</h3>
-      <p>Love Me To Death (le « Jeu ») est un roman visuel jouable dans le navigateur. En jouant, vous acceptez que les données de progression soient enregistrées localement sur votre appareil à des fins de sauvegarde.</p>
-      <p>Aucune donnée personnelle n'est collectée, transmise ou partagée avec des tiers. Toutes les données de sauvegarde sont stockées exclusivement dans le localStorage de votre navigateur. Vous pouvez les supprimer à tout moment en effaçant le stockage de votre navigateur.</p>
-
-      <h3>DONNÉES COLLECTÉES</h3>
-      <p>Les données suivantes sont stockées localement : votre préférence de langue, votre progression actuelle, votre score d'affinité, et l'historique de vos dialogues. Aucun cookie, outil d'analyse ou service externe n'est utilisé.</p>
-
-      <h3>CONDITIONS D'UTILISATION</h3>
-      <p>Ce jeu est destiné à un public âgé de 16 ans et plus. Il contient des thèmes de romance, de mystère et de dark fantasy douce. Le Jeu est fourni à des fins de divertissement uniquement. Tous les personnages, scénarios et événements sont fictifs.</p>
-      <p>Vous ne pouvez pas reproduire, modifier, distribuer ou vendre une partie de ce Jeu sans autorisation écrite. Les créations de fans non commerciales sont les bienvenues.</p>
-
-      <h3>AVERTISSEMENT DE CONTENU</h3>
-      <p>Love Me To Death explore des thèmes d'amour, d'obsession, de mortalité et de romance surnaturelle. Certaines scènes peuvent contenir : des images d'horreur légère, des dialogues émotionnellement intenses et des choix narratifs à conséquences.</p>
-
-      <h3>INFORMATIONS DE JEU</h3>
-      <p>Vos choix affectent le compteur d'affinité affiché en haut de l'écran. Ce niveau influencera la fin que vous obtiendrez. La sauvegarde est automatique à chaque transition de scène. Vous pouvez revoir les dialogues passés via le bouton historique.</p>
-      <p>Des mini-jeux peuvent apparaître entre les scènes. Le son peut être ajusté dans le menu pause.</p>
-      <p>Personnalisation de la vitesse d'écriture : ajoutez "typeSpeed" dans une scène JSON pour modifier la vitesse du texte (ex: "typeSpeed": 40 pour plus lent, "typeSpeed": 10 pour plus rapide, défaut: 22).</p>
-
-      <h3>CRÉDITS</h3>
-      <div class="credits">
-        <p>Histoire & Direction — Game Director</p>
-        <p>Art des personnages — Artistes originaux</p>
-        <p>Décors — Équipe visuelle</p>
-        <p>Musique & Son — Compositeurs</p>
-        <p>Développement — Équipe de développement</p>
-        <p>Remerciements spéciaux — À chaque joueur qui a choisi l'amour en sachant le prix à payer.</p>
-        <p style="margin-top:1rem; color: var(--crimson);">♥ Love Me To Death — Version 1.0 ♥</p>
-      </div>
-    </div>
+    <div class="policy-header" id="policy-header">Terms, Privacy &amp; Credits</div>
+    <div class="policy-scroll" id="policy-scroll"></div>
     <div class="policy-progress"><div class="policy-progress-bar" id="policy-bar"></div></div>
     <div class="policy-footer">
-      <span class="policy-hint" id="policy-hint">Faites défiler jusqu'en bas pour accepter</span>
-      <button class="btn-accept" id="btn-accept">ACCEPTER & JOUER</button>
+      <span class="policy-hint" id="policy-hint">Scroll to the bottom to accept</span>
+      <button class="btn-accept" id="btn-accept">ACCEPT &amp; PLAY</button>
     </div>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     GAME SCREEN
-══════════════════════════════════════════ -->
 <div id="game-screen" class="screen">
   <div id="game-bg-prev"></div>
   <div id="game-bg"></div>
   <div id="char-wrap"><img id="char-img" src="" alt="" onerror="this.style.display='none'"></div>
-
-  <!-- HUD -->
   <div id="hud">
     <div class="hud-left">
       <div id="affinity-wrap">
@@ -670,859 +257,582 @@ body::before {
       </div>
     </div>
     <div class="hud-right">
-      <button class="hud-btn" id="btn-history" title="Historique">📜</button>
-      <button class="hud-btn" id="btn-help" title="Comment jouer">?</button>
-      <button class="hud-btn" id="btn-pause" title="Pause">⏸</button>
+      <button class="hud-btn" id="btn-history">📜</button>
+      <button class="hud-btn" id="btn-help">?</button>
+      <button class="hud-btn" id="btn-pause">⏸</button>
     </div>
   </div>
-
-  <!-- Dialogue -->
   <div id="dialogue-wrap">
     <div id="dialogue-box">
-      <div id="speaker-bar">
-        <span class="speaker-deco">◆</span>
-        <span id="speaker-name"></span>
-      </div>
+      <div id="speaker-bar"><span class="speaker-deco">◆</span><span id="speaker-name"></span></div>
       <div id="dialogue-text"></div>
       <div id="dialogue-nav">
-        <button id="btn-back-dialogue" title="Scène précédente">◂ RETOUR</button>
+        <button id="btn-back-dialogue">◂ BACK</button>
         <span id="dialogue-continue">▾</span>
       </div>
     </div>
   </div>
-
-  <!-- Choices -->
   <div id="choices-wrap"></div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     ENDING SCREEN
-══════════════════════════════════════════ -->
 <div id="ending-screen" class="screen">
-  <div class="ending-type"  id="ending-type"></div>
+  <div class="ending-type" id="ending-type"></div>
   <div class="ending-title" id="ending-title"></div>
-  <div class="ending-text"  id="ending-text"></div>
-  <button class="btn-restart" id="btn-restart-end">RECOMMENCER</button>
+  <div class="ending-text" id="ending-text"></div>
+  <button class="btn-restart" id="btn-restart-end">RESTART</button>
 </div>
 
-<!-- ══════════════════════════════════════════
-     HISTORY OVERLAY
-══════════════════════════════════════════ -->
 <div id="history-overlay">
   <div class="history-header">
-    <span>HISTORIQUE DES DIALOGUES</span>
+    <span id="history-title-label">DIALOGUE HISTORY</span>
     <button class="hud-btn" id="btn-close-history">✕</button>
   </div>
   <div id="history-list"></div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     PAUSE MODAL
-══════════════════════════════════════════ -->
 <div id="pause-modal">
   <div class="pause-panel">
     <div class="pause-title">— PAUSE —</div>
-    <button class="pause-btn" id="btn-resume">REPRENDRE</button>
-    <button class="pause-btn" id="btn-save-quit">SAUVEGARDER & QUITTER</button>
-    <button class="pause-btn danger" id="btn-restart-game">RECOMMENCER DEPUIS LE DÉBUT</button>
+    <button class="pause-btn" id="btn-resume">RESUME</button>
+    <button class="pause-btn" id="btn-save-quit">SAVE &amp; QUIT</button>
+    <button class="pause-btn danger" id="btn-restart-game">RESTART FROM BEGINNING</button>
     <div class="volume-row">
-      <span class="vol-label">MUSIQUE</span>
+      <span class="vol-label">MUSIC</span>
       <input type="range" id="vol-slider" min="0" max="1" step="0.01" value="0.7">
       <button class="vol-mute" id="btn-mute">🔊</button>
     </div>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     HELP OVERLAY
-══════════════════════════════════════════ -->
 <div id="help-overlay">
   <div class="help-panel">
-    <h2>COMMENT JOUER</h2>
-    <div class="help-row"><span class="help-key">TAP / CLIC</span><span class="help-val">Avancer le dialogue. Passe l'effet machine à écrire si en cours.</span></div>
-    <div class="help-row"><span class="help-key">CHOIX</span><span class="help-val">Sélectionnez une option. Votre choix peut affecter l'affinité.</span></div>
-    <div class="help-row"><span class="help-key">♥ AFFINITÉ</span><span class="help-val">Votre lien avec le personnage. Monte ou descend selon vos choix. Détermine votre fin.</span></div>
-    <div class="help-row"><span class="help-key">◂ RETOUR</span><span class="help-val">Revenir à la scène précédente (hors choix). Annule le delta d'affinité du dernier choix.</span></div>
-    <div class="help-row"><span class="help-key">📜 HISTORIQUE</span><span class="help-val">Revoir les dialogues passés à tout moment.</span></div>
-    <div class="help-row"><span class="help-key">⏸ PAUSE</span><span class="help-val">Régler le volume, sauvegarder ou recommencer.</span></div>
-    <div class="help-row"><span class="help-key">SAUVEGARDE AUTO</span><span class="help-val">La progression est sauvegardée automatiquement à chaque scène.</span></div>
-    <div class="help-row"><span class="help-key">MINI-JEUX</span><span class="help-val">Des moments interactifs spéciaux peuvent apparaître entre les scènes.</span></div>
-    <button class="pause-btn" id="btn-close-help" style="margin-top:1rem">FERMER</button>
+    <h2 id="help-title">HOW TO PLAY</h2>
+    <div id="help-rows"></div>
+    <button class="pause-btn" id="btn-close-help" style="margin-top:1rem">CLOSE</button>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     MINIGAME OVERLAY
-══════════════════════════════════════════ -->
-<div id="minigame-overlay">
-  <div id="minigame-content"></div>
-</div>
+<div id="minigame-overlay"><div id="minigame-content"></div></div>
 
-<!-- Audio -->
 <audio id="bgm" loop></audio>
 
-<!-- ══════════════════════════════════════════
-     MOTEUR DE JEU
-══════════════════════════════════════════ -->
 <script>
 'use strict';
 
-// ═══════════════════════════════════════════════
-// CONFIGURATION — modifiez ici les chapitres
-// ═══════════════════════════════════════════════
 const GAME_CONFIG = {
-  chapters: [
-    'json/chapter1.json'
-    // 'json/chapter2.json',
-    // 'json/chapter3.json',
-  ],
+  chapterFiles: ['chapter1.json'],
   introMusic: 'music/intro.mp3',
-  // Assets critiques à précharger avant de lancer le titre
   preloadImages: [
     'images/backgrounds/manor_gate.webp',
     'images/backgrounds/manor_hall.webp',
     'images/backgrounds/manor_library.webp',
     'images/backgrounds/manor_night.webp',
     'images/characters/dorian_idle.webp',
-  ],
-  // NOTE: on ne précharge plus l'audio ici car ça cause des erreurs
-  // Les fichiers audio sont chargés à la demande
-  preloadAudio: []
+  ]
 };
 
-// ─────────────────────────────────────────────
-// FINS
-// ─────────────────────────────────────────────
-const ENDING_RANGES = [
-  { min: 51,  max: 100, endingId: 'true_love'   },
-  { min: 1,   max: 50,  endingId: 'bittersweet' },
-  { min: -50, max: 0,   endingId: 'bad_end_1'   },
-  { min: -100,max: -51, endingId: 'bad_end_2'   }
-];
-const ENDINGS = {
-  true_love: {
-    type: 'FIN VRAIE',
-    title: 'Éternellement Vôtre',
-    text: 'Il prend votre visage entre ses mains froides, et pour la première fois ses yeux portent quelque chose d\'autre que les ténèbres. « Vous êtes resté(e), » murmure-t-il. « Tous les autres ont fui. » Vous posez votre main sur sa poitrine — aucun battement, et pourtant vous ne vous êtes jamais senti(e) aussi vivant(e). Cet amour survivra à la mort elle-même.'
+// ── I18N ──
+const I18N = {
+  en: {
+    loading:'Loading', titleSub:'— a visual novel —', btnBegin:'BEGIN', btnContinue:'CONTINUE',
+    policyHeader:'Terms, Privacy & Credits', policyHint:'Scroll to the bottom to accept',
+    btnAccept:'ACCEPT & PLAY', btnBack:'◂ BACK', btnResume:'RESUME', btnSaveQuit:'SAVE & QUIT',
+    btnRestart:'RESTART FROM BEGINNING', btnRestartEnd:'RESTART', musicLabel:'MUSIC',
+    historyTitle:'DIALOGUE HISTORY', helpTitle:'HOW TO PLAY', helpClose:'CLOSE',
+    helpRows:[
+      ['TAP / CLICK','Advance dialogue. Skips typewriter effect if in progress.'],
+      ['CHOICES','Select an option. Your choice may affect affinity.'],
+      ['♥ AFFINITY','Your bond with the character. Rises or falls with choices. Determines your ending.'],
+      ['◂ BACK','Return to the previous scene (not during choices). Reverses the affinity delta.'],
+      ['📜 HISTORY','Review past dialogue at any time.'],
+      ['⏸ PAUSE','Adjust volume, save, or restart.'],
+      ['AUTO-SAVE','Progress is saved automatically at each scene.'],
+      ['MINI-GAMES','Special interactive moments may appear between scenes.'],
+    ],
+    confirmRestart:'Restart from the beginning? Your progress will be lost.',
+    confirmRestartEnd:'Restart the game?',
+    youLabel:'You', systemLabel:'— System —',
+    systemFallback:'No JSON file found at json/en/chapter1.json. Place your scene files in the json/en/ folder to begin.',
+    policyContent:`
+      <h3>PRIVACY POLICY</h3>
+      <p>Love Me To Death (the "Game") is a browser-based visual novel. By playing, you agree that progress data is stored locally on your device for save purposes.</p>
+      <p>No personal data is collected, transmitted, or shared with third parties. All save data is stored exclusively in your browser's localStorage. You may delete it at any time by clearing your browser storage.</p>
+      <h3>DATA COLLECTED</h3>
+      <p>The following data is stored locally: your language preference, your current progress, your affinity score, and your dialogue history. No cookies, analytics tools, or external services are used.</p>
+      <h3>TERMS OF USE</h3>
+      <p>This game is intended for audiences aged 16 and above. It contains themes of romance, mystery, and soft dark fantasy. The Game is provided for entertainment purposes only. All characters, scenarios, and events are fictional.</p>
+      <p>You may not reproduce, modify, distribute, or sell any part of this Game without written permission. Non-commercial fan creations are welcome.</p>
+      <h3>CONTENT WARNING</h3>
+      <p>Love Me To Death explores themes of love, obsession, mortality, and supernatural romance. Some scenes may include: mild horror imagery, emotionally intense dialogue, and narrative choices with consequences.</p>
+      <h3>GAMEPLAY NOTES</h3>
+      <p>Your choices affect the affinity counter shown at the top of the screen. This level will influence the ending you receive. Saving is automatic at each scene transition. You can review past dialogue via the history button.</p>
+      <p>Mini-games may appear between scenes. Sound can be adjusted in the pause menu.</p>
+      <p>Typing speed: add "typeSpeed" to a JSON scene to change text speed (e.g. 40 for slower, 10 for faster, default: 22).</p>
+      <h3>CREDITS</h3>
+      <div class="credits">
+        <p>Story & Direction — Game Director</p><p>Character Art — Original Artists</p>
+        <p>Backgrounds — Visual Team</p><p>Music & Sound — Composers</p>
+        <p>Development — Development Team</p>
+        <p>Special Thanks — To every player who chose love knowing the price.</p>
+        <p style="margin-top:1rem;color:var(--crimson)">♥ Love Me To Death — Version 1.0 ♥</p>
+      </div>`,
+    endings:{
+      true_love:{type:'TRUE ENDING',title:'Eternally Yours',text:'He takes your face in his cold hands, and for the first time his eyes hold something other than darkness. "You stayed," he whispers. "All the others fled." You press your hand to his chest — no heartbeat, and yet you have never felt so alive. This love will outlast death itself.'},
+      bittersweet:{type:'BITTERSWEET ENDING',title:'A Beautiful Wound',text:'He lets you leave at dawn, pressing a black rose into your hands. "You deserved better than a monster," he murmurs. You watch him dissolve into the mist, carrying the memory of his eyes for the rest of your life. Some loves are not meant to last — only to transform you.'},
+      bad_end_1:{type:'BAD ENDING',title:'Darkness Wins',text:'The warmth fades from his gaze. "You never understood," he says softly, and he turns toward the endless night. You stand at the threshold — neither in his world nor back in your own. The door closes. You are alone.',isBad:true},
+      bad_end_2:{type:'BAD ENDING — ABYSS',title:'Consumed',text:'He smiles, and it does not reach his eyes. "You thought you could resist me." Darkness spreads from his fingers like ink in water. Your last thought is that you should have heeded the warnings carved into the manor walls. Too late.',isBad:true}
+    }
   },
-  bittersweet: {
-    type: 'FIN DOUCE-AMÈRE',
-    title: 'Une Belle Blessure',
-    text: 'Il vous laisse partir à l\'aube, pressant une rose noire dans vos mains. « Vous méritiez mieux qu\'un monstre, » murmure-t-il. Vous le regardez se dissoudre dans la brume, portant le souvenir de ses yeux pour le reste de votre vie. Certains amours ne sont pas faits pour durer — seulement pour vous transformer.'
-  },
-  bad_end_1: {
-    type: 'MAUVAISE FIN',
-    title: 'L\'Obscurité Gagne',
-    text: 'La chaleur s\'éteint dans son regard. « Vous ne m\'avez jamais compris(e), » dit-il doucement, et il se détourne vers la nuit éternelle. Vous restez au seuil — ni dans son monde, ni de retour dans le vôtre. La porte se ferme. Vous êtes seul(e).',
-    isBad: true
-  },
-  bad_end_2: {
-    type: 'MAUVAISE FIN — ABÎME',
-    title: 'Consumé(e)',
-    text: 'Il sourit, et ça n\'atteint pas ses yeux. « Vous pensiez pouvoir me résister. » Les ténèbres se propagent de ses doigts comme de l\'encre dans l\'eau. Votre dernière pensée est que vous auriez dû écouter les avertissements gravés dans les murs du manoir. Trop tard.',
-    isBad: true
-  }
-};
-
-// ═══════════════════════════════════════════════
-// ÉTAT DU JEU
-// ═══════════════════════════════════════════════
-const LS_KEY = 'lmtd_save_v2';
-
-const state = {
-  lang: 'fr',
-  firstTime: true,
-  sceneIndex: 0,
-  scenes: [],
-  // Pile de navigation : chaque entrée = { sceneIndex, affinityDeltaApplied }
-  // Permet d'annuler le delta d'affinité lors d'un retour
-  navStack: [],
-  affinity: 0,
-  history: [],
-  muted: false,
-  volume: 0.7,
-  currentMusic: null,
-  isTyping: false,
-  typing: null,
-  awaitingChoice: false,
-};
-
-// Registre des minigames
-window.LMTD = {
-  minigames: {},
-  registerMinigame(id, obj) { this.minigames[id] = obj; }
-};
-
-// ═══════════════════════════════════════════════
-// PRÉCHARGEMENT DES ASSETS (images seulement)
-// ═══════════════════════════════════════════════
-async function preloadAssets() {
-  const bar   = document.getElementById('loading-bar');
-  const label = document.getElementById('loading-pct');
-
-  const images = GAME_CONFIG.preloadImages;
-
-  // Si rien à précharger, passer directement à 100%
-  if (images.length === 0) {
-    bar.style.width = '100%';
-    label.textContent = '100%';
-    return;
-  }
-
-  let loaded = 0;
-  const total = images.length;
-
-  function tick() {
-    loaded++;
-    const pct = Math.round((loaded / total) * 100);
-    bar.style.width = pct + '%';
-    label.textContent = pct + '%';
-  }
-
-  const imgPromises = images.map(src => new Promise(res => {
-    const img = new Image();
-    img.onload = img.onerror = () => { tick(); res(); };
-    img.src = src;
-  }));
-
-  await Promise.allSettled(imgPromises);
-}
-
-// ═══════════════════════════════════════════════
-// CHARGEMENT DES SCÈNES JSON
-// ═══════════════════════════════════════════════
-async function loadChapters() {
-  let all = [];
-  for (const path of GAME_CONFIG.chapters) {
-    try {
-      const res = await fetch(path);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      all = all.concat(data);
-    } catch (e) {
-      console.warn(`Impossible de charger ${path}:`, e.message);
+  fr: {
+    loading:'Chargement', titleSub:'— un roman visuel —', btnBegin:'COMMENCER', btnContinue:'CONTINUER',
+    policyHeader:'Conditions, Confidentialité & Crédits', policyHint:"Faites défiler jusqu'en bas pour accepter",
+    btnAccept:'ACCEPTER & JOUER', btnBack:'◂ RETOUR', btnResume:'REPRENDRE', btnSaveQuit:'SAUVEGARDER & QUITTER',
+    btnRestart:'RECOMMENCER DEPUIS LE DÉBUT', btnRestartEnd:'RECOMMENCER', musicLabel:'MUSIQUE',
+    historyTitle:'HISTORIQUE DES DIALOGUES', helpTitle:'COMMENT JOUER', helpClose:'FERMER',
+    helpRows:[
+      ['TAP / CLIC',"Avancer le dialogue. Passe l'effet machine à écrire si en cours."],
+      ['CHOIX',"Sélectionnez une option. Votre choix peut affecter l'affinité."],
+      ['♥ AFFINITÉ','Votre lien avec le personnage. Monte ou descend selon vos choix. Détermine votre fin.'],
+      ['◂ RETOUR',"Revenir à la scène précédente (hors choix). Annule le delta d'affinité."],
+      ['📜 HISTORIQUE','Revoir les dialogues passés à tout moment.'],
+      ['⏸ PAUSE','Régler le volume, sauvegarder ou recommencer.'],
+      ['SAUVEGARDE AUTO','La progression est sauvegardée automatiquement à chaque scène.'],
+      ['MINI-JEUX','Des moments interactifs spéciaux peuvent apparaître entre les scènes.'],
+    ],
+    confirmRestart:'Recommencer depuis le début ? Votre progression sera perdue.',
+    confirmRestartEnd:'Recommencer le jeu ?',
+    youLabel:'Vous', systemLabel:'— Système —',
+    systemFallback:'Aucun fichier JSON trouvé dans json/fr/chapter1.json. Placez vos fichiers de scènes dans le dossier json/fr/ pour commencer.',
+    policyContent:`
+      <h3>POLITIQUE DE CONFIDENTIALITÉ</h3>
+      <p>Love Me To Death (le « Jeu ») est un roman visuel jouable dans le navigateur. En jouant, vous acceptez que les données de progression soient enregistrées localement sur votre appareil à des fins de sauvegarde.</p>
+      <p>Aucune donnée personnelle n'est collectée, transmise ou partagée avec des tiers. Toutes les données de sauvegarde sont stockées exclusivement dans le localStorage de votre navigateur.</p>
+      <h3>DONNÉES COLLECTÉES</h3>
+      <p>Les données suivantes sont stockées localement : votre préférence de langue, votre progression actuelle, votre score d'affinité, et l'historique de vos dialogues. Aucun cookie, outil d'analyse ou service externe n'est utilisé.</p>
+      <h3>CONDITIONS D'UTILISATION</h3>
+      <p>Ce jeu est destiné à un public âgé de 16 ans et plus. Il contient des thèmes de romance, de mystère et de dark fantasy douce. Tous les personnages, scénarios et événements sont fictifs.</p>
+      <p>Vous ne pouvez pas reproduire, modifier, distribuer ou vendre une partie de ce Jeu sans autorisation écrite. Les créations de fans non commerciales sont les bienvenues.</p>
+      <h3>AVERTISSEMENT DE CONTENU</h3>
+      <p>Love Me To Death explore des thèmes d'amour, d'obsession, de mortalité et de romance surnaturelle. Certaines scènes peuvent contenir : des images d'horreur légère, des dialogues émotionnellement intenses et des choix narratifs à conséquences.</p>
+      <h3>INFORMATIONS DE JEU</h3>
+      <p>Vos choix affectent le compteur d'affinité affiché en haut de l'écran. La sauvegarde est automatique à chaque transition de scène. Vous pouvez revoir les dialogues passés via le bouton historique.</p>
+      <p>Des mini-jeux peuvent apparaître entre les scènes. Le son peut être ajusté dans le menu pause.</p>
+      <p>Vitesse d'écriture : ajoutez "typeSpeed" dans une scène JSON pour modifier la vitesse (ex: 40 pour plus lent, 10 pour plus rapide, défaut: 22).</p>
+      <h3>CRÉDITS</h3>
+      <div class="credits">
+        <p>Histoire & Direction — Game Director</p><p>Art des personnages — Artistes originaux</p>
+        <p>Décors — Équipe visuelle</p><p>Musique & Son — Compositeurs</p>
+        <p>Développement — Équipe de développement</p>
+        <p>Remerciements spéciaux — À chaque joueur qui a choisi l'amour en sachant le prix à payer.</p>
+        <p style="margin-top:1rem;color:var(--crimson)">♥ Love Me To Death — Version 1.0 ♥</p>
+      </div>`,
+    endings:{
+      true_love:{type:'FIN VRAIE',title:'Éternellement Vôtre',text:"Il prend votre visage entre ses mains froides, et pour la première fois ses yeux portent quelque chose d'autre que les ténèbres. « Vous êtes resté(e), » murmure-t-il. « Tous les autres ont fui. » Vous posez votre main sur sa poitrine — aucun battement, et pourtant vous ne vous êtes jamais senti(e) aussi vivant(e). Cet amour survivra à la mort elle-même."},
+      bittersweet:{type:'FIN DOUCE-AMÈRE',title:'Une Belle Blessure',text:"Il vous laisse partir à l'aube, pressant une rose noire dans vos mains. « Vous méritiez mieux qu'un monstre, » murmure-t-il. Vous le regardez se dissoudre dans la brume, portant le souvenir de ses yeux pour le reste de votre vie. Certains amours ne sont pas faits pour durer — seulement pour vous transformer."},
+      bad_end_1:{type:'MAUVAISE FIN',title:"L'Obscurité Gagne",text:"La chaleur s'éteint dans son regard. « Vous ne m'avez jamais compris(e), » dit-il doucement, et il se détourne vers la nuit éternelle. Vous restez au seuil — ni dans son monde, ni de retour dans le vôtre. La porte se ferme. Vous êtes seul(e).",isBad:true},
+      bad_end_2:{type:'MAUVAISE FIN — ABÎME',title:'Consumé(e)',text:"Il sourit, et ça n'atteint pas ses yeux. « Vous pensiez pouvoir me résister. » Les ténèbres se propagent de ses doigts comme de l'encre dans l'eau. Votre dernière pensée est que vous auriez dû écouter les avertissements gravés dans les murs du manoir. Trop tard.",isBad:true}
     }
   }
-  if (all.length === 0) {
-    console.warn('Aucun JSON chargé — utilisation des scènes de démo intégrées.');
-    all = FALLBACK_SCENES;
+};
+
+const ENDING_RANGES=[{min:51,max:100,endingId:'true_love'},{min:1,max:50,endingId:'bittersweet'},{min:-50,max:0,endingId:'bad_end_1'},{min:-100,max:-51,endingId:'bad_end_2'}];
+const LS_KEY='lmtd_save_v3';
+
+const state={lang:'en',firstTime:true,sceneIndex:0,scenes:[],navStack:[],affinity:0,history:[],muted:false,volume:0.7,currentMusic:null,isTyping:false,typing:null,awaitingChoice:false};
+window.LMTD={minigames:{},registerMinigame(id,obj){this.minigames[id]=obj;}};
+
+function t(k){return(I18N[state.lang]||I18N.en)[k];}
+
+// ── APPLIQUER LA LANGUE ──
+function applyLang(){
+  const L=I18N[state.lang]||I18N.en;
+  document.getElementById('loading-label').textContent=L.loading;
+  document.getElementById('title-sub').textContent=L.titleSub;
+  document.getElementById('btn-start').textContent=checkHasSave()?L.btnContinue:L.btnBegin;
+  document.getElementById('policy-header').textContent=L.policyHeader;
+  document.getElementById('policy-hint').textContent=L.policyHint;
+  document.getElementById('btn-accept').textContent=L.btnAccept;
+  document.getElementById('policy-scroll').innerHTML=L.policyContent;
+  document.getElementById('btn-back-dialogue').textContent=L.btnBack;
+  document.getElementById('btn-resume').textContent=L.btnResume;
+  document.getElementById('btn-save-quit').textContent=L.btnSaveQuit;
+  document.getElementById('btn-restart-game').textContent=L.btnRestart;
+  document.getElementById('btn-restart-end').textContent=L.btnRestartEnd;
+  document.querySelector('.vol-label').textContent=L.musicLabel;
+  document.getElementById('history-title-label').textContent=L.historyTitle;
+  document.getElementById('help-title').textContent=L.helpTitle;
+  document.getElementById('btn-close-help').textContent=L.helpClose;
+  const hr=document.getElementById('help-rows'); hr.innerHTML='';
+  L.helpRows.forEach(([k,v])=>{hr.innerHTML+=`<div class="help-row"><span class="help-key">${k}</span><span class="help-val">${v}</span></div>`;});
+}
+
+// ── PRELOAD ──
+function checkHasSave(){try{const d=JSON.parse(localStorage.getItem(LS_KEY)||'{}');return d.firstTime===false;}catch{return false;}}
+
+async function preloadAssets(){
+  const bar=document.getElementById('loading-bar'),label=document.getElementById('loading-pct');
+  const imgs=GAME_CONFIG.preloadImages; if(!imgs.length){bar.style.width='100%';label.textContent='100%';return;}
+  let loaded=0; const tick=()=>{loaded++;const p=Math.round(loaded/imgs.length*100);bar.style.width=p+'%';label.textContent=p+'%';};
+  await Promise.allSettled(imgs.map(s=>new Promise(r=>{const i=new Image();i.onload=i.onerror=()=>{tick();r();};i.src=s;})));
+}
+
+// Précharge une image et resolve quand c'est prêt (utilisé avant affichage bg)
+function preloadImage(src){
+  return new Promise(res=>{if(!src)return res();const i=new Image();i.onload=i.onerror=res;i.src=src;});
+}
+
+async function loadChapters(){
+  let all=[];
+  for(const file of GAME_CONFIG.chapterFiles){
+    const path=`json/${state.lang}/${file}`;
+    try{const r=await fetch(path);if(!r.ok)throw new Error('HTTP '+r.status);const d=await r.json();all=all.concat(d);}
+    catch(e){console.warn('Cannot load',path,e.message);}
   }
-  state.scenes = all;
+  if(!all.length){const L=I18N[state.lang]||I18N.en;all=[{id:'s_demo',bg:null,charImg:null,speaker:L.systemLabel,text:L.systemFallback,typeSpeed:30,next:'__ending__'}];}
+  state.scenes=all;
 }
 
-// ═══════════════════════════════════════════════
-// CHARGEMENT DYNAMIQUE DES MINIGAMES
-// ═══════════════════════════════════════════════
-function loadMinigameScript(path) {
-  return new Promise((res, rej) => {
-    const s = document.createElement('script');
-    s.src = path;
-    s.onload  = res;
-    s.onerror = () => { console.warn('Minigame introuvable:', path); res(); };
-    document.head.appendChild(s);
-  });
+function loadMinigameScript(path){return new Promise(res=>{const s=document.createElement('script');s.src=path;s.onload=res;s.onerror=()=>{console.warn('Minigame not found:',path);res();};document.head.appendChild(s);});}
+async function preloadMinigames(){const f=new Set();state.scenes.forEach(sc=>{if(sc.minigameFile)f.add(sc.minigameFile);});for(const x of f)await loadMinigameScript(x);}
+
+// ── SAVE / LOAD ──
+function saveGame(){try{localStorage.setItem(LS_KEY,JSON.stringify({lang:state.lang,firstTime:false,sceneIndex:state.sceneIndex,navStack:state.navStack.slice(-30),affinity:state.affinity,history:state.history.slice(-60),volume:state.volume,muted:state.muted,currentMusic:state.currentMusic}));}catch(e){}}
+function loadSave(){
+  try{const raw=localStorage.getItem(LS_KEY);if(!raw)return false;const d=JSON.parse(raw);
+    state.lang=d.lang||'en';state.firstTime=d.firstTime!==false;state.sceneIndex=d.sceneIndex||0;
+    state.navStack=(d.navStack||[]).map(e=>typeof e==='number'?{sceneIndex:e,affinityDelta:0}:e);
+    state.affinity=d.affinity||0;state.history=d.history||[];state.volume=d.volume!==undefined?d.volume:0.7;state.muted=d.muted||false;state.currentMusic=d.currentMusic||null;return true;}
+  catch{return false;}
+}
+function resetGame(){try{localStorage.removeItem(LS_KEY);}catch(e){}location.reload();}
+
+// ── ÉCRANS ──
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function fadeTransition(cb){const fo=document.getElementById('fade-overlay');fo.classList.add('fade-in');setTimeout(()=>{cb();setTimeout(()=>fo.classList.remove('fade-in'),100);},500);}
+
+// ── AFFINITÉ ──
+function updateAffinity(d){if(!d)return;state.affinity=Math.max(-100,Math.min(100,state.affinity+d));renderAffinity();showAffinityDelta(d);}
+function renderAffinity(){
+  const aff=state.affinity;
+  document.getElementById('affinity-bar').style.width=((aff+100)/200*100)+'%';
+  const v=document.getElementById('affinity-val');v.textContent=aff>0?'+'+aff:String(aff);
+  const tp=(aff+100)/200;const r=Math.round(107+(220-107)*tp),g=Math.round(33+(20-33)*tp),b=Math.round(168+(60-168)*tp);
+  document.getElementById('affinity-bar').style.background=`rgb(${r},${g},${b})`;
+  v.style.color=aff>=0?'var(--rose)':'var(--affinity-neg)';
+  document.getElementById('aff-icon').style.filter=aff>=0?'drop-shadow(0 0 4px var(--crimson))':'drop-shadow(0 0 4px #6B21A8)';
+}
+function showAffinityDelta(d){const el=document.getElementById('affinity-delta');el.className='';el.textContent=(d>0?'+ ':'− ')+Math.abs(d);el.style.color=d>0?'var(--crimson)':'#9333ea';void el.offsetWidth;el.className='show';}
+
+// ══════════════════════════════════════════════════════════
+// AUDIO — FIX MUSIQUE INTRO SANS CLIC UTILISATEUR
+//
+// Stratégie :
+//  1. Au boot, on assigne src + muted=true + on tente play().
+//     Le navigateur autorise play() sur un élément muté même sans geste.
+//  2. Au PREMIER clic n'importe où, on lève le mute et on fade le volume.
+//     Résultat : la musique "est déjà en train de jouer" dès l'écran titre,
+//     le son apparaît dès la première interaction — pas de silence awkward.
+// ══════════════════════════════════════════════════════════
+const bgm=document.getElementById('bgm');
+let audioUnlocked=false;
+
+function initIntroAudio(){
+  bgm.src=GAME_CONFIG.introMusic;
+  bgm.loop=true;
+  bgm.volume=0;
+  bgm.muted=true;
+  bgm.play().catch(()=>{});   // silencieux — OK sur tous navigateurs modernes
 }
 
-async function preloadMinigames() {
-  const files = new Set();
-  state.scenes.forEach(sc => {
-    if (sc.minigameFile) files.add(sc.minigameFile);
-  });
-  for (const f of files) await loadMinigameScript(f);
+function unlockAudio(){
+  if(audioUnlocked)return;
+  audioUnlocked=true;
+  bgm.muted=false;
+  if(bgm.paused)bgm.play().catch(()=>{});
+  // fade-in doux vers le volume cible
+  let v=0; const target=state.muted?0:state.volume; const step=target/30;
+  const fade=setInterval(()=>{v=Math.min(v+step,target);bgm.volume=v;if(v>=target)clearInterval(fade);},50);
 }
 
-// ═══════════════════════════════════════════════
-// SAVE / LOAD
-// ═══════════════════════════════════════════════
-function saveGame() {
-  const data = {
-    lang: state.lang, firstTime: false,
-    sceneIndex: state.sceneIndex,
-    // Sauvegarder la pile de navigation (max 30 entrées)
-    navStack: state.navStack.slice(-30),
-    affinity: state.affinity,
-    history: state.history.slice(-60),
-    volume: state.volume, muted: state.muted,
-    currentMusic: state.currentMusic
-  };
-  try { localStorage.setItem(LS_KEY, JSON.stringify(data)); } catch(e) {}
+function playMusic(src){
+  if(!src||state.currentMusic===src)return;
+  state.currentMusic=src;
+  bgm.muted=state.muted;
+  bgm.volume=state.muted?0:state.volume;
+  bgm.src=src;
+  bgm.play().catch(()=>{const r=()=>{bgm.play().catch(()=>{});document.removeEventListener('click',r);};document.addEventListener('click',r);});
+}
+function stopMusic(){bgm.pause();bgm.src='';state.currentMusic=null;}
+function applyVolume(){bgm.volume=state.muted?0:state.volume;}
+
+// ══════════════════════════════════════════════════════════
+// BACKGROUND — FIX TRANSITIONS NOIRES
+//
+// Problème : quand on change de fond, le navigateur met un instant
+// à décoder l'image → flash noir visible.
+//
+// Solution : on PRÉCHARGE l'image avec un <img> temporaire AVANT de
+// l'assigner au CSS. Pendant le chargement, l'ancien fond reste visible.
+// Puis on fait un crossfade propre.
+// ══════════════════════════════════════════════════════════
+let lastBg=null;
+
+async function setBg(src){
+  const cur=document.getElementById('game-bg'),prev=document.getElementById('game-bg-prev');
+  if(!src||src===lastBg)return;
+
+  // Précharger l'image AVANT de toucher au DOM → zéro flash noir
+  await preloadImage(src);
+
+  // L'ancien fond va dans prev (reste visible en dessous)
+  prev.style.backgroundImage=cur.style.backgroundImage;
+  prev.style.opacity='1';
+
+  // Nouveau fond dans cur, encore invisible
+  cur.style.backgroundImage=`url('${src}')`;
+  cur.style.transition='none';
+  cur.style.opacity='0';
+
+  // Forcer reflow puis lancer le fondu
+  void cur.offsetWidth;
+  cur.style.transition='opacity 0.6s ease';
+  cur.style.opacity='1';
+
+  // Une fois le fondu terminé, on cache prev (propre)
+  setTimeout(()=>{prev.style.opacity='0';},650);
+  lastBg=src;
 }
 
-function loadSave() {
-  try {
-    const raw = localStorage.getItem(LS_KEY);
-    if (!raw) return false;
-    const d = JSON.parse(raw);
-    state.lang        = d.lang        || 'fr';
-    state.firstTime   = d.firstTime   !== false;
-    state.sceneIndex  = d.sceneIndex  || 0;
-    // Migration : ancienne save stockait des entiers, nouvelle stocke des objets
-    state.navStack    = (d.navStack || []).map(entry =>
-      typeof entry === 'number' ? { sceneIndex: entry, affinityDelta: 0 } : entry
-    );
-    state.affinity    = d.affinity    || 0;
-    state.history     = d.history     || [];
-    state.volume      = d.volume      !== undefined ? d.volume : 0.7;
-    state.muted       = d.muted       || false;
-    state.currentMusic = d.currentMusic || null;
-    return true;
-  } catch { return false; }
+function setCharacter(img){
+  const wrap=document.getElementById('char-wrap'),el=document.getElementById('char-img');
+  if(!img){wrap.style.opacity='0';return;}
+  el.src=img;el.style.display='';wrap.style.opacity='1';
 }
 
-function resetGame() {
-  try { localStorage.removeItem(LS_KEY); } catch(e) {}
-  location.reload();
+// ── TYPEWRITER ──
+const DEFAULT_TYPE_SPEED=22;
+function typeText(el,text,speed,onDone){
+  el.textContent='';state.isTyping=true;let i=0;
+  if(state.typing)clearInterval(state.typing);
+  const ms=(typeof speed==='number'&&speed>0)?speed:DEFAULT_TYPE_SPEED;
+  state.typing=setInterval(()=>{el.textContent+=text[i++];if(i>=text.length){clearInterval(state.typing);state.typing=null;state.isTyping=false;if(onDone)onDone();}},ms);
+}
+function skipTyping(text){if(state.typing){clearInterval(state.typing);state.typing=null;}state.isTyping=false;document.getElementById('dialogue-text').textContent=text;}
+
+// ── HISTORIQUE ──
+function addToHistory(sp,tx,ic){state.history.push({speaker:sp,text:tx,isChoice:ic});}
+function renderHistory(){
+  const list=document.getElementById('history-list');list.innerHTML='';
+  state.history.forEach(e=>{const d=document.createElement('div');d.className='history-entry';d.innerHTML=e.isChoice?`<div class="h-choice">▸ ${e.text}</div>`:`<div class="h-name">${e.speaker}</div><div>${e.text}</div>`;list.appendChild(d);});
+  list.scrollTop=list.scrollHeight;
 }
 
-// ═══════════════════════════════════════════════
-// ÉCRANS
-// ═══════════════════════════════════════════════
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
+// ── BOUTON RETOUR ──
+function updateBackBtn(){const b=document.getElementById('btn-back-dialogue');state.navStack.length>0&&!state.awaitingChoice?b.classList.add('visible'):b.classList.remove('visible');}
 
-function fadeTransition(cb) {
-  const fo = document.getElementById('fade-overlay');
-  fo.classList.add('fade-in');
-  setTimeout(() => { cb(); setTimeout(() => fo.classList.remove('fade-in'), 100); }, 500);
-}
-
-// ═══════════════════════════════════════════════
-// AFFINITÉ
-// ═══════════════════════════════════════════════
-function updateAffinity(delta) {
-  if (!delta) return;
-  state.affinity = Math.max(-100, Math.min(100, state.affinity + delta));
-  renderAffinity();
-  showAffinityDelta(delta);
-}
-
-function renderAffinity() {
-  const aff = state.affinity;
-  const bar = document.getElementById('affinity-bar');
-  const val = document.getElementById('affinity-val');
-  const ico = document.getElementById('aff-icon');
-  bar.style.width = ((aff + 100) / 200 * 100) + '%';
-  val.textContent = aff > 0 ? '+' + aff : String(aff);
-  const t = (aff + 100) / 200;
-  const r = Math.round(107 + (220-107)*t);
-  const g = Math.round(33  + (20-33)*t);
-  const b = Math.round(168 + (60-168)*t);
-  bar.style.background = `rgb(${r},${g},${b})`;
-  val.style.color = aff >= 0 ? 'var(--rose)' : 'var(--affinity-neg)';
-  ico.style.filter = aff >= 0 ? 'drop-shadow(0 0 4px var(--crimson))' : 'drop-shadow(0 0 4px #6B21A8)';
-}
-
-function showAffinityDelta(delta) {
-  const el = document.getElementById('affinity-delta');
-  el.className = '';
-  el.textContent = (delta > 0 ? '+ ' : '− ') + Math.abs(delta);
-  el.style.color = delta > 0 ? 'var(--crimson)' : '#9333ea';
-  void el.offsetWidth;
-  el.className = 'show';
-}
-
-// ═══════════════════════════════════════════════
-// AUDIO — FIX musique intro/jeu
-// ═══════════════════════════════════════════════
-const bgm = document.getElementById('bgm');
-
-// Joue une musique. Si src est null/undefined → arrête la musique.
-function playMusic(src) {
-  if (!src) {
-    // Pas de musique pour cette scène : ne pas changer
-    return;
-  }
-  if (state.currentMusic === src) return;
-  state.currentMusic = src;
-  bgm.src = src;
-  bgm.volume = state.muted ? 0 : state.volume;
-  bgm.play().catch(() => {
-    const resume = () => { bgm.play().catch(()=>{}); document.removeEventListener('click', resume); };
-    document.addEventListener('click', resume);
-  });
-}
-
-// Arrête complètement la musique
-function stopMusic() {
-  bgm.pause();
-  bgm.src = '';
-  state.currentMusic = null;
-}
-
-function applyVolume() { bgm.volume = state.muted ? 0 : state.volume; }
-
-// Musique d'intro
-function playIntroMusic() { playMusic(GAME_CONFIG.introMusic); }
-
-// ═══════════════════════════════════════════════
-// BACKGROUND
-// ═══════════════════════════════════════════════
-let lastBg = null;
-function setBg(src) {
-  const cur  = document.getElementById('game-bg');
-  const prev = document.getElementById('game-bg-prev');
-  if (!src || src === lastBg) return;
-  prev.style.backgroundImage = cur.style.backgroundImage;
-  prev.style.opacity = '1';
-  cur.style.backgroundImage = `url('${src}')`;
-  cur.style.opacity = '0';
-  requestAnimationFrame(() => requestAnimationFrame(() => {
-    cur.style.opacity = '1';
-    prev.style.opacity = '0';
-  }));
-  lastBg = src;
-}
-
-// ═══════════════════════════════════════════════
-// PERSONNAGE
-// ═══════════════════════════════════════════════
-function setCharacter(charImg) {
-  const wrap = document.getElementById('char-wrap');
-  const img  = document.getElementById('char-img');
-  if (!charImg) { wrap.style.opacity = '0'; return; }
-  img.src = charImg;
-  img.style.display = '';
-  wrap.style.opacity = '1';
-}
-
-// ═══════════════════════════════════════════════
-// TYPEWRITER — vitesse personnalisable par scène
-// ═══════════════════════════════════════════════
-const DEFAULT_TYPE_SPEED = 22; // ms par caractère
-
-function typeText(el, text, speed, onDone) {
-  el.textContent = '';
-  state.isTyping = true;
-  let i = 0;
-  if (state.typing) clearInterval(state.typing);
-  const ms = (typeof speed === 'number' && speed > 0) ? speed : DEFAULT_TYPE_SPEED;
-  state.typing = setInterval(() => {
-    el.textContent += text[i++];
-    if (i >= text.length) {
-      clearInterval(state.typing);
-      state.typing = null;
-      state.isTyping = false;
-      if (onDone) onDone();
-    }
-  }, ms);
-}
-
-function skipTyping(text) {
-  if (state.typing) { clearInterval(state.typing); state.typing = null; }
-  state.isTyping = false;
-  document.getElementById('dialogue-text').textContent = text;
-}
-
-// ═══════════════════════════════════════════════
-// HISTORIQUE
-// ═══════════════════════════════════════════════
-function addToHistory(speaker, text, isChoice) {
-  state.history.push({ speaker, text, isChoice });
-}
-
-function renderHistory() {
-  const list = document.getElementById('history-list');
-  list.innerHTML = '';
-  state.history.forEach(entry => {
-    const div = document.createElement('div');
-    div.className = 'history-entry';
-    div.innerHTML = entry.isChoice
-      ? `<div class="h-choice">▸ ${entry.text}</div>`
-      : `<div class="h-name">${entry.speaker}</div><div>${entry.text}</div>`;
-    list.appendChild(div);
-  });
-  list.scrollTop = list.scrollHeight;
-}
-
-// ═══════════════════════════════════════════════
-// BOUTON RETOUR DIALOGUE
-// ═══════════════════════════════════════════════
-function updateBackBtn() {
-  const btn = document.getElementById('btn-back-dialogue');
-  if (state.navStack.length > 0 && !state.awaitingChoice) {
-    btn.classList.add('visible');
-  } else {
-    btn.classList.remove('visible');
-  }
-}
-
-document.getElementById('btn-back-dialogue').addEventListener('click', () => {
-  if (state.awaitingChoice) return;
-  if (state.navStack.length === 0) return;
-
-  if (state.typing) { clearInterval(state.typing); state.typing = null; }
-  state.isTyping = false;
-
-  const entry = state.navStack.pop();
-  const prevIdx = entry.sceneIndex;
-
-  // Annuler le delta d'affinité enregistré lors du passage à la scène suivante
-  if (entry.affinityDelta) {
-    state.affinity = Math.max(-100, Math.min(100, state.affinity - entry.affinityDelta));
-    renderAffinity();
-    showAffinityDelta(-entry.affinityDelta);
-  }
-
-  state.sceneIndex = prevIdx;
-  renderScene(state.scenes[prevIdx], /* fromBack= */ true);
+document.getElementById('btn-back-dialogue').addEventListener('click',()=>{
+  if(state.awaitingChoice||!state.navStack.length)return;
+  if(state.typing){clearInterval(state.typing);state.typing=null;}state.isTyping=false;
+  const entry=state.navStack.pop();
+  if(entry.affinityDelta){state.affinity=Math.max(-100,Math.min(100,state.affinity-entry.affinityDelta));renderAffinity();showAffinityDelta(-entry.affinityDelta);}
+  state.sceneIndex=entry.sceneIndex;renderScene(state.scenes[entry.sceneIndex],true);
 });
 
-// ═══════════════════════════════════════════════
-// RENDU DE SCÈNE
-// ═══════════════════════════════════════════════
-function getSceneIndex(id) { return state.scenes.findIndex(s => s.id === id); }
+// ── SCÈNES ──
+function getSceneIndex(id){return state.scenes.findIndex(s=>s.id===id);}
 
-function renderScene(scene, fromBack = false) {
-  if (!scene) { triggerEnding(); return; }
+function renderScene(scene,fromBack=false){
+  if(!scene){triggerEnding();return;}
+  if(scene.bg)setBg(scene.bg);   // async : précharge avant d'afficher
+  setCharacter(scene.charImg||null);
+  if(scene.music)playMusic(scene.music);
+  document.getElementById('speaker-name').textContent=scene.speaker||'';
+  const cw=document.getElementById('choices-wrap');
+  cw.style.display='none';
+  document.getElementById('dialogue-wrap').style.display='';
+  document.getElementById('dialogue-continue').style.display='';
+  state.awaitingChoice=false;
+  addToHistory(scene.speaker||'',scene.text,false);
+  const textEl=document.getElementById('dialogue-text');
+  scene.choices?typeText(textEl,scene.text,scene.typeSpeed,()=>renderChoices(scene.choices)):typeText(textEl,scene.text,scene.typeSpeed,null);
+  updateBackBtn();saveGame();
 
-  if (scene.bg)      setBg(scene.bg);
-  setCharacter(scene.charImg || null);
-  if (scene.music)   playMusic(scene.music);
-
-  document.getElementById('speaker-name').textContent = scene.speaker || '';
-
-  const cw = document.getElementById('choices-wrap');
-  cw.style.display = 'none';
-  document.getElementById('dialogue-wrap').style.display = '';
-  document.getElementById('dialogue-continue').style.display = '';
-  state.awaitingChoice = false;
-
-  addToHistory(scene.speaker || '', scene.text, false);
-
-  const textEl = document.getElementById('dialogue-text');
-  const speed  = scene.typeSpeed;
-
-  if (scene.choices) {
-    typeText(textEl, scene.text, speed, () => renderChoices(scene.choices));
-  } else {
-    typeText(textEl, scene.text, speed, null);
+  // Précharge silencieuse du fond de la scène suivante
+  if(scene.next&&scene.next!=='__ending__'){
+    const ni=getSceneIndex(scene.next);
+    if(ni!==-1&&state.scenes[ni]&&state.scenes[ni].bg)preloadImage(state.scenes[ni].bg);
   }
-
-  updateBackBtn();
-  saveGame();
 }
 
-function advance() {
-  if (state.awaitingChoice) return;
-  const scene = state.scenes[state.sceneIndex];
-  if (!scene) return;
-
-  if (state.isTyping) {
-    skipTyping(scene.text);
-    if (scene.choices) renderChoices(scene.choices);
-    return;
-  }
-
-  if (scene.choices && document.getElementById('choices-wrap').style.display !== 'none') return;
-
-  if (scene.next === '__ending__') { triggerEnding(); return; }
-
-  if (scene.minigame) {
-    triggerMinigame(scene, () => navigateTo(scene.next));
-    return;
-  }
-
-  if (scene.next) navigateTo(scene.next);
+function advance(){
+  if(state.awaitingChoice)return;
+  const scene=state.scenes[state.sceneIndex];if(!scene)return;
+  if(state.isTyping){skipTyping(scene.text);if(scene.choices)renderChoices(scene.choices);return;}
+  if(scene.choices&&document.getElementById('choices-wrap').style.display!=='none')return;
+  if(scene.next==='__ending__'){triggerEnding();return;}
+  if(scene.minigame){triggerMinigame(scene,()=>navigateTo(scene.next));return;}
+  if(scene.next)navigateTo(scene.next);
 }
 
-// navigateTo enregistre le delta d'affinité = 0 (pas de choix ici)
-function navigateTo(id, affinityDeltaFromChoice = 0) {
-  if (!id || id === '__ending__') { triggerEnding(); return; }
-  const idx = getSceneIndex(id);
-  if (idx === -1) { triggerEnding(); return; }
-
-  // Empiler l'index actuel + le delta éventuellement reçu d'un choix
-  state.navStack.push({ sceneIndex: state.sceneIndex, affinityDelta: affinityDeltaFromChoice });
-
-  state.sceneIndex = idx;
-  renderScene(state.scenes[idx]);
+function navigateTo(id,affinityDelta=0){
+  if(!id||id==='__ending__'){triggerEnding();return;}
+  const idx=getSceneIndex(id);if(idx===-1){triggerEnding();return;}
+  state.navStack.push({sceneIndex:state.sceneIndex,affinityDelta});
+  state.sceneIndex=idx;renderScene(state.scenes[idx]);
 }
 
-function renderChoices(choices) {
-  state.awaitingChoice = true;
-  updateBackBtn();
-
-  const cw = document.getElementById('choices-wrap');
-  document.getElementById('dialogue-continue').style.display = 'none';
-  cw.innerHTML = '';
-  cw.style.display = 'flex';
-
-  choices.forEach(ch => {
-    const btn = document.createElement('button');
-    btn.className = 'choice-btn';
-    btn.textContent = ch.text;
-    btn.addEventListener('click', () => {
-      addToHistory('Vous', ch.text, true);
-
-      // Appliquer le delta d'affinité
-      const delta = ch.affinityDelta || 0;
-      if (delta) updateAffinity(delta);
-
-      cw.style.display = 'none';
-      state.awaitingChoice = false;
-      document.getElementById('dialogue-continue').style.display = '';
-
-      if (ch.next === '__ending__') { triggerEnding(); return; }
-
-      // Passer le delta au navigateTo pour qu'il soit stocké dans navStack
-      // et puisse être annulé lors d'un retour
-      navigateTo(ch.next, delta);
+function renderChoices(choices){
+  state.awaitingChoice=true;updateBackBtn();
+  const cw=document.getElementById('choices-wrap');
+  document.getElementById('dialogue-continue').style.display='none';
+  cw.innerHTML='';cw.style.display='flex';
+  choices.forEach(ch=>{
+    const btn=document.createElement('button');btn.className='choice-btn';btn.textContent=ch.text;
+    btn.addEventListener('click',()=>{
+      addToHistory(t('youLabel'),ch.text,true);
+      const delta=ch.affinityDelta||0;if(delta)updateAffinity(delta);
+      cw.style.display='none';state.awaitingChoice=false;
+      document.getElementById('dialogue-continue').style.display='';
+      if(ch.next==='__ending__'){triggerEnding();return;}
+      navigateTo(ch.next,delta);
     });
     cw.appendChild(btn);
   });
 }
 
-// ═══════════════════════════════════════════════
-// FIN DE JEU
-// ═══════════════════════════════════════════════
-function triggerEnding() {
-  const aff = state.affinity;
-  let endingId = 'bad_end_2';
-  for (const r of ENDING_RANGES) {
-    if (aff >= r.min && aff <= r.max) { endingId = r.endingId; break; }
-  }
-  const ending = ENDINGS[endingId];
-  document.getElementById('ending-type').textContent  = ending.type;
-  document.getElementById('ending-title').textContent = ending.title;
-  document.getElementById('ending-text').textContent  = ending.text;
-  document.getElementById('ending-type').style.color  = ending.isBad ? '#ff6b6b' : 'var(--blood)';
-  fadeTransition(() => showScreen('ending-screen'));
-  playMusic(ending.isBad ? 'music/bad_ending.mp3' : 'music/true_ending.mp3');
+// ── FIN ──
+function triggerEnding(){
+  const aff=state.affinity;let endingId='bad_end_2';
+  for(const r of ENDING_RANGES){if(aff>=r.min&&aff<=r.max){endingId=r.endingId;break;}}
+  const ending=(I18N[state.lang]||I18N.en).endings[endingId];
+  document.getElementById('ending-type').textContent=ending.type;
+  document.getElementById('ending-title').textContent=ending.title;
+  document.getElementById('ending-text').textContent=ending.text;
+  document.getElementById('ending-type').style.color=ending.isBad?'#ff6b6b':'var(--blood)';
+  fadeTransition(()=>showScreen('ending-screen'));
+  playMusic(ending.isBad?'music/bad_ending.mp3':'music/true_ending.mp3');
 }
 
-// ═══════════════════════════════════════════════
-// MINI-JEUX
-// ═══════════════════════════════════════════════
-async function triggerMinigame(scene, onComplete) {
-  const id = scene.minigame;
-  if (!window.LMTD.minigames[id] && scene.minigameFile) {
-    await loadMinigameScript(scene.minigameFile);
-  }
-  const mg = window.LMTD.minigames[id];
-  if (!mg) { console.warn('Minigame inconnu:', id); onComplete(); return; }
-
-  const overlay = document.getElementById('minigame-overlay');
-  const content = document.getElementById('minigame-content');
-  overlay.style.display = 'flex';
-  mg.render(content, () => {
-    overlay.style.display = 'none';
-    onComplete();
-  });
+// ── MINIGAMES ──
+async function triggerMinigame(scene,onComplete){
+  const id=scene.minigame;
+  if(!window.LMTD.minigames[id]&&scene.minigameFile)await loadMinigameScript(scene.minigameFile);
+  const mg=window.LMTD.minigames[id];
+  if(!mg){console.warn('Unknown minigame:',id);onComplete();return;}
+  const ov=document.getElementById('minigame-overlay'),ct=document.getElementById('minigame-content');
+  ov.style.display='flex';mg.render(ct,()=>{ov.style.display='none';onComplete();});
 }
 
-// ═══════════════════════════════════════════════
-// DÉMARRAGE DU JEU — FIX: stopper la musique intro
-// ═══════════════════════════════════════════════
-function startGame(fromIdx = 0) {
-  // Arrêter la musique d'intro avant de lancer le jeu
-  stopMusic();
-
-  state.sceneIndex = fromIdx;
-  showScreen('game-screen');
-  renderAffinity();
-  renderScene(state.scenes[fromIdx]);
+// ── DÉMARRAGE ──
+function startGame(fromIdx=0){
+  stopMusic();state.sceneIndex=fromIdx;
+  showScreen('game-screen');renderAffinity();renderScene(state.scenes[fromIdx]);
 }
 
-// ═══════════════════════════════════════════════
-// BOOT — séquence de chargement
-// ═══════════════════════════════════════════════
-async function boot() {
-  // 1. Précharger assets visuels critiques (pas d'audio ici)
+// ── BOOT ──
+async function boot(){
+  state.lang='en';
+  applyLang();
   await preloadAssets();
 
-  // 2. Charger les scènes JSON
-  await loadChapters();
+  // Démarre la musique intro SILENCIEUSEMENT dès maintenant.
+  // Elle sera débloquée (son levé) dès le premier clic utilisateur.
+  initIntroAudio();
 
-  // 3. Précharger les scripts de minigames référencés
-  await preloadMinigames();
-
-  // 4. Lancer la musique d'intro DÈS que le chargement est terminé
-  playIntroMusic();
-
-  // 5. Vérifier si une sauvegarde existe pour adapter le bouton
-  const hasSave = (() => {
-    try {
-      const raw = localStorage.getItem(LS_KEY);
-      if (!raw) return false;
-      const d = JSON.parse(raw);
-      return d.firstTime === false;
-    } catch { return false; }
-  })();
-
-  // Mettre à jour le label du bouton
-  const btnStart = document.getElementById('btn-start');
-  if (hasSave) {
-    btnStart.textContent = 'CONTINUER';
-  } else {
-    btnStart.textContent = 'COMMENCER';
-  }
-
-  // 6. Afficher l'écran titre
-  fadeTransition(() => showScreen('title-screen'));
+  fadeTransition(()=>showScreen('title-screen'));
 }
 
-// ──────────────────────────────────────────
-// ÉVÉNEMENTS — Bouton démarrer
-// ──────────────────────────────────────────
-document.getElementById('btn-start').addEventListener('click', () => {
-  const saved = loadSave();
-  if (saved && !state.firstTime) {
-    // Joueur de retour : reprendre directement
-    fadeTransition(() => {
-      stopMusic(); // Stopper l'intro avant de reprendre
-      showScreen('game-screen');
-      renderAffinity();
-      renderScene(state.scenes[state.sceneIndex] || state.scenes[0]);
+// ── ÉVÉNEMENTS ──
+
+// Tout clic déverrouille l'audio (lève le mute + fade-in volume)
+document.addEventListener('click', unlockAudio);
+
+document.getElementById('btn-start').addEventListener('click',()=>{
+  const saved=loadSave();
+  if(saved&&!state.firstTime){
+    applyLang();
+    loadChapters().then(()=>{
+      fadeTransition(()=>{stopMusic();showScreen('game-screen');renderAffinity();renderScene(state.scenes[state.sceneIndex]||state.scenes[0]);});
     });
   } else {
-    fadeTransition(() => showScreen('lang-screen'));
+    fadeTransition(()=>showScreen('lang-screen'));
   }
 });
 
-// Langue
-document.querySelectorAll('.lang-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    state.lang = btn.dataset.lang;
-    fadeTransition(() => showScreen('policy-screen'));
+document.querySelectorAll('.lang-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    state.lang=btn.dataset.lang;
+    applyLang();
+    document.getElementById('policy-bar').style.width='0%';
+    document.getElementById('btn-accept').classList.remove('ready');
+    fadeTransition(()=>showScreen('policy-screen'));
   });
 });
 
-// Policy scroll
-const policyScroll = document.getElementById('policy-scroll');
-const policyBar    = document.getElementById('policy-bar');
-const btnAccept    = document.getElementById('btn-accept');
-policyScroll.addEventListener('scroll', () => {
-  const { scrollTop, scrollHeight, clientHeight } = policyScroll;
-  const pct = scrollTop / (scrollHeight - clientHeight);
-  policyBar.style.width = Math.min(100, pct * 100) + '%';
-  if (pct >= 0.98) btnAccept.classList.add('ready');
+const policyScroll=document.getElementById('policy-scroll');
+policyScroll.addEventListener('scroll',()=>{
+  const{scrollTop,scrollHeight,clientHeight}=policyScroll;
+  const pct=scrollTop/(scrollHeight-clientHeight);
+  document.getElementById('policy-bar').style.width=Math.min(100,pct*100)+'%';
+  if(pct>=0.98)document.getElementById('btn-accept').classList.add('ready');
 });
-btnAccept.addEventListener('click', () => {
-  if (!btnAccept.classList.contains('ready')) return;
-  state.firstTime = false;
+
+document.getElementById('btn-accept').addEventListener('click',async()=>{
+  if(!document.getElementById('btn-accept').classList.contains('ready'))return;
+  state.firstTime=false;
+  await loadChapters();
+  await preloadMinigames();
   saveGame();
-  fadeTransition(() => startGame(0));
+  fadeTransition(()=>startGame(0));
 });
 
-// Avancer le dialogue
-document.getElementById('dialogue-box').addEventListener('click', e => {
-  if (e.target.id === 'btn-back-dialogue') return;
-  advance();
-});
-document.getElementById('game-bg').addEventListener('click',   advance);
-document.getElementById('char-wrap').addEventListener('click', advance);
+document.getElementById('dialogue-box').addEventListener('click',e=>{if(e.target.id==='btn-back-dialogue')return;advance();});
+document.getElementById('game-bg').addEventListener('click',advance);
+document.getElementById('game-bg-prev').addEventListener('click',advance);
+document.getElementById('char-wrap').addEventListener('click',advance);
 
-// Historique
-document.getElementById('btn-history').addEventListener('click', () => {
-  renderHistory();
-  document.getElementById('history-overlay').style.display = 'flex';
-});
-document.getElementById('btn-close-history').addEventListener('click', () => {
-  document.getElementById('history-overlay').style.display = 'none';
-});
-
-// Aide
-document.getElementById('btn-help').addEventListener('click', () => {
-  document.getElementById('help-overlay').style.display = 'flex';
-});
-document.getElementById('btn-close-help').addEventListener('click', () => {
-  document.getElementById('help-overlay').style.display = 'none';
-});
-
-// Pause
-document.getElementById('btn-pause').addEventListener('click', () => {
+document.getElementById('btn-history').addEventListener('click',()=>{renderHistory();document.getElementById('history-overlay').style.display='flex';});
+document.getElementById('btn-close-history').addEventListener('click',()=>{document.getElementById('history-overlay').style.display='none';});
+document.getElementById('btn-help').addEventListener('click',()=>{document.getElementById('help-overlay').style.display='flex';});
+document.getElementById('btn-close-help').addEventListener('click',()=>{document.getElementById('help-overlay').style.display='none';});
+document.getElementById('btn-pause').addEventListener('click',()=>{saveGame();document.getElementById('pause-modal').style.display='flex';});
+document.getElementById('btn-resume').addEventListener('click',()=>{document.getElementById('pause-modal').style.display='none';});
+document.getElementById('btn-save-quit').addEventListener('click',()=>{
   saveGame();
-  document.getElementById('pause-modal').style.display = 'flex';
-});
-document.getElementById('btn-resume').addEventListener('click', () => {
-  document.getElementById('pause-modal').style.display = 'none';
-});
-document.getElementById('btn-save-quit').addEventListener('click', () => {
-  saveGame();
-  fadeTransition(() => {
-    document.getElementById('pause-modal').style.display = 'none';
+  fadeTransition(()=>{
+    document.getElementById('pause-modal').style.display='none';
     showScreen('title-screen');
-    // Remettre le bouton en CONTINUER puisqu'une sauvegarde existe
-    document.getElementById('btn-start').textContent = 'CONTINUER';
-    playIntroMusic();
+    document.getElementById('btn-start').textContent=t('btnContinue');
+    initIntroAudio();
+    unlockAudio(); // déjà cliqué donc on lève le son immédiatement
   });
 });
-document.getElementById('btn-restart-game').addEventListener('click', () => {
-  if (confirm('Recommencer depuis le début ? Votre progression sera perdue.')) resetGame();
-});
-document.getElementById('btn-restart-end').addEventListener('click', () => {
-  if (confirm('Recommencer le jeu ?')) resetGame();
-});
+document.getElementById('btn-restart-game').addEventListener('click',()=>{if(confirm(t('confirmRestart')))resetGame();});
+document.getElementById('btn-restart-end').addEventListener('click',()=>{if(confirm(t('confirmRestartEnd')))resetGame();});
 
-// Volume
-const volSlider = document.getElementById('vol-slider');
-const btnMute   = document.getElementById('btn-mute');
-volSlider.value = state.volume;
-volSlider.addEventListener('input', () => { state.volume = parseFloat(volSlider.value); applyVolume(); saveGame(); });
-btnMute.addEventListener('click', () => {
-  state.muted = !state.muted;
-  btnMute.textContent = state.muted ? '🔇' : '🔊';
-  applyVolume(); saveGame();
-});
+const volSlider=document.getElementById('vol-slider'),btnMute=document.getElementById('btn-mute');
+volSlider.value=state.volume;
+volSlider.addEventListener('input',()=>{state.volume=parseFloat(volSlider.value);applyVolume();saveGame();});
+btnMute.addEventListener('click',()=>{state.muted=!state.muted;btnMute.textContent=state.muted?'🔇':'🔊';applyVolume();saveGame();});
 
-// Particules
-(function spawnParticles() {
-  const container = document.getElementById('particles');
-  const colors = ['#DC143C','#8B0000','#FF6B8A','#C9A84C'];
-  for (let i = 0; i < 20; i++) {
-    const p = document.createElement('div');
-    p.className = 'particle';
-    p.style.cssText = `left:${Math.random()*100}%;animation-duration:${6+Math.random()*10}s;animation-delay:${Math.random()*8}s;width:${2+Math.random()*3}px;height:${2+Math.random()*3}px;background:${colors[i%colors.length]};`;
-    container.appendChild(p);
-  }
-})();
+(function(){const c=document.getElementById('particles'),colors=['#DC143C','#8B0000','#FF6B8A','#C9A84C'];for(let i=0;i<20;i++){const p=document.createElement('div');p.className='particle';p.style.cssText=`left:${Math.random()*100}%;animation-duration:${6+Math.random()*10}s;animation-delay:${Math.random()*8}s;width:${2+Math.random()*3}px;height:${2+Math.random()*3}px;background:${colors[i%colors.length]};`;c.appendChild(p);}})();
 
-// Ripple au clic
-document.addEventListener('click', e => {
-  const r = document.createElement('div');
-  r.className = 'ripple';
-  r.style.left = e.clientX + 'px';
-  r.style.top  = e.clientY + 'px';
-  document.body.appendChild(r);
-  setTimeout(() => r.remove(), 600);
-});
+document.addEventListener('click',e=>{const r=document.createElement('div');r.className='ripple';r.style.left=e.clientX+'px';r.style.top=e.clientY+'px';document.body.appendChild(r);setTimeout(()=>r.remove(),600);});
 
-// Clavier
-document.addEventListener('keydown', e => {
-  if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); advance(); }
-  if (e.key === 'Backspace' && !state.awaitingChoice) {
-    document.getElementById('btn-back-dialogue').click();
-  }
-  if (e.key === 'Escape') {
-    const histOpen  = document.getElementById('history-overlay').style.display === 'flex';
-    const helpOpen  = document.getElementById('help-overlay').style.display    === 'flex';
-    const pauseOpen = document.getElementById('pause-modal').style.display     === 'flex';
-    if (histOpen)  document.getElementById('history-overlay').style.display = 'none';
-    else if (helpOpen)  document.getElementById('help-overlay').style.display = 'none';
-    else if (pauseOpen) document.getElementById('pause-modal').style.display  = 'none';
-    else if (document.getElementById('game-screen').classList.contains('active'))
-      document.getElementById('pause-modal').style.display = 'flex';
+document.addEventListener('keydown',e=>{
+  if(e.key===' '||e.key==='Enter'){e.preventDefault();advance();}
+  if(e.key==='Backspace'&&!state.awaitingChoice)document.getElementById('btn-back-dialogue').click();
+  if(e.key==='Escape'){
+    const h=document.getElementById('history-overlay').style.display==='flex';
+    const hp=document.getElementById('help-overlay').style.display==='flex';
+    const p=document.getElementById('pause-modal').style.display==='flex';
+    if(h)document.getElementById('history-overlay').style.display='none';
+    else if(hp)document.getElementById('help-overlay').style.display='none';
+    else if(p)document.getElementById('pause-modal').style.display='none';
+    else if(document.getElementById('game-screen').classList.contains('active'))document.getElementById('pause-modal').style.display='flex';
   }
 });
 
-// ══════════════════════════════════════════════════
-// SCÈNES DE DÉMO (fallback si les JSON sont absents)
-// ══════════════════════════════════════════════════
-const FALLBACK_SCENES = [
-  {
-    id: 's_demo',
-    bg: null, character: null, charImg: null,
-    speaker: '— Système —',
-    text: 'Aucun fichier JSON trouvé dans json/chapter1.json. Placez vos fichiers de scènes dans le dossier json/ pour commencer.',
-    music: null,
-    typeSpeed: 30,
-    next: '__ending__'
-  }
-];
-
-// Lancer le boot
 boot();
 </script>
 </body>
