@@ -109,10 +109,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 /* GAME */
 #game-screen{background:var(--obsidian);padding:0}
 
-/* ── FIX TRANSITIONS NOIRES : deux calques qui se croisent ── */
-#game-bg-prev,#game-bg{position:absolute;inset:0;background-size:cover;background-position:center;z-index:0}
-#game-bg-prev{opacity:1;z-index:0}
-#game-bg{opacity:0;z-index:1;transition:opacity .6s ease}
+#game-bg{position:absolute;inset:0;background-size:cover;background-position:center;z-index:0}
 
 #char-wrap{position:absolute;bottom:0;left:50%;transform:translateX(-50%);z-index:2;max-height:85%;display:flex;align-items:flex-end;justify-content:center;transition:opacity .5s ease;pointer-events:none}
 #char-img{max-height:100%;max-width:60vw;object-fit:contain;filter:drop-shadow(0 0 30px rgba(0,0,0,.8))}
@@ -245,7 +242,6 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 </div>
 
 <div id="game-screen" class="screen">
-  <div id="game-bg-prev"></div>
   <div id="game-bg"></div>
   <div id="char-wrap"><img id="char-img" src="" alt="" onerror="this.style.display='none'"></div>
   <div id="hud">
@@ -438,7 +434,12 @@ const I18N = {
 const ENDING_RANGES=[{min:51,max:100,endingId:'true_love'},{min:1,max:50,endingId:'bittersweet'},{min:-50,max:0,endingId:'bad_end_1'},{min:-100,max:-51,endingId:'bad_end_2'}];
 const LS_KEY='lmtd_save_v3';
 
-const state={lang:'en',firstTime:true,sceneIndex:0,scenes:[],navStack:[],affinity:0,history:[],muted:false,volume:0.7,currentMusic:null,isTyping:false,typing:null,awaitingChoice:false};
+const state={
+  lang:'en', firstTime:true, sceneIndex:0, scenes:[], navStack:[],
+  affinity:0, history:[], muted:false, volume:0.7, currentMusic:null,
+  isTyping:false, typing:null, awaitingChoice:false,
+  pendingChoices:null  // FIX choix trop tôt : choix stockés jusqu'au prochain clic
+};
 window.LMTD={minigames:{},registerMinigame(id,obj){this.minigames[id]=obj;}};
 
 function t(k){return(I18N[state.lang]||I18N.en)[k];}
@@ -476,7 +477,6 @@ async function preloadAssets(){
   await Promise.allSettled(imgs.map(s=>new Promise(r=>{const i=new Image();i.onload=i.onerror=()=>{tick();r();};i.src=s;})));
 }
 
-// Précharge une image et resolve quand c'est prêt (utilisé avant affichage bg)
 function preloadImage(src){
   return new Promise(res=>{if(!src)return res();const i=new Image();i.onload=i.onerror=res;i.src=src;});
 }
@@ -524,83 +524,56 @@ function renderAffinity(){
 function showAffinityDelta(d){const el=document.getElementById('affinity-delta');el.className='';el.textContent=(d>0?'+ ':'− ')+Math.abs(d);el.style.color=d>0?'var(--crimson)':'#9333ea';void el.offsetWidth;el.className='show';}
 
 // ══════════════════════════════════════════════════════════
-// AUDIO — FIX MUSIQUE INTRO SANS CLIC UTILISATEUR
+// AUDIO — 3 corrections :
 //
-// Stratégie :
-//  1. Au boot, on assigne src + muted=true + on tente play().
-//     Le navigateur autorise play() sur un élément muté même sans geste.
-//  2. Au PREMIER clic n'importe où, on lève le mute et on fade le volume.
-//     Résultat : la musique "est déjà en train de jouer" dès l'écran titre,
-//     le son apparaît dès la première interaction — pas de silence awkward.
+// 1. startIntroMusic() : appelée sur le clic BEGIN/CONTINUE
+//    (premier geste utilisateur garanti → autoplay autorisé
+//    par tous les navigateurs modernes)
+//
+// 2. playMusic() : vérifie !bgm.paused pour forcer la reprise
+//    si la piste est la même mais s'est arrêtée (après pause/reprise)
+//
+// 3. btn-save-quit : appelle startIntroMusic() au lieu de l'ancienne
+//    logique complexe qui ne fonctionnait pas
 // ══════════════════════════════════════════════════════════
-const bgm=document.getElementById('bgm');
-let audioUnlocked=false;
+const bgm = document.getElementById('bgm');
 
-function initIntroAudio(){
-  bgm.src=GAME_CONFIG.introMusic;
-  bgm.loop=true;
-  bgm.volume=0;
-  bgm.muted=true;
-  bgm.play().catch(()=>{});   // silencieux — OK sur tous navigateurs modernes
+function startIntroMusic() {
+  bgm.src = GAME_CONFIG.introMusic;
+  bgm.loop = true;
+  bgm.muted = false;
+  bgm.volume = state.muted ? 0 : state.volume;
+  bgm.play().catch(() => {});
+  state.currentMusic = GAME_CONFIG.introMusic;
 }
 
-function unlockAudio(){
-  if(audioUnlocked)return;
-  audioUnlocked=true;
-  bgm.muted=false;
-  if(bgm.paused)bgm.play().catch(()=>{});
-  // fade-in doux vers le volume cible
-  let v=0; const target=state.muted?0:state.volume; const step=target/30;
-  const fade=setInterval(()=>{v=Math.min(v+step,target);bgm.volume=v;if(v>=target)clearInterval(fade);},50);
+function playMusic(src) {
+  if (!src) return;
+  // FIX musique scène : si même src mais bgm arrêté (ex: après reprise de sauvegarde), on relance
+  if (state.currentMusic === src && !bgm.paused) return;
+  state.currentMusic = src;
+  bgm.src = src;
+  bgm.loop = true;
+  bgm.muted = false;
+  bgm.volume = state.muted ? 0 : state.volume;
+  bgm.play().catch(() => {});
 }
 
-function playMusic(src){
-  if(!src||state.currentMusic===src)return;
-  state.currentMusic=src;
-  bgm.muted=state.muted;
-  bgm.volume=state.muted?0:state.volume;
-  bgm.src=src;
-  bgm.play().catch(()=>{const r=()=>{bgm.play().catch(()=>{});document.removeEventListener('click',r);};document.addEventListener('click',r);});
-}
-function stopMusic(){bgm.pause();bgm.src='';state.currentMusic=null;}
-function applyVolume(){bgm.volume=state.muted?0:state.volume;}
+function stopMusic() { bgm.pause(); bgm.src = ''; state.currentMusic = null; }
+function applyVolume() { bgm.volume = state.muted ? 0 : state.volume; }
 
 // ══════════════════════════════════════════════════════════
-// BACKGROUND — FIX TRANSITIONS NOIRES
-//
-// Problème : quand on change de fond, le navigateur met un instant
-// à décoder l'image → flash noir visible.
-//
-// Solution : on PRÉCHARGE l'image avec un <img> temporaire AVANT de
-// l'assigner au CSS. Pendant le chargement, l'ancien fond reste visible.
-// Puis on fait un crossfade propre.
+// BACKGROUND — simple et fiable, sans double-calque
+// Précharge l'image avant de l'assigner → zéro flash noir
+// (le double-calque prev/cur causait le bug "image qui ne change pas")
 // ══════════════════════════════════════════════════════════
-let lastBg=null;
+let lastBg = null;
 
-async function setBg(src){
-  const cur=document.getElementById('game-bg'),prev=document.getElementById('game-bg-prev');
-  if(!src||src===lastBg)return;
-
-  // Précharger l'image AVANT de toucher au DOM → zéro flash noir
+async function setBg(src) {
+  if (!src || src === lastBg) return;
   await preloadImage(src);
-
-  // L'ancien fond va dans prev (reste visible en dessous)
-  prev.style.backgroundImage=cur.style.backgroundImage;
-  prev.style.opacity='1';
-
-  // Nouveau fond dans cur, encore invisible
-  cur.style.backgroundImage=`url('${src}')`;
-  cur.style.transition='none';
-  cur.style.opacity='0';
-
-  // Forcer reflow puis lancer le fondu
-  void cur.offsetWidth;
-  cur.style.transition='opacity 0.6s ease';
-  cur.style.opacity='1';
-
-  // Une fois le fondu terminé, on cache prev (propre)
-  setTimeout(()=>{prev.style.opacity='0';},650);
-  lastBg=src;
+  document.getElementById('game-bg').style.backgroundImage = `url('${src}')`;
+  lastBg = src;
 }
 
 function setCharacter(img){
@@ -641,37 +614,63 @@ document.getElementById('btn-back-dialogue').addEventListener('click',()=>{
 // ── SCÈNES ──
 function getSceneIndex(id){return state.scenes.findIndex(s=>s.id===id);}
 
-function renderScene(scene,fromBack=false){
+function renderScene(scene, fromBack=false){
   if(!scene){triggerEnding();return;}
-  if(scene.bg)setBg(scene.bg);   // async : précharge avant d'afficher
+
+  if(scene.bg) setBg(scene.bg); // async — précharge avant d'afficher, zéro flash
   setCharacter(scene.charImg||null);
-  if(scene.music)playMusic(scene.music);
+  if(scene.music) playMusic(scene.music);
+
   document.getElementById('speaker-name').textContent=scene.speaker||'';
+
   const cw=document.getElementById('choices-wrap');
   cw.style.display='none';
+  cw.innerHTML='';
   document.getElementById('dialogue-wrap').style.display='';
   document.getElementById('dialogue-continue').style.display='';
-  state.awaitingChoice=false;
-  addToHistory(scene.speaker||'',scene.text,false);
-  const textEl=document.getElementById('dialogue-text');
-  scene.choices?typeText(textEl,scene.text,scene.typeSpeed,()=>renderChoices(scene.choices)):typeText(textEl,scene.text,scene.typeSpeed,null);
-  updateBackBtn();saveGame();
 
-  // Précharge silencieuse du fond de la scène suivante
-  if(scene.next&&scene.next!=='__ending__'){
+  state.awaitingChoice=false;
+
+  // FIX choix trop tôt : on stocke les choix, ils ne s'affichent
+  // QU'au prochain clic du joueur (géré dans advance())
+  state.pendingChoices = scene.choices || null;
+
+  addToHistory(scene.speaker||'',scene.text,false);
+
+  // On ne passe JAMAIS renderChoices en callback du typewriter
+  typeText(document.getElementById('dialogue-text'), scene.text, scene.typeSpeed, null);
+
+  updateBackBtn();
+  saveGame();
+
+  // Précharge silencieuse du fond suivant
+  if(scene.next && scene.next!=='__ending__'){
     const ni=getSceneIndex(scene.next);
-    if(ni!==-1&&state.scenes[ni]&&state.scenes[ni].bg)preloadImage(state.scenes[ni].bg);
+    if(ni!==-1 && state.scenes[ni] && state.scenes[ni].bg) preloadImage(state.scenes[ni].bg);
   }
 }
 
 function advance(){
-  if(state.awaitingChoice)return;
-  const scene=state.scenes[state.sceneIndex];if(!scene)return;
-  if(state.isTyping){skipTyping(scene.text);if(scene.choices)renderChoices(scene.choices);return;}
-  if(scene.choices&&document.getElementById('choices-wrap').style.display!=='none')return;
+  if(state.awaitingChoice) return;
+  const scene=state.scenes[state.sceneIndex]; if(!scene) return;
+
+  // 1. Typewriter en cours → afficher tout le texte, attendre un autre clic
+  if(state.isTyping){
+    skipTyping(scene.text);
+    return;
+  }
+
+  // 2. Des choix attendent → les afficher maintenant
+  if(state.pendingChoices){
+    renderChoices(state.pendingChoices);
+    state.pendingChoices=null;
+    return;
+  }
+
+  // 3. Avancer normalement
   if(scene.next==='__ending__'){triggerEnding();return;}
   if(scene.minigame){triggerMinigame(scene,()=>navigateTo(scene.next));return;}
-  if(scene.next)navigateTo(scene.next);
+  if(scene.next) navigateTo(scene.next);
 }
 
 function navigateTo(id,affinityDelta=0){
@@ -685,6 +684,7 @@ function renderChoices(choices){
   state.awaitingChoice=true;updateBackBtn();
   const cw=document.getElementById('choices-wrap');
   document.getElementById('dialogue-continue').style.display='none';
+  document.getElementById('dialogue-wrap').style.display='';
   cw.innerHTML='';cw.style.display='flex';
   choices.forEach(ch=>{
     const btn=document.createElement('button');btn.className='choice-btn';btn.textContent=ch.text;
@@ -725,34 +725,41 @@ async function triggerMinigame(scene,onComplete){
 
 // ── DÉMARRAGE ──
 function startGame(fromIdx=0){
-  stopMusic();state.sceneIndex=fromIdx;
-  showScreen('game-screen');renderAffinity();renderScene(state.scenes[fromIdx]);
+  stopMusic();
+  state.sceneIndex=fromIdx;
+  lastBg=null; // reset pour forcer le rechargement du fond de la première scène
+  showScreen('game-screen');
+  renderAffinity();
+  renderScene(state.scenes[fromIdx]);
 }
 
-// ── BOOT ──
+// ── BOOT ── (pas de musique ici, elle démarre sur le premier clic)
 async function boot(){
   state.lang='en';
   applyLang();
   await preloadAssets();
-
-  // Démarre la musique intro SILENCIEUSEMENT dès maintenant.
-  // Elle sera débloquée (son levé) dès le premier clic utilisateur.
-  initIntroAudio();
-
   fadeTransition(()=>showScreen('title-screen'));
 }
 
 // ── ÉVÉNEMENTS ──
 
-// Tout clic déverrouille l'audio (lève le mute + fade-in volume)
-document.addEventListener('click', unlockAudio);
-
+// FIX musique menu : startIntroMusic() sur le clic BEGIN/CONTINUE
+// C'est le premier geste utilisateur garanti → autoplay autorisé
 document.getElementById('btn-start').addEventListener('click',()=>{
+  startIntroMusic();
+
   const saved=loadSave();
-  if(saved&&!state.firstTime){
+  if(saved && !state.firstTime){
     applyLang();
     loadChapters().then(()=>{
-      fadeTransition(()=>{stopMusic();showScreen('game-screen');renderAffinity();renderScene(state.scenes[state.sceneIndex]||state.scenes[0]);});
+      fadeTransition(()=>{
+        stopMusic();
+        showScreen('game-screen');
+        renderAffinity();
+        lastBg=null;
+        const scene=state.scenes[state.sceneIndex]||state.scenes[0];
+        renderScene(scene);
+      });
     });
   } else {
     fadeTransition(()=>showScreen('lang-screen'));
@@ -788,7 +795,6 @@ document.getElementById('btn-accept').addEventListener('click',async()=>{
 
 document.getElementById('dialogue-box').addEventListener('click',e=>{if(e.target.id==='btn-back-dialogue')return;advance();});
 document.getElementById('game-bg').addEventListener('click',advance);
-document.getElementById('game-bg-prev').addEventListener('click',advance);
 document.getElementById('char-wrap').addEventListener('click',advance);
 
 document.getElementById('btn-history').addEventListener('click',()=>{renderHistory();document.getElementById('history-overlay').style.display='flex';});
@@ -797,16 +803,18 @@ document.getElementById('btn-help').addEventListener('click',()=>{document.getEl
 document.getElementById('btn-close-help').addEventListener('click',()=>{document.getElementById('help-overlay').style.display='none';});
 document.getElementById('btn-pause').addEventListener('click',()=>{saveGame();document.getElementById('pause-modal').style.display='flex';});
 document.getElementById('btn-resume').addEventListener('click',()=>{document.getElementById('pause-modal').style.display='none';});
+
 document.getElementById('btn-save-quit').addEventListener('click',()=>{
   saveGame();
   fadeTransition(()=>{
     document.getElementById('pause-modal').style.display='none';
     showScreen('title-screen');
     document.getElementById('btn-start').textContent=t('btnContinue');
-    initIntroAudio();
-    unlockAudio(); // déjà cliqué donc on lève le son immédiatement
+    // FIX musique menu après retour au titre : on relance proprement
+    startIntroMusic();
   });
 });
+
 document.getElementById('btn-restart-game').addEventListener('click',()=>{if(confirm(t('confirmRestart')))resetGame();});
 document.getElementById('btn-restart-end').addEventListener('click',()=>{if(confirm(t('confirmRestartEnd')))resetGame();});
 
