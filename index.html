@@ -4,30 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Love Me To Death</title>
-
-<!--
-  ╔══════════════════════════════════════════════════════════════════╗
-  ║  STRUCTURE DES FICHIERS                                         ║
-  ║                                                                  ║
-  ║  index.html                                                      ║
-  ║  json/                                                           ║
-  ║    en/                                                           ║
-  ║      chapter1.json   ← English scenes                           ║
-  ║      chapter2.json   ← etc.                                     ║
-  ║    fr/                                                           ║
-  ║      chapter1.json   ← Scènes FR                                ║
-  ║      chapter2.json   ← etc.                                     ║
-  ║  images/backgrounds/  images/characters/                        ║
-  ║  music/  minigames/                                              ║
-  ╚══════════════════════════════════════════════════════════════════╝
-
-  typeSpeed : ajoutez "typeSpeed": 30 dans une scène (défaut: 22ms).
--->
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
-
 <style>
 :root {
   --blood:#8B0000;--crimson:#DC143C;--rose:#FF6B8A;--petal:#FFD6E0;
@@ -50,11 +29,10 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .particle{position:absolute;width:3px;height:3px;border-radius:50%;background:var(--crimson);opacity:0;animation:floatUp linear infinite}
 @keyframes floatUp{0%{transform:translateY(100vh) scale(0);opacity:0}10%{opacity:.6}90%{opacity:.3}100%{transform:translateY(-10vh) scale(1.5);opacity:0}}
 
-/* TITLE */
 #title-screen{background:radial-gradient(ellipse at 50% 30%,#1a0510 0%,var(--obsidian) 70%)}
 .title-bg-roses{position:absolute;inset:0;background:radial-gradient(circle at 20% 80%,rgba(139,0,0,.15) 0%,transparent 50%),radial-gradient(circle at 80% 20%,rgba(139,0,0,.10) 0%,transparent 40%);pointer-events:none}
 .title-deco{position:absolute;top:0;left:50%;transform:translateX(-50%);width:1px;height:30%;background:linear-gradient(to bottom,transparent,var(--blood))}
-.title-deco::after{content:'✦';position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);color:var(--blood);font-size:12px}
+.title-deco::after{content:'\2756';position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);color:var(--blood);font-size:12px}
 .title-wrap{position:relative;text-align:center;z-index:2}
 .title-sub{font-family:'Cinzel',serif;font-size:clamp(.55rem,1.5vw,.8rem);letter-spacing:.5em;color:var(--blood);text-transform:uppercase;margin-bottom:1.2rem;opacity:0;animation:fadeIn 1.5s .5s forwards}
 .title-main{font-family:'Cinzel',serif;font-size:clamp(2.5rem,8vw,6rem);font-weight:600;color:var(--silver);line-height:1;text-shadow:0 0 60px rgba(220,20,60,.4),0 0 120px rgba(220,20,60,.2);opacity:0;animation:titleReveal 5s .8s forwards}
@@ -70,7 +48,6 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .btn-start:hover{border-color:var(--crimson);color:#fff;letter-spacing:.4em;box-shadow:0 0 30px rgba(220,20,60,.3)}
 .btn-start:hover::before{opacity:1}
 
-/* LANG */
 #lang-screen{background:radial-gradient(ellipse at 50% 50%,#0d0515 0%,var(--obsidian) 80%)}
 .lang-title{font-family:'Cinzel',serif;font-size:clamp(1.2rem,4vw,2rem);color:var(--silver);margin-bottom:.5rem;text-align:center}
 .lang-sub{font-size:clamp(.75rem,2vw,.95rem);color:var(--text-dim);font-style:italic;margin-bottom:3rem;text-align:center}
@@ -80,7 +57,6 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .lang-flag{font-size:3.5rem;line-height:1}
 .lang-name{font-family:'Cinzel',serif;font-size:.9rem;letter-spacing:.2em;color:var(--silver)}
 
-/* POLICY */
 #policy-screen{background:var(--obsidian);padding:1rem}
 .policy-container{width:100%;max-width:700px;display:flex;flex-direction:column;height:100vh;max-height:100vh;padding:2rem 1.5rem 1.5rem}
 .policy-header{font-family:'Cinzel',serif;font-size:clamp(1rem,3vw,1.5rem);color:var(--silver);text-align:center;border-bottom:1px solid var(--box-border);padding-bottom:1rem;margin-bottom:1.2rem;flex-shrink:0}
@@ -98,7 +74,6 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .btn-accept.ready{opacity:1;pointer-events:all}
 .btn-accept.ready:hover{background:var(--crimson);box-shadow:0 0 20px rgba(220,20,60,.4)}
 
-/* LOADING */
 #loading-screen{background:var(--obsidian);z-index:50}
 .loading-inner{text-align:center}
 .loading-title{font-family:'Cinzel',serif;font-size:1rem;letter-spacing:.4em;color:var(--blood);margin-bottom:2rem;text-transform:uppercase}
@@ -106,14 +81,11 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .loading-bar-inner{height:100%;background:var(--crimson);width:0%;transition:width .3s ease;border-radius:1px}
 .loading-pct{font-family:'Cinzel',serif;font-size:.7rem;color:var(--text-dim);letter-spacing:.3em}
 
-/* GAME */
 #game-screen{background:var(--obsidian);padding:0}
-
 #game-bg{position:absolute;inset:0;background-size:cover;background-position:center;z-index:0}
-
 #char-wrap{position:absolute;bottom:0;left:50%;transform:translateX(-50%);z-index:2;max-height:85%;display:flex;align-items:flex-end;justify-content:center;transition:opacity .5s ease;pointer-events:none}
 #char-img{max-height:100%;max-width:60vw;object-fit:contain;filter:drop-shadow(0 0 30px rgba(0,0,0,.8))}
-@media(max-width:600px){#char-img{max-width:100vw}#char-wrap{max-height:70%}}
+@media(max-width:600px){#char-img{max-width:100vw}#char-wrap{max-height:100%}}
 
 #hud{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:.8rem 1.2rem;z-index:10;background:linear-gradient(to bottom,rgba(0,0,0,.6),transparent)}
 .hud-left,.hud-right{display:flex;align-items:center;gap:.8rem}
@@ -173,7 +145,16 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .help-key{min-width:80px;color:var(--crimson);font-family:'Cinzel',serif;font-size:.75rem;letter-spacing:.1em}
 .help-val{color:var(--mist)}
 
-#minigame-overlay{position:fixed;inset:0;z-index:50;background:rgba(5,5,10,.95);display:none;flex-direction:column;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(12px)}
+/* ── MINIGAME OVERLAY : iframe plein écran ── */
+#minigame-overlay{
+  position:fixed;inset:0;z-index:70;
+  background:var(--obsidian);
+  display:none;
+}
+#minigame-frame{
+  width:100%;height:100%;
+  border:none;display:block;
+}
 
 #ending-screen{background:var(--obsidian);flex-direction:column;gap:1.5rem;text-align:center;padding:2rem}
 .ending-type{font-family:'Cinzel',serif;font-size:.7rem;letter-spacing:.5em;color:var(--blood);text-transform:uppercase}
@@ -193,6 +174,15 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 @keyframes rippleAnim{to{transform:translate(-50%,-50%) scale(8);opacity:0}}
 
 @media(max-width:480px){.pause-panel{padding:1.5rem 1.2rem}#hud{padding:.6rem .8rem}#dialogue-wrap,#choices-wrap{padding:0 .5rem .5rem}#affinity-bar-outer{width:60px}}
+/* GRANDS ÉCRANS (>= 1200px) : personnages plus petits */
+@media (min-width: 1200px) {
+  #char-wrap {
+    max-height: 45% !important;
+  }
+  #char-img {
+    max-width: 25vw !important;
+  }
+}
 </style>
 </head>
 <body>
@@ -215,7 +205,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   <div class="title-wrap">
     <div class="title-sub" id="title-sub">— a visual novel —</div>
     <div class="title-main">Love Me<br>To <span>Death</span></div>
-    <div class="title-line"><span class="title-line-icon">✦</span></div>
+    <div class="title-line"><span class="title-line-icon">&#10022;</span></div>
     <button class="btn-start" id="btn-start">BEGIN</button>
   </div>
 </div>
@@ -224,8 +214,8 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   <div class="lang-title">Choose Your Language</div>
   <div class="lang-sub">Choisissez votre langue</div>
   <div class="lang-choices">
-    <button class="lang-btn" data-lang="en"><span class="lang-flag">🇬🇧</span><span class="lang-name">ENGLISH</span></button>
-    <button class="lang-btn" data-lang="fr"><span class="lang-flag">🇫🇷</span><span class="lang-name">FRANÇAIS</span></button>
+    <button class="lang-btn" data-lang="en"><span class="lang-flag">&#127468;&#127463;</span><span class="lang-name">ENGLISH</span></button>
+    <button class="lang-btn" data-lang="fr"><span class="lang-flag">&#127467;&#127479;</span><span class="lang-name">FRAN&#199;AIS</span></button>
   </div>
 </div>
 
@@ -247,24 +237,24 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   <div id="hud">
     <div class="hud-left">
       <div id="affinity-wrap">
-        <span class="affinity-icon" id="aff-icon">♥</span>
+        <span class="affinity-icon" id="aff-icon">&#9829;</span>
         <div id="affinity-bar-outer"><div id="affinity-bar"></div></div>
         <span id="affinity-val">0</span>
       </div>
     </div>
     <div class="hud-right">
-      <button class="hud-btn" id="btn-history">📜</button>
+      <button class="hud-btn" id="btn-history">&#128220;</button>
       <button class="hud-btn" id="btn-help">?</button>
-      <button class="hud-btn" id="btn-pause">⏸</button>
+      <button class="hud-btn" id="btn-pause">&#9208;</button>
     </div>
   </div>
   <div id="dialogue-wrap">
     <div id="dialogue-box">
-      <div id="speaker-bar"><span class="speaker-deco">◆</span><span id="speaker-name"></span></div>
+      <div id="speaker-bar"><span class="speaker-deco">&#9670;</span><span id="speaker-name"></span></div>
       <div id="dialogue-text"></div>
       <div id="dialogue-nav">
-        <button id="btn-back-dialogue">◂ BACK</button>
-        <span id="dialogue-continue">▾</span>
+        <button id="btn-back-dialogue">&#9666; BACK</button>
+        <span id="dialogue-continue">&#9662;</span>
       </div>
     </div>
   </div>
@@ -281,7 +271,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 <div id="history-overlay">
   <div class="history-header">
     <span id="history-title-label">DIALOGUE HISTORY</span>
-    <button class="hud-btn" id="btn-close-history">✕</button>
+    <button class="hud-btn" id="btn-close-history">&#10005;</button>
   </div>
   <div id="history-list"></div>
 </div>
@@ -295,7 +285,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
     <div class="volume-row">
       <span class="vol-label">MUSIC</span>
       <input type="range" id="vol-slider" min="0" max="1" step="0.01" value="0.7">
-      <button class="vol-mute" id="btn-mute">🔊</button>
+      <button class="vol-mute" id="btn-mute">&#128266;</button>
     </div>
   </div>
 </div>
@@ -308,7 +298,10 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   </div>
 </div>
 
-<div id="minigame-overlay"><div id="minigame-content"></div></div>
+<!-- MINIGAME : iframe plein écran, sans padding -->
+<div id="minigame-overlay">
+  <iframe id="minigame-frame" src="" allowfullscreen></iframe>
+</div>
 
 <audio id="bgm" loop></audio>
 
@@ -318,13 +311,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 const GAME_CONFIG = {
   chapterFiles: ['chapter1.json'],
   introMusic: 'music/intro.mp3',
-  preloadImages: [
-    'images/backgrounds/manor_gate.webp',
-    'images/backgrounds/manor_hall.webp',
-    'images/backgrounds/manor_library.webp',
-    'images/backgrounds/manor_night.webp',
-    'images/characters/dorian_idle.webp',
-  ]
+  preloadImages: []
 };
 
 // ── I18N ──
@@ -332,16 +319,16 @@ const I18N = {
   en: {
     loading:'Loading', titleSub:'— a visual novel —', btnBegin:'BEGIN', btnContinue:'CONTINUE',
     policyHeader:'Terms, Privacy & Credits', policyHint:'Scroll to the bottom to accept',
-    btnAccept:'ACCEPT & PLAY', btnBack:'◂ BACK', btnResume:'RESUME', btnSaveQuit:'SAVE & QUIT',
+    btnAccept:'ACCEPT & PLAY', btnBack:'\u25C2 BACK', btnResume:'RESUME', btnSaveQuit:'SAVE & QUIT',
     btnRestart:'RESTART FROM BEGINNING', btnRestartEnd:'RESTART', musicLabel:'MUSIC',
     historyTitle:'DIALOGUE HISTORY', helpTitle:'HOW TO PLAY', helpClose:'CLOSE',
     helpRows:[
       ['TAP / CLICK','Advance dialogue. Skips typewriter effect if in progress.'],
       ['CHOICES','Select an option. Your choice may affect affinity.'],
-      ['♥ AFFINITY','Your bond with the character. Rises or falls with choices. Determines your ending.'],
-      ['◂ BACK','Return to the previous scene (not during choices). Reverses the affinity delta.'],
-      ['📜 HISTORY','Review past dialogue at any time.'],
-      ['⏸ PAUSE','Adjust volume, save, or restart.'],
+      ['\u2665 AFFINITY','Your bond with the character. Rises or falls with choices. Determines your ending.'],
+      ['\u25C2 BACK','Return to the previous scene (not during choices). Reverses the affinity delta.'],
+      ['\u{1F4DC} HISTORY','Review past dialogue at any time.'],
+      ['\u23F8 PAUSE','Adjust volume, save, or restart.'],
       ['AUTO-SAVE','Progress is saved automatically at each scene.'],
       ['MINI-GAMES','Special interactive moments may appear between scenes.'],
     ],
@@ -351,82 +338,64 @@ const I18N = {
     systemFallback:'No JSON file found at json/en/chapter1.json. Place your scene files in the json/en/ folder to begin.',
     policyContent:`
       <h3>PRIVACY POLICY</h3>
-      <p>Love Me To Death (the "Game") is a browser-based visual novel. By playing, you agree that progress data is stored locally on your device for save purposes.</p>
-      <p>No personal data is collected, transmitted, or shared with third parties. All save data is stored exclusively in your browser's localStorage. You may delete it at any time by clearing your browser storage.</p>
-      <h3>DATA COLLECTED</h3>
-      <p>The following data is stored locally: your language preference, your current progress, your affinity score, and your dialogue history. No cookies, analytics tools, or external services are used.</p>
+      <p>Love Me To Death is a browser-based visual novel. Progress data is stored locally on your device. No personal data is collected or shared.</p>
       <h3>TERMS OF USE</h3>
-      <p>This game is intended for audiences aged 16 and above. It contains themes of romance, mystery, and soft dark fantasy. The Game is provided for entertainment purposes only. All characters, scenarios, and events are fictional.</p>
-      <p>You may not reproduce, modify, distribute, or sell any part of this Game without written permission. Non-commercial fan creations are welcome.</p>
-      <h3>CONTENT WARNING</h3>
-      <p>Love Me To Death explores themes of love, obsession, mortality, and supernatural romance. Some scenes may include: mild horror imagery, emotionally intense dialogue, and narrative choices with consequences.</p>
+      <p>This game is intended for audiences aged 16 and above. All characters and events are fictional.</p>
       <h3>GAMEPLAY NOTES</h3>
-      <p>Your choices affect the affinity counter shown at the top of the screen. This level will influence the ending you receive. Saving is automatic at each scene transition. You can review past dialogue via the history button.</p>
-      <p>Mini-games may appear between scenes. Sound can be adjusted in the pause menu.</p>
-      <p>Typing speed: add "typeSpeed" to a JSON scene to change text speed (e.g. 40 for slower, 10 for faster, default: 22).</p>
+      <p>Your choices affect the affinity counter. Saving is automatic. Mini-games may appear between scenes. Sound can be adjusted in the pause menu.</p>
       <h3>CREDITS</h3>
       <div class="credits">
-        <p>Story & Direction — Game Director</p><p>Character Art — Original Artists</p>
-        <p>Backgrounds — Visual Team</p><p>Music & Sound — Composers</p>
+        <p>Story &amp; Direction — Game Director</p>
+        <p>Character Art — Original Artists</p>
         <p>Development — Development Team</p>
-        <p>Special Thanks — To every player who chose love knowing the price.</p>
-        <p style="margin-top:1rem;color:var(--crimson)">♥ Love Me To Death — Version 1.0 ♥</p>
+        <p style="margin-top:1rem;color:var(--crimson)">\u2665 Love Me To Death — Version 1.0 \u2665</p>
       </div>`,
     endings:{
-      true_love:{type:'TRUE ENDING',title:'Eternally Yours',text:'He takes your face in his cold hands, and for the first time his eyes hold something other than darkness. "You stayed," he whispers. "All the others fled." You press your hand to his chest — no heartbeat, and yet you have never felt so alive. This love will outlast death itself.'},
-      bittersweet:{type:'BITTERSWEET ENDING',title:'A Beautiful Wound',text:'He lets you leave at dawn, pressing a black rose into your hands. "You deserved better than a monster," he murmurs. You watch him dissolve into the mist, carrying the memory of his eyes for the rest of your life. Some loves are not meant to last — only to transform you.'},
-      bad_end_1:{type:'BAD ENDING',title:'Darkness Wins',text:'The warmth fades from his gaze. "You never understood," he says softly, and he turns toward the endless night. You stand at the threshold — neither in his world nor back in your own. The door closes. You are alone.',isBad:true},
-      bad_end_2:{type:'BAD ENDING — ABYSS',title:'Consumed',text:'He smiles, and it does not reach his eyes. "You thought you could resist me." Darkness spreads from his fingers like ink in water. Your last thought is that you should have heeded the warnings carved into the manor walls. Too late.',isBad:true}
+      true_love:{type:'TRUE ENDING',title:'Eternally Yours',text:'He takes your face in his cold hands, and for the first time his eyes hold something other than darkness. "You stayed," he whispers. "All the others fled." You press your hand to his chest — no heartbeat, and yet you have never felt so alive.'},
+      bittersweet:{type:'BITTERSWEET ENDING',title:'A Beautiful Wound',text:'He lets you leave at dawn, pressing a black rose into your hands. "You deserved better than a monster," he murmurs. Some loves are not meant to last — only to transform you.'},
+      bad_end_1:{type:'BAD ENDING',title:'Darkness Wins',text:'The warmth fades from his gaze. "You never understood," he says softly, and he turns toward the endless night. The door closes. You are alone.',isBad:true},
+      bad_end_2:{type:'BAD ENDING — ABYSS',title:'Consumed',text:'He smiles, and it does not reach his eyes. "You thought you could resist me." Your last thought is that you should have heeded the warnings. Too late.',isBad:true}
     }
   },
   fr: {
     loading:'Chargement', titleSub:'— un roman visuel —', btnBegin:'COMMENCER', btnContinue:'CONTINUER',
-    policyHeader:'Conditions, Confidentialité & Crédits', policyHint:"Faites défiler jusqu'en bas pour accepter",
-    btnAccept:'ACCEPTER & JOUER', btnBack:'◂ RETOUR', btnResume:'REPRENDRE', btnSaveQuit:'SAUVEGARDER & QUITTER',
-    btnRestart:'RECOMMENCER DEPUIS LE DÉBUT', btnRestartEnd:'RECOMMENCER', musicLabel:'MUSIQUE',
+    policyHeader:'Conditions, Confidentialit\u00e9 & Cr\u00e9dits', policyHint:"Faites d\u00e9filer jusqu'en bas pour accepter",
+    btnAccept:'ACCEPTER & JOUER', btnBack:'\u25C2 RETOUR', btnResume:'REPRENDRE', btnSaveQuit:'SAUVEGARDER & QUITTER',
+    btnRestart:'RECOMMENCER DEPUIS LE D\u00c9BUT', btnRestartEnd:'RECOMMENCER', musicLabel:'MUSIQUE',
     historyTitle:'HISTORIQUE DES DIALOGUES', helpTitle:'COMMENT JOUER', helpClose:'FERMER',
     helpRows:[
-      ['TAP / CLIC',"Avancer le dialogue. Passe l'effet machine à écrire si en cours."],
-      ['CHOIX',"Sélectionnez une option. Votre choix peut affecter l'affinité."],
-      ['♥ AFFINITÉ','Votre lien avec le personnage. Monte ou descend selon vos choix. Détermine votre fin.'],
-      ['◂ RETOUR',"Revenir à la scène précédente (hors choix). Annule le delta d'affinité."],
-      ['📜 HISTORIQUE','Revoir les dialogues passés à tout moment.'],
-      ['⏸ PAUSE','Régler le volume, sauvegarder ou recommencer.'],
-      ['SAUVEGARDE AUTO','La progression est sauvegardée automatiquement à chaque scène.'],
-      ['MINI-JEUX','Des moments interactifs spéciaux peuvent apparaître entre les scènes.'],
+      ['TAP / CLIC',"Avancer le dialogue. Passe l\u2019effet machine \u00e0 \u00e9crire si en cours."],
+      ['CHOIX',"S\u00e9lectionnez une option. Votre choix peut affecter l\u2019affinit\u00e9."],
+      ['\u2665 AFFINIT\u00c9','Votre lien avec le personnage. Monte ou descend selon vos choix.'],
+      ['\u25C2 RETOUR',"Revenir \u00e0 la sc\u00e8ne pr\u00e9c\u00e9dente (hors choix). Annule le delta d\u2019affinit\u00e9."],
+      ['\u{1F4DC} HISTORIQUE','Revoir les dialogues pass\u00e9s \u00e0 tout moment.'],
+      ['\u23F8 PAUSE','R\u00e9gler le volume, sauvegarder ou recommencer.'],
+      ['SAUVEGARDE AUTO','La progression est sauvegard\u00e9e automatiquement \u00e0 chaque sc\u00e8ne.'],
+      ['MINI-JEUX','Des moments interactifs sp\u00e9ciaux peuvent appara\u00eetre entre les sc\u00e8nes.'],
     ],
-    confirmRestart:'Recommencer depuis le début ? Votre progression sera perdue.',
-    confirmRestartEnd:'Recommencer le jeu ?',
-    youLabel:'Vous', systemLabel:'— Système —',
-    systemFallback:'Aucun fichier JSON trouvé dans json/fr/chapter1.json. Placez vos fichiers de scènes dans le dossier json/fr/ pour commencer.',
+    confirmRestart:'Recommencer depuis le d\u00e9but\u00a0? Votre progression sera perdue.',
+    confirmRestartEnd:'Recommencer le jeu\u00a0?',
+    youLabel:'Vous', systemLabel:'— Syst\u00e8me —',
+    systemFallback:'Aucun fichier JSON trouv\u00e9 dans json/fr/chapter1.json.',
     policyContent:`
-      <h3>POLITIQUE DE CONFIDENTIALITÉ</h3>
-      <p>Love Me To Death (le « Jeu ») est un roman visuel jouable dans le navigateur. En jouant, vous acceptez que les données de progression soient enregistrées localement sur votre appareil à des fins de sauvegarde.</p>
-      <p>Aucune donnée personnelle n'est collectée, transmise ou partagée avec des tiers. Toutes les données de sauvegarde sont stockées exclusivement dans le localStorage de votre navigateur.</p>
-      <h3>DONNÉES COLLECTÉES</h3>
-      <p>Les données suivantes sont stockées localement : votre préférence de langue, votre progression actuelle, votre score d'affinité, et l'historique de vos dialogues. Aucun cookie, outil d'analyse ou service externe n'est utilisé.</p>
-      <h3>CONDITIONS D'UTILISATION</h3>
-      <p>Ce jeu est destiné à un public âgé de 16 ans et plus. Il contient des thèmes de romance, de mystère et de dark fantasy douce. Tous les personnages, scénarios et événements sont fictifs.</p>
-      <p>Vous ne pouvez pas reproduire, modifier, distribuer ou vendre une partie de ce Jeu sans autorisation écrite. Les créations de fans non commerciales sont les bienvenues.</p>
-      <h3>AVERTISSEMENT DE CONTENU</h3>
-      <p>Love Me To Death explore des thèmes d'amour, d'obsession, de mortalité et de romance surnaturelle. Certaines scènes peuvent contenir : des images d'horreur légère, des dialogues émotionnellement intenses et des choix narratifs à conséquences.</p>
+      <h3>POLITIQUE DE CONFIDENTIALIT\u00c9</h3>
+      <p>Love Me To Death est un roman visuel jouable dans le navigateur. Les donn\u00e9es de progression sont stock\u00e9es localement. Aucune donn\u00e9e personnelle n\u2019est collect\u00e9e.</p>
+      <h3>CONDITIONS D\u2019UTILISATION</h3>
+      <p>Ce jeu est destin\u00e9 \u00e0 un public \u00e2g\u00e9 de 16 ans et plus. Tous les personnages et \u00e9v\u00e9nements sont fictifs.</p>
       <h3>INFORMATIONS DE JEU</h3>
-      <p>Vos choix affectent le compteur d'affinité affiché en haut de l'écran. La sauvegarde est automatique à chaque transition de scène. Vous pouvez revoir les dialogues passés via le bouton historique.</p>
-      <p>Des mini-jeux peuvent apparaître entre les scènes. Le son peut être ajusté dans le menu pause.</p>
-      <p>Vitesse d'écriture : ajoutez "typeSpeed" dans une scène JSON pour modifier la vitesse (ex: 40 pour plus lent, 10 pour plus rapide, défaut: 22).</p>
-      <h3>CRÉDITS</h3>
+      <p>Vos choix affectent le compteur d\u2019affinit\u00e9. La sauvegarde est automatique. Des mini-jeux peuvent appara\u00eetre entre les sc\u00e8nes.</p>
+      <h3>CR\u00c9DITS</h3>
       <div class="credits">
-        <p>Histoire & Direction — Game Director</p><p>Art des personnages — Artistes originaux</p>
-        <p>Décors — Équipe visuelle</p><p>Musique & Son — Compositeurs</p>
-        <p>Développement — Équipe de développement</p>
-        <p>Remerciements spéciaux — À chaque joueur qui a choisi l'amour en sachant le prix à payer.</p>
-        <p style="margin-top:1rem;color:var(--crimson)">♥ Love Me To Death — Version 1.0 ♥</p>
+        <p>Histoire &amp; Direction — Game Director</p>
+        <p>Art des personnages — Artistes originaux</p>
+        <p>D\u00e9veloppement — \u00c9quipe de d\u00e9veloppement</p>
+        <p style="margin-top:1rem;color:var(--crimson)">\u2665 Love Me To Death — Version 1.0 \u2665</p>
       </div>`,
     endings:{
-      true_love:{type:'FIN VRAIE',title:'Éternellement Vôtre',text:"Il prend votre visage entre ses mains froides, et pour la première fois ses yeux portent quelque chose d'autre que les ténèbres. « Vous êtes resté(e), » murmure-t-il. « Tous les autres ont fui. » Vous posez votre main sur sa poitrine — aucun battement, et pourtant vous ne vous êtes jamais senti(e) aussi vivant(e). Cet amour survivra à la mort elle-même."},
-      bittersweet:{type:'FIN DOUCE-AMÈRE',title:'Une Belle Blessure',text:"Il vous laisse partir à l'aube, pressant une rose noire dans vos mains. « Vous méritiez mieux qu'un monstre, » murmure-t-il. Vous le regardez se dissoudre dans la brume, portant le souvenir de ses yeux pour le reste de votre vie. Certains amours ne sont pas faits pour durer — seulement pour vous transformer."},
-      bad_end_1:{type:'MAUVAISE FIN',title:"L'Obscurité Gagne",text:"La chaleur s'éteint dans son regard. « Vous ne m'avez jamais compris(e), » dit-il doucement, et il se détourne vers la nuit éternelle. Vous restez au seuil — ni dans son monde, ni de retour dans le vôtre. La porte se ferme. Vous êtes seul(e).",isBad:true},
-      bad_end_2:{type:'MAUVAISE FIN — ABÎME',title:'Consumé(e)',text:"Il sourit, et ça n'atteint pas ses yeux. « Vous pensiez pouvoir me résister. » Les ténèbres se propagent de ses doigts comme de l'encre dans l'eau. Votre dernière pensée est que vous auriez dû écouter les avertissements gravés dans les murs du manoir. Trop tard.",isBad:true}
+      true_love:{type:'FIN VRAIE',title:'\u00c9ternellement V\u00f4tre',text:"Il prend votre visage entre ses mains froides, et pour la premi\u00e8re fois ses yeux portent quelque chose d\u2019autre que les t\u00e9n\u00e8bres. \u00ab\u00a0Vous \u00eates rest\u00e9(e),\u00a0\u00bb murmure-t-il. Cet amour survivra \u00e0 la mort elle-m\u00eame."},
+      bittersweet:{type:'FIN DOUCE-AM\u00c8RE',title:'Une Belle Blessure',text:"Il vous laisse partir \u00e0 l\u2019aube, pressant une rose noire dans vos mains. Certains amours ne sont pas faits pour durer \u2014 seulement pour vous transformer."},
+      bad_end_1:{type:'MAUVAISE FIN',title:"L\u2019Obscurit\u00e9 Gagne",text:"La chaleur s\u2019\u00e9teint dans son regard. La porte se ferme. Vous \u00eates seul(e).",isBad:true},
+      bad_end_2:{type:'MAUVAISE FIN \u2014 AB\u00ceME',title:'Consum\u00e9(e)',text:"Il sourit, et \u00e7a n\u2019atteint pas ses yeux. Trop tard.",isBad:true}
     }
   }
 };
@@ -438,9 +407,8 @@ const state={
   lang:'en', firstTime:true, sceneIndex:0, scenes:[], navStack:[],
   affinity:0, history:[], muted:false, volume:0.7, currentMusic:null,
   isTyping:false, typing:null, awaitingChoice:false,
-  pendingChoices:null  // FIX choix trop tôt : choix stockés jusqu'au prochain clic
+  pendingChoices:null
 };
-window.LMTD={minigames:{},registerMinigame(id,obj){this.minigames[id]=obj;}};
 
 function t(k){return(I18N[state.lang]||I18N.en)[k];}
 
@@ -463,17 +431,28 @@ function applyLang(){
   document.getElementById('history-title-label').textContent=L.historyTitle;
   document.getElementById('help-title').textContent=L.helpTitle;
   document.getElementById('btn-close-help').textContent=L.helpClose;
-  const hr=document.getElementById('help-rows'); hr.innerHTML='';
-  L.helpRows.forEach(([k,v])=>{hr.innerHTML+=`<div class="help-row"><span class="help-key">${k}</span><span class="help-val">${v}</span></div>`;});
+  const hr=document.getElementById('help-rows');
+  hr.innerHTML='';
+  // ── FIX CRITIQUE : vérification que helpRows est bien un tableau de paires ──
+  const rows = L.helpRows;
+  if(Array.isArray(rows)){
+    rows.forEach(function(row){
+      if(Array.isArray(row) && row.length >= 2){
+        hr.innerHTML += '<div class="help-row"><span class="help-key">'+row[0]+'</span><span class="help-val">'+row[1]+'</span></div>';
+      }
+    });
+  }
 }
 
 // ── PRELOAD ──
-function checkHasSave(){try{const d=JSON.parse(localStorage.getItem(LS_KEY)||'{}');return d.firstTime===false;}catch{return false;}}
+function checkHasSave(){try{const d=JSON.parse(localStorage.getItem(LS_KEY)||'{}');return d.firstTime===false;}catch(e){return false;}}
 
 async function preloadAssets(){
   const bar=document.getElementById('loading-bar'),label=document.getElementById('loading-pct');
-  const imgs=GAME_CONFIG.preloadImages; if(!imgs.length){bar.style.width='100%';label.textContent='100%';return;}
-  let loaded=0; const tick=()=>{loaded++;const p=Math.round(loaded/imgs.length*100);bar.style.width=p+'%';label.textContent=p+'%';};
+  const imgs=GAME_CONFIG.preloadImages;
+  if(!imgs.length){bar.style.width='100%';label.textContent='100%';return;}
+  let loaded=0;
+  const tick=()=>{loaded++;const p=Math.round(loaded/imgs.length*100);bar.style.width=p+'%';label.textContent=p+'%';};
   await Promise.allSettled(imgs.map(s=>new Promise(r=>{const i=new Image();i.onload=i.onerror=()=>{tick();r();};i.src=s;})));
 }
 
@@ -484,25 +463,48 @@ function preloadImage(src){
 async function loadChapters(){
   let all=[];
   for(const file of GAME_CONFIG.chapterFiles){
-    const path=`json/${state.lang}/${file}`;
-    try{const r=await fetch(path);if(!r.ok)throw new Error('HTTP '+r.status);const d=await r.json();all=all.concat(d);}
-    catch(e){console.warn('Cannot load',path,e.message);}
+    const path='json/'+state.lang+'/'+file;
+    try{
+      const r=await fetch(path);
+      if(!r.ok)throw new Error('HTTP '+r.status);
+      const d=await r.json();
+      all=all.concat(d);
+    }catch(e){console.warn('Cannot load',path,e.message);}
   }
-  if(!all.length){const L=I18N[state.lang]||I18N.en;all=[{id:'s_demo',bg:null,charImg:null,speaker:L.systemLabel,text:L.systemFallback,typeSpeed:30,next:'__ending__'}];}
+  if(!all.length){
+    const L=I18N[state.lang]||I18N.en;
+    all=[{id:'s_demo',bg:null,charImg:null,speaker:L.systemLabel,text:L.systemFallback,typeSpeed:30,next:'__ending__'}];
+  }
   state.scenes=all;
 }
 
-function loadMinigameScript(path){return new Promise(res=>{const s=document.createElement('script');s.src=path;s.onload=res;s.onerror=()=>{console.warn('Minigame not found:',path);res();};document.head.appendChild(s);});}
-async function preloadMinigames(){const f=new Set();state.scenes.forEach(sc=>{if(sc.minigameFile)f.add(sc.minigameFile);});for(const x of f)await loadMinigameScript(x);}
-
 // ── SAVE / LOAD ──
-function saveGame(){try{localStorage.setItem(LS_KEY,JSON.stringify({lang:state.lang,firstTime:false,sceneIndex:state.sceneIndex,navStack:state.navStack.slice(-30),affinity:state.affinity,history:state.history.slice(-60),volume:state.volume,muted:state.muted,currentMusic:state.currentMusic}));}catch(e){}}
+function saveGame(){
+  try{
+    localStorage.setItem(LS_KEY,JSON.stringify({
+      lang:state.lang,firstTime:false,sceneIndex:state.sceneIndex,
+      navStack:state.navStack.slice(-30),affinity:state.affinity,
+      history:state.history.slice(-60),volume:state.volume,
+      muted:state.muted,currentMusic:state.currentMusic
+    }));
+  }catch(e){}
+}
 function loadSave(){
-  try{const raw=localStorage.getItem(LS_KEY);if(!raw)return false;const d=JSON.parse(raw);
-    state.lang=d.lang||'en';state.firstTime=d.firstTime!==false;state.sceneIndex=d.sceneIndex||0;
+  try{
+    const raw=localStorage.getItem(LS_KEY);
+    if(!raw)return false;
+    const d=JSON.parse(raw);
+    state.lang=d.lang||'en';
+    state.firstTime=d.firstTime!==false;
+    state.sceneIndex=d.sceneIndex||0;
     state.navStack=(d.navStack||[]).map(e=>typeof e==='number'?{sceneIndex:e,affinityDelta:0}:e);
-    state.affinity=d.affinity||0;state.history=d.history||[];state.volume=d.volume!==undefined?d.volume:0.7;state.muted=d.muted||false;state.currentMusic=d.currentMusic||null;return true;}
-  catch{return false;}
+    state.affinity=d.affinity||0;
+    state.history=d.history||[];
+    state.volume=d.volume!==undefined?d.volume:0.7;
+    state.muted=d.muted||false;
+    state.currentMusic=d.currentMusic||null;
+    return true;
+  }catch(e){return false;}
 }
 function resetGame(){try{localStorage.removeItem(LS_KEY);}catch(e){}location.reload();}
 
@@ -515,67 +517,47 @@ function updateAffinity(d){if(!d)return;state.affinity=Math.max(-100,Math.min(10
 function renderAffinity(){
   const aff=state.affinity;
   document.getElementById('affinity-bar').style.width=((aff+100)/200*100)+'%';
-  const v=document.getElementById('affinity-val');v.textContent=aff>0?'+'+aff:String(aff);
-  const tp=(aff+100)/200;const r=Math.round(107+(220-107)*tp),g=Math.round(33+(20-33)*tp),b=Math.round(168+(60-168)*tp);
-  document.getElementById('affinity-bar').style.background=`rgb(${r},${g},${b})`;
+  const v=document.getElementById('affinity-val');
+  v.textContent=aff>0?'+'+aff:String(aff);
+  const tp=(aff+100)/200;
+  const r=Math.round(107+(220-107)*tp),g=Math.round(33+(20-33)*tp),b=Math.round(168+(60-168)*tp);
+  document.getElementById('affinity-bar').style.background='rgb('+r+','+g+','+b+')';
   v.style.color=aff>=0?'var(--rose)':'var(--affinity-neg)';
   document.getElementById('aff-icon').style.filter=aff>=0?'drop-shadow(0 0 4px var(--crimson))':'drop-shadow(0 0 4px #6B21A8)';
 }
-function showAffinityDelta(d){const el=document.getElementById('affinity-delta');el.className='';el.textContent=(d>0?'+ ':'− ')+Math.abs(d);el.style.color=d>0?'var(--crimson)':'#9333ea';void el.offsetWidth;el.className='show';}
-
-// ══════════════════════════════════════════════════════════
-// AUDIO — 3 corrections :
-//
-// 1. startIntroMusic() : appelée sur le clic BEGIN/CONTINUE
-//    (premier geste utilisateur garanti → autoplay autorisé
-//    par tous les navigateurs modernes)
-//
-// 2. playMusic() : vérifie !bgm.paused pour forcer la reprise
-//    si la piste est la même mais s'est arrêtée (après pause/reprise)
-//
-// 3. btn-save-quit : appelle startIntroMusic() au lieu de l'ancienne
-//    logique complexe qui ne fonctionnait pas
-// ══════════════════════════════════════════════════════════
-const bgm = document.getElementById('bgm');
-
-function startIntroMusic() {
-  bgm.src = GAME_CONFIG.introMusic;
-  bgm.loop = true;
-  bgm.muted = false;
-  bgm.volume = state.muted ? 0 : state.volume;
-  bgm.play().catch(() => {});
-  state.currentMusic = GAME_CONFIG.introMusic;
+function showAffinityDelta(d){
+  const el=document.getElementById('affinity-delta');
+  el.className='';
+  el.textContent=(d>0?'+ ':'\u2212 ')+Math.abs(d);
+  el.style.color=d>0?'var(--crimson)':'#9333ea';
+  void el.offsetWidth;
+  el.className='show';
 }
 
-function playMusic(src) {
-  if (!src) return;
-  // FIX musique scène : si même src mais bgm arrêté (ex: après reprise de sauvegarde), on relance
-  if (state.currentMusic === src && !bgm.paused) return;
-  state.currentMusic = src;
-  bgm.src = src;
-  bgm.loop = true;
-  bgm.muted = false;
-  bgm.volume = state.muted ? 0 : state.volume;
-  bgm.play().catch(() => {});
+// ── AUDIO ──
+const bgm=document.getElementById('bgm');
+function startIntroMusic(){
+  bgm.src=GAME_CONFIG.introMusic;bgm.loop=true;bgm.muted=false;
+  bgm.volume=state.muted?0:state.volume;bgm.play().catch(()=>{});
+  state.currentMusic=GAME_CONFIG.introMusic;
 }
+function playMusic(src){
+  if(!src)return;
+  if(state.currentMusic===src&&!bgm.paused)return;
+  state.currentMusic=src;bgm.src=src;bgm.loop=true;bgm.muted=false;
+  bgm.volume=state.muted?0:state.volume;bgm.play().catch(()=>{});
+}
+function stopMusic(){bgm.pause();bgm.src='';state.currentMusic=null;}
+function applyVolume(){bgm.volume=state.muted?0:state.volume;}
 
-function stopMusic() { bgm.pause(); bgm.src = ''; state.currentMusic = null; }
-function applyVolume() { bgm.volume = state.muted ? 0 : state.volume; }
-
-// ══════════════════════════════════════════════════════════
-// BACKGROUND — simple et fiable, sans double-calque
-// Précharge l'image avant de l'assigner → zéro flash noir
-// (le double-calque prev/cur causait le bug "image qui ne change pas")
-// ══════════════════════════════════════════════════════════
-let lastBg = null;
-
-async function setBg(src) {
-  if (!src || src === lastBg) return;
+// ── BACKGROUND ──
+let lastBg=null;
+async function setBg(src){
+  if(!src||src===lastBg)return;
   await preloadImage(src);
-  document.getElementById('game-bg').style.backgroundImage = `url('${src}')`;
-  lastBg = src;
+  document.getElementById('game-bg').style.backgroundImage="url('"+src+"')";
+  lastBg=src;
 }
-
 function setCharacter(img){
   const wrap=document.getElementById('char-wrap'),el=document.getElementById('char-img');
   if(!img){wrap.style.opacity='0';return;}
@@ -588,7 +570,10 @@ function typeText(el,text,speed,onDone){
   el.textContent='';state.isTyping=true;let i=0;
   if(state.typing)clearInterval(state.typing);
   const ms=(typeof speed==='number'&&speed>0)?speed:DEFAULT_TYPE_SPEED;
-  state.typing=setInterval(()=>{el.textContent+=text[i++];if(i>=text.length){clearInterval(state.typing);state.typing=null;state.isTyping=false;if(onDone)onDone();}},ms);
+  state.typing=setInterval(()=>{
+    el.textContent+=text[i++];
+    if(i>=text.length){clearInterval(state.typing);state.typing=null;state.isTyping=false;if(onDone)onDone();}
+  },ms);
 }
 function skipTyping(text){if(state.typing){clearInterval(state.typing);state.typing=null;}state.isTyping=false;document.getElementById('dialogue-text').textContent=text;}
 
@@ -596,13 +581,21 @@ function skipTyping(text){if(state.typing){clearInterval(state.typing);state.typ
 function addToHistory(sp,tx,ic){state.history.push({speaker:sp,text:tx,isChoice:ic});}
 function renderHistory(){
   const list=document.getElementById('history-list');list.innerHTML='';
-  state.history.forEach(e=>{const d=document.createElement('div');d.className='history-entry';d.innerHTML=e.isChoice?`<div class="h-choice">▸ ${e.text}</div>`:`<div class="h-name">${e.speaker}</div><div>${e.text}</div>`;list.appendChild(d);});
+  state.history.forEach(e=>{
+    const d=document.createElement('div');d.className='history-entry';
+    d.innerHTML=e.isChoice
+      ?'<div class="h-choice">\u25B8 '+e.text+'</div>'
+      :'<div class="h-name">'+e.speaker+'</div><div>'+e.text+'</div>';
+    list.appendChild(d);
+  });
   list.scrollTop=list.scrollHeight;
 }
 
 // ── BOUTON RETOUR ──
-function updateBackBtn(){const b=document.getElementById('btn-back-dialogue');state.navStack.length>0&&!state.awaitingChoice?b.classList.add('visible'):b.classList.remove('visible');}
-
+function updateBackBtn(){
+  const b=document.getElementById('btn-back-dialogue');
+  state.navStack.length>0&&!state.awaitingChoice?b.classList.add('visible'):b.classList.remove('visible');
+}
 document.getElementById('btn-back-dialogue').addEventListener('click',()=>{
   if(state.awaitingChoice||!state.navStack.length)return;
   if(state.typing){clearInterval(state.typing);state.typing=null;}state.isTyping=false;
@@ -614,69 +607,57 @@ document.getElementById('btn-back-dialogue').addEventListener('click',()=>{
 // ── SCÈNES ──
 function getSceneIndex(id){return state.scenes.findIndex(s=>s.id===id);}
 
-function renderScene(scene, fromBack=false){
+function renderScene(scene,fromBack){
   if(!scene){triggerEnding();return;}
 
-  if(scene.bg) setBg(scene.bg); // async — précharge avant d'afficher, zéro flash
+  // ══ FIX CRITIQUE : gestion des mini-jeux ══
+  if(scene.type==='minigame'){
+    triggerMinigame(scene,function(){
+      if(scene.next&&scene.next!=='__ending__') navigateTo(scene.next);
+      else triggerEnding();
+    });
+    return;
+  }
+
+  if(scene.bg)setBg(scene.bg);
   setCharacter(scene.charImg||null);
-  if(scene.music) playMusic(scene.music);
+  if(scene.music)playMusic(scene.music);
 
   document.getElementById('speaker-name').textContent=scene.speaker||'';
-
   const cw=document.getElementById('choices-wrap');
-  cw.style.display='none';
-  cw.innerHTML='';
+  cw.style.display='none';cw.innerHTML='';
   document.getElementById('dialogue-wrap').style.display='';
   document.getElementById('dialogue-continue').style.display='';
-
   state.awaitingChoice=false;
+  state.pendingChoices=scene.choices||null;
 
-  // FIX choix trop tôt : on stocke les choix, ils ne s'affichent
-  // QU'au prochain clic du joueur (géré dans advance())
-  state.pendingChoices = scene.choices || null;
-
-  addToHistory(scene.speaker||'',scene.text,false);
-
-  // On ne passe JAMAIS renderChoices en callback du typewriter
-  typeText(document.getElementById('dialogue-text'), scene.text, scene.typeSpeed, null);
-
+  addToHistory(scene.speaker||'',scene.text||'',false);
+  typeText(document.getElementById('dialogue-text'),scene.text||'',scene.typeSpeed,null);
   updateBackBtn();
   saveGame();
 
-  // Précharge silencieuse du fond suivant
-  if(scene.next && scene.next!=='__ending__'){
+  if(scene.next&&scene.next!=='__ending__'){
     const ni=getSceneIndex(scene.next);
-    if(ni!==-1 && state.scenes[ni] && state.scenes[ni].bg) preloadImage(state.scenes[ni].bg);
+    if(ni!==-1&&state.scenes[ni]&&state.scenes[ni].bg)preloadImage(state.scenes[ni].bg);
   }
 }
 
 function advance(){
-  if(state.awaitingChoice) return;
-  const scene=state.scenes[state.sceneIndex]; if(!scene) return;
-
-  // 1. Typewriter en cours → afficher tout le texte, attendre un autre clic
-  if(state.isTyping){
-    skipTyping(scene.text);
-    return;
-  }
-
-  // 2. Des choix attendent → les afficher maintenant
-  if(state.pendingChoices){
-    renderChoices(state.pendingChoices);
-    state.pendingChoices=null;
-    return;
-  }
-
-  // 3. Avancer normalement
+  if(state.awaitingChoice)return;
+  const scene=state.scenes[state.sceneIndex];
+  if(!scene)return;
+  if(state.isTyping){skipTyping(scene.text||'');return;}
+  if(state.pendingChoices){renderChoices(state.pendingChoices);state.pendingChoices=null;return;}
   if(scene.next==='__ending__'){triggerEnding();return;}
-  if(scene.minigame){triggerMinigame(scene,()=>navigateTo(scene.next));return;}
-  if(scene.next) navigateTo(scene.next);
+  if(scene.next)navigateTo(scene.next);
 }
 
-function navigateTo(id,affinityDelta=0){
+function navigateTo(id,affinityDelta){
+  affinityDelta=affinityDelta||0;
   if(!id||id==='__ending__'){triggerEnding();return;}
-  const idx=getSceneIndex(id);if(idx===-1){triggerEnding();return;}
-  state.navStack.push({sceneIndex:state.sceneIndex,affinityDelta});
+  const idx=getSceneIndex(id);
+  if(idx===-1){triggerEnding();return;}
+  state.navStack.push({sceneIndex:state.sceneIndex,affinityDelta:affinityDelta});
   state.sceneIndex=idx;renderScene(state.scenes[idx]);
 }
 
@@ -713,27 +694,53 @@ function triggerEnding(){
   playMusic(ending.isBad?'music/bad_ending.mp3':'music/true_ending.mp3');
 }
 
-// ── MINIGAMES ──
-async function triggerMinigame(scene,onComplete){
-  const id=scene.minigame;
-  if(!window.LMTD.minigames[id]&&scene.minigameFile)await loadMinigameScript(scene.minigameFile);
-  const mg=window.LMTD.minigames[id];
-  if(!mg){console.warn('Unknown minigame:',id);onComplete();return;}
-  const ov=document.getElementById('minigame-overlay'),ct=document.getElementById('minigame-content');
-  ov.style.display='flex';mg.render(ct,()=>{ov.style.display='none';onComplete();});
+// ══════════════════════════════════════════════════════════
+// MINIGAME — système iframe
+// Le minigame est chargé dans une iframe plein écran.
+// Pour terminer, le minigame appelle :
+//   window.parent.LMTD_MINIGAME_DONE({ affinity: N })
+// depuis son propre JS.
+// ══════════════════════════════════════════════════════════
+function triggerMinigame(scene,onComplete){
+  const file = scene.minigameFile || ('minigames/'+(scene.name||scene.minigame)+'.html');
+  const ov  = document.getElementById('minigame-overlay');
+  const frm = document.getElementById('minigame-frame');
+
+  // Passer le config glutamate à l'iframe via l'URL ou via postMessage après chargement
+  // On utilise sessionStorage comme pont cross-frame (même origine)
+  try{
+    // Détecter si le joueur a choisi le glutamate (scène précédente)
+    const glutamate = state.history.some(h => h.text && h.text.toLowerCase().includes('glutamate') && h.isChoice===false && h.speaker==='Dazai');
+    sessionStorage.setItem('LMTD_CFG', JSON.stringify({ glutamate: glutamate, affinity: state.affinity }));
+  }catch(e){}
+
+  // Callback appelé par l'iframe
+  window.LMTD_MINIGAME_DONE = function(result){
+    ov.style.display='none';
+    frm.src='';
+    window.LMTD_MINIGAME_DONE=null;
+    // Appliquer le delta d'affinité éventuel du mini-jeu
+    if(result && result.affinity){
+      updateAffinity(result.affinity);
+    }
+    onComplete();
+  };
+
+  frm.src=file;
+  ov.style.display='block';
 }
 
 // ── DÉMARRAGE ──
-function startGame(fromIdx=0){
+function startGame(fromIdx){
+  fromIdx=fromIdx||0;
   stopMusic();
   state.sceneIndex=fromIdx;
-  lastBg=null; // reset pour forcer le rechargement du fond de la première scène
+  lastBg=null;
   showScreen('game-screen');
   renderAffinity();
   renderScene(state.scenes[fromIdx]);
 }
 
-// ── BOOT ── (pas de musique ici, elle démarre sur le premier clic)
 async function boot(){
   state.lang='en';
   applyLang();
@@ -742,14 +749,10 @@ async function boot(){
 }
 
 // ── ÉVÉNEMENTS ──
-
-// FIX musique menu : startIntroMusic() sur le clic BEGIN/CONTINUE
-// C'est le premier geste utilisateur garanti → autoplay autorisé
 document.getElementById('btn-start').addEventListener('click',()=>{
   startIntroMusic();
-
   const saved=loadSave();
-  if(saved && !state.firstTime){
+  if(saved&&!state.firstTime){
     applyLang();
     loadChapters().then(()=>{
       fadeTransition(()=>{
@@ -761,7 +764,7 @@ document.getElementById('btn-start').addEventListener('click',()=>{
         renderScene(scene);
       });
     });
-  } else {
+  }else{
     fadeTransition(()=>showScreen('lang-screen'));
   }
 });
@@ -788,7 +791,6 @@ document.getElementById('btn-accept').addEventListener('click',async()=>{
   if(!document.getElementById('btn-accept').classList.contains('ready'))return;
   state.firstTime=false;
   await loadChapters();
-  await preloadMinigames();
   saveGame();
   fadeTransition(()=>startGame(0));
 });
@@ -810,7 +812,6 @@ document.getElementById('btn-save-quit').addEventListener('click',()=>{
     document.getElementById('pause-modal').style.display='none';
     showScreen('title-screen');
     document.getElementById('btn-start').textContent=t('btnContinue');
-    // FIX musique menu après retour au titre : on relance proprement
     startIntroMusic();
   });
 });
@@ -821,11 +822,22 @@ document.getElementById('btn-restart-end').addEventListener('click',()=>{if(conf
 const volSlider=document.getElementById('vol-slider'),btnMute=document.getElementById('btn-mute');
 volSlider.value=state.volume;
 volSlider.addEventListener('input',()=>{state.volume=parseFloat(volSlider.value);applyVolume();saveGame();});
-btnMute.addEventListener('click',()=>{state.muted=!state.muted;btnMute.textContent=state.muted?'🔇':'🔊';applyVolume();saveGame();});
+btnMute.addEventListener('click',()=>{state.muted=!state.muted;btnMute.textContent=state.muted?'\u{1F507}':'\u{1F50A}';applyVolume();saveGame();});
 
-(function(){const c=document.getElementById('particles'),colors=['#DC143C','#8B0000','#FF6B8A','#C9A84C'];for(let i=0;i<20;i++){const p=document.createElement('div');p.className='particle';p.style.cssText=`left:${Math.random()*100}%;animation-duration:${6+Math.random()*10}s;animation-delay:${Math.random()*8}s;width:${2+Math.random()*3}px;height:${2+Math.random()*3}px;background:${colors[i%colors.length]};`;c.appendChild(p);}})();
+(function(){
+  const c=document.getElementById('particles'),colors=['#DC143C','#8B0000','#FF6B8A','#C9A84C'];
+  for(let i=0;i<20;i++){
+    const p=document.createElement('div');p.className='particle';
+    p.style.cssText='left:'+Math.random()*100+'%;animation-duration:'+(6+Math.random()*10)+'s;animation-delay:'+Math.random()*8+'s;width:'+(2+Math.random()*3)+'px;height:'+(2+Math.random()*3)+'px;background:'+colors[i%colors.length]+';';
+    c.appendChild(p);
+  }
+})();
 
-document.addEventListener('click',e=>{const r=document.createElement('div');r.className='ripple';r.style.left=e.clientX+'px';r.style.top=e.clientY+'px';document.body.appendChild(r);setTimeout(()=>r.remove(),600);});
+document.addEventListener('click',e=>{
+  const r=document.createElement('div');r.className='ripple';
+  r.style.left=e.clientX+'px';r.style.top=e.clientY+'px';
+  document.body.appendChild(r);setTimeout(()=>r.remove(),600);
+});
 
 document.addEventListener('keydown',e=>{
   if(e.key===' '||e.key==='Enter'){e.preventDefault();advance();}
