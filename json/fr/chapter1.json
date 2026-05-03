@@ -92,7 +92,7 @@
     "id": "salle_6",
     "bg": "images/backgrounds/salleamanger.webp",
     "character": null,
-    "charImg": null,
+    "charImg":"images/characters/dadread.webp",
     "speaker": null,
     "text": "Papa, lui, ne dit rien. Il est noyé dans son journal.",
     "typeSpeed": 20,
@@ -136,7 +136,7 @@
     "id": "salle_10",
     "bg": "images/backgrounds/salleamanger.webp",
     "character": null,
-    "charImg": null,
+    "charImg":"images/characters/silentdad.webp",
     "speaker": null,
     "text": "Les yeux de mon père se lèvent. J’aurais tout donné pour qu’il reste dans son silence.",
     "typeSpeed": 20,
@@ -147,7 +147,7 @@
     "id": "salle_11",
     "bg": "images/backgrounds/salleamanger.webp",
     "character": null,
-    "charImg": null,
+   "charImg":"images/characters/angrydad.webp",
     "speaker": "Papa",
     "text": "Tu ne peux donc pas faire attention ?! Tu ne changeras donc jamais. Regarde ce que tu as fait…",
     "typeSpeed": 20,
@@ -169,7 +169,7 @@
     "id": "salle_choix1_repondre",
     "bg": "images/backgrounds/salleamanger.webp",
     "character": null,
-    "charImg": null,
+   "charImg":"images/characters/silentdad.webp",
     "speaker": "Moi",
     "text": "Non je....",
     "typeSpeed": 18,
@@ -180,7 +180,7 @@
     "id": "salle_pere_repond",
     "bg": "images/backgrounds/salleamanger.webp",
     "character": null,
-    "charImg": null,
+   "charImg":"images/characters/angrydad.webp",
     "speaker": "Papa",
     "text": "Toi et ta mère n'êtes que de bonnes à rien! Pendant que je sue au boulot tout le jour, elle est censée faire une seule chose c'est de t’éduquer. Et elle est même pas foutue de faire ça correctement.",
     "typeSpeed": 20,
@@ -196,17 +196,99 @@
     "text": "Le sourire de maman s’éteint.",
     "typeSpeed": 18,
     "music": "music/impuissant.mp3",
-    "next": "__ending__"
+    "next": "pensee_interieure"
   },
   {
     "id": "salle_choix2_silence",
     "bg": "images/backgrounds/salleamanger.webp",
     "character": null,
-    "charImg": null,
+    "charImg": "images/characters/silentdad.webp",
     "speaker": null,
     "text": "Parler ne ferait qu’envenimer.",
     "typeSpeed": 22,
    "music": "music/impuissant.mp3",
-    "next": "__ending__"
-  }
+    "next": "pensee_interieure"
+  },
+  {
+  "id": "pensee_interieure",
+  "bg": "images/backgrounds/salleamanger.webp",
+  "character": null,
+   "charImg": "images/characters/silentdad.webp",
+  "speaker": null,
+  "text": "Il ne me quitte pas des yeux. Que faire?",
+  "typeSpeed": 20,
+  "music": "music/impuissant.mp3",
+  "choices": [
+    {
+      "text": "S'excuser",
+      "affinityDelta": 0,
+      "next": "choix_excuser_action"
+    },
+    {
+      "text": "Nettoyer en silence",
+      "affinityDelta": 0,
+      "next": "choix_nettoyer"
+    },
+    {
+      "text": "Ne rien faire",
+      "affinityDelta": 0,
+      "next": "choix_rienfaire"
+    }
+  ]
+},
+{
+  "id": "choix_excuser_action",
+  "bg": "images/backgrounds/salleamanger.webp",
+  "character": null,
+  "charImg": "images/characters/silentdad.webp",
+  "speaker": null,
+  "text": "Je baisse la tête. Mes doigts tremblent.",
+  "typeSpeed": 18,
+  "music": "music/impuissant.mp3",
+  "next": "choix_excuser_parole"
+},
+{
+  "id": "choix_excuser_parole",
+  "bg": "images/backgrounds/salleamanger.webp",
+  "character": null,
+  "charImg": "images/characters/silentdad.webp",
+  "speaker": "Moi",
+  "text": "Je suis désolée… j’ai été imprudente. Ça ne se reproduira plus.",
+  "typeSpeed": 18,
+  "music": "music/impuissant.mp3",
+  "next": "precipitation_porte"
+},
+{
+  "id": "choix_nettoyer",
+  "bg": "images/backgrounds/salleamanger.webp",
+  "character": null,
+  "charImg": "images/characters/silentdad.webp",
+  "speaker": null,
+  "text": "Je prends le torchon et je nettoie chaque goutte comme si je voulais effacer tout ce qu’il a dit. Le silence devient plus lourd que les insultes.",
+  "typeSpeed": 20,
+  "music": "music/impuissant.mp3",
+  "next": "precipitation_porte"
+},
+{
+  "id": "choix_rienfaire",
+  "bg": "images/backgrounds/salleamanger.webp",
+  "character": null,
+  "charImg": "images/characters/momsad.webp",
+  "speaker": null,
+  "text": "Je reste figée. Maman essuie le café en silence, son dos voûté meurt un peu plus.",
+  "typeSpeed": 20,
+  "music": "music/impuissant.mp3",
+  "next": "precipitation_porte"
+},
+{
+  "id": "precipitation_porte",
+  "bg": "images/backgrounds/salleamanger.webp",
+  "character": null,
+  "charImg": null,
+  "speaker": null,
+  "text": "En un instant, je me précipite vers la porte.",
+  "typeSpeed": 22,
+  "music": "music/impuissant.mp3",
+  "next": "__suite_ecole__"
+}
 ]
