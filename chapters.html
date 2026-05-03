@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Love Me To Death — Chapters</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blood:#8B0000;--crimson:#DC143C;--rose:#FF6B8A;
+  --obsidian:#0A0A0F;--midnight:#12121A;--dusk:#1E1E2E;
+  --mist:#C8B8D0;--silver:#E8DDF0;--gold:#C9A84C;
+  --text-main:#F0E8F5;--text-dim:#9B8FAA;
+  --box-bg:rgba(10,10,15,0.88);--box-border:rgba(200,160,200,0.25);
+  --locked-border:rgba(80,40,80,.2);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;min-height:100%;background:var(--obsidian);font-family:'Cormorant Garamond',serif;color:var(--text-main);overflow-x:hidden}
+
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:999;opacity:.3}
+
+.bg-gradient{position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(139,0,0,.12) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(107,33,168,.08) 0%,transparent 50%),radial-gradient(ellipse at 50% 50%,#110814 0%,var(--obsidian) 80%);pointer-events:none;z-index:0}
+
+#particles{position:fixed;inset:0;pointer-events:none;z-index:1;overflow:hidden}
+.particle{position:absolute;border-radius:50%;opacity:0;animation:floatUp linear infinite}
+@keyframes floatUp{0%{transform:translateY(100vh) scale(0);opacity:0}10%{opacity:.6}90%{opacity:.3}100%{transform:translateY(-10vh) scale(1.5);opacity:0}}
+
+/* ── HEADER ── */
+header{
+  position:relative;z-index:10;
+  display:flex;flex-direction:column;align-items:center;
+  padding:3rem 1rem 2.5rem;
+  border-bottom:1px solid var(--box-border);
+}
+.header-deco-top{
+  width:1px;height:40px;
+  background:linear-gradient(to bottom,transparent,var(--blood));
+  margin-bottom:1rem;
+}
+.back-btn{
+  position:absolute;left:1.5rem;top:2rem;
+  font-family:'Cinzel',serif;font-size:.7rem;letter-spacing:.2em;
+  color:var(--text-dim);background:transparent;
+  border:1px solid rgba(200,160,200,.2);
+  padding:.5rem 1rem;cursor:pointer;
+  transition:all .25s ease;text-decoration:none;
+  display:flex;align-items:center;gap:.4rem;
+}
+.back-btn:hover{border-color:var(--crimson);color:var(--silver)}
+
+.header-eyebrow{
+  font-family:'Cinzel',serif;font-size:clamp(.55rem,1.5vw,.75rem);
+  letter-spacing:.55em;color:var(--blood);text-transform:uppercase;
+  opacity:0;animation:fadeIn 1s .3s forwards;
+}
+.header-divider{
+  display:flex;align-items:center;gap:1rem;
+  width:100%;max-width:300px;margin:.8rem 0 0;
+  opacity:0;animation:fadeIn 1s .6s forwards;
+}
+.header-divider::before,.header-divider::after{content:'';flex:1;height:1px;background:linear-gradient(to right,transparent,var(--blood))}
+.header-divider::after{background:linear-gradient(to left,transparent,var(--blood))}
+.header-divider span{color:var(--crimson);font-size:.75rem}
+
+@keyframes fadeIn{to{opacity:1}}
+
+/* ── PROGRESS ── */
+#progress-section{
+  position:relative;z-index:10;
+  max-width:900px;margin:2.5rem auto 0;
+  padding:0 1.5rem;
+  opacity:0;animation:fadeIn 1s .9s forwards;
+}
+.progress-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:.8rem;
+}
+.progress-label{
+  font-family:'Cinzel',serif;font-size:.65rem;letter-spacing:.3em;
+  color:var(--text-dim);text-transform:uppercase;
+}
+.progress-count{
+  font-family:'Cinzel',serif;font-size:.7rem;color:var(--mist);
+}
+.progress-rail{
+  position:relative;height:3px;
+  background:rgba(255,255,255,.06);
+  border-radius:2px;overflow:visible;
+}
+.progress-fill{
+  height:100%;background:linear-gradient(to right,var(--blood),var(--crimson));
+  border-radius:2px;transition:width 1s cubic-bezier(.4,0,.2,1);
+  position:relative;
+}
+.progress-fill::after{
+  content:'';position:absolute;right:-1px;top:50%;
+  transform:translateY(-50%);
+  width:8px;height:8px;border-radius:50%;
+  background:var(--crimson);
+  box-shadow:0 0 8px rgba(220,20,60,.8);
+}
+.progress-ticks{
+  position:absolute;top:0;left:0;right:0;bottom:0;
+  display:flex;align-items:center;
+  pointer-events:none;
+}
+.progress-tick{
+  position:absolute;top:50%;transform:translate(-50%,-50%);
+  width:5px;height:5px;border-radius:50%;
+  border:1px solid rgba(200,160,200,.3);
+  background:var(--obsidian);
+  transition:all .4s ease;
+}
+.progress-tick.done{
+  background:var(--crimson);
+  border-color:var(--crimson);
+  box-shadow:0 0 6px rgba(220,20,60,.5);
+}
+.progress-tick.current{
+  background:transparent;
+  border-color:var(--gold);
+  box-shadow:0 0 8px rgba(201,168,76,.4);
+  animation:pulseTick 2s ease infinite;
+}
+@keyframes pulseTick{0%,100%{box-shadow:0 0 4px rgba(201,168,76,.4)}50%{box-shadow:0 0 12px rgba(201,168,76,.7)}}
+
+.progress-endings{
+  display:flex;gap:.5rem;margin-top:.8rem;align-items:center;
+}
+.ending-pip{
+  display:flex;align-items:center;gap:.3rem;
+  font-family:'Cinzel',serif;font-size:.6rem;letter-spacing:.1em;color:var(--text-dim);
+}
+.ending-pip-dot{
+  width:6px;height:6px;border-radius:50%;
+  border:1px solid rgba(200,160,200,.25);
+  background:transparent;transition:all .4s;
+}
+.ending-pip-dot.unlocked-good{background:var(--crimson);border-color:var(--crimson);box-shadow:0 0 5px rgba(220,20,60,.5)}
+.ending-pip-dot.unlocked-bad{background:#9333ea;border-color:#9333ea;box-shadow:0 0 5px rgba(147,51,234,.5)}
+.progress-complete-msg{
+  font-family:'IM Fell English',serif;font-size:.8rem;color:var(--gold);
+  font-style:italic;margin-left:.5rem;opacity:0;transition:opacity .5s;
+}
+.progress-complete-msg.show{opacity:1}
+
+/* ── MAIN ── */
+main{
+  position:relative;z-index:10;
+  max-width:1100px;margin:0 auto;
+  padding:2.5rem 1.5rem 5rem;
+}
+
+#status{text-align:center;padding:4rem 1rem;font-family:'IM Fell English',serif;font-size:1.1rem;color:var(--text-dim);font-style:italic}
+.spinner{width:28px;height:28px;border:2px solid rgba(220,20,60,.2);border-top-color:var(--crimson);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 1rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.section-title{
+  font-family:'Cinzel',serif;font-size:.7rem;letter-spacing:.45em;
+  color:var(--blood);text-transform:uppercase;
+  display:flex;align-items:center;gap:1rem;
+  margin:0 0 2rem;
+}
+.section-title::before,.section-title::after{content:'';flex:1;height:1px;background:linear-gradient(to right,var(--blood),transparent)}
+.section-title::after{background:linear-gradient(to left,var(--blood),transparent)}
+
+/* ── CHAPTER GRID ── */
+#chapters-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+  gap:1.8rem;
+  opacity:0;transition:opacity .7s ease;
+}
+#chapters-grid.visible{opacity:1}
+
+.chapter-card{
+  position:relative;overflow:hidden;
+  background:var(--box-bg);
+  border:1px solid var(--box-border);
+  backdrop-filter:blur(12px);
+  cursor:pointer;
+  transition:transform .3s ease,border-color .3s ease,box-shadow .3s ease;
+  display:flex;flex-direction:column;
+  text-decoration:none;
+  min-height:220px;
+}
+.chapter-card:hover:not(.locked){
+  border-color:rgba(220,20,60,.5);
+  transform:translateY(-5px);
+  box-shadow:0 20px 50px rgba(0,0,0,.6),0 0 25px rgba(220,20,60,.08);
+}
+.chapter-card.locked{
+  background:rgba(12,6,18,.9);
+  border-color:var(--locked-border);
+  cursor:not-allowed;
+  filter:saturate(.25) brightness(.7);
+}
+
+.card-thumb{
+  width:100%;height:160px;
+  background-size:cover;background-position:center top;
+  position:relative;flex-shrink:0;
+  background-color:rgba(20,8,30,.9);
+  overflow:hidden;
+}
+.card-thumb::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(to bottom,rgba(10,10,15,0) 30%,rgba(10,10,15,.95) 100%);
+}
+.card-char-img{
+  position:absolute;bottom:0;left:50%;
+  transform:translateX(-50%);
+  height:145px;
+  object-fit:contain;
+  filter:drop-shadow(0 0 18px rgba(0,0,0,.9));
+  z-index:1;
+  transition:transform .4s ease;
+}
+.chapter-card:hover:not(.locked) .card-char-img{
+  transform:translateX(-50%) scale(1.04) translateY(-4px);
+}
+.card-thumb-placeholder{
+  width:100%;height:100%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:3rem;opacity:.1;color:var(--crimson);
+}
+
+.card-num{
+  position:absolute;top:.7rem;left:.7rem;z-index:3;
+  font-family:'Cinzel',serif;font-size:.58rem;letter-spacing:.3em;
+  color:var(--crimson);
+  background:rgba(10,10,15,.85);border:1px solid rgba(220,20,60,.35);
+  padding:.2rem .55rem;
+}
+.chapter-card.chapter-one .card-num{color:var(--gold);border-color:rgba(201,168,76,.4)}
+.card-badge-locked{position:absolute;top:.7rem;right:.7rem;z-index:3;font-size:1rem;opacity:.35}
+
+.card-body{padding:.9rem 1.2rem 1.1rem;flex:1;display:flex;flex-direction:column;gap:.4rem}
+.card-title{font-family:'Cinzel',serif;font-size:clamp(.88rem,2vw,.98rem);color:var(--silver);letter-spacing:.1em;line-height:1.2}
+.card-subtitle{font-family:'IM Fell English',serif;font-size:.85rem;color:var(--mist);font-style:italic;line-height:1.5;flex:1}
+.card-meta{display:flex;align-items:center;justify-content:space-between;margin-top:.5rem;padding-top:.5rem;border-top:1px solid rgba(200,160,200,.08)}
+.card-tag{font-family:'Cinzel',serif;font-size:.58rem;letter-spacing:.15em;color:var(--text-dim)}
+.card-arrow{color:var(--crimson);font-size:.8rem;opacity:0;transition:opacity .2s,transform .2s}
+.chapter-card:hover:not(.locked) .card-arrow{opacity:1;transform:translateX(4px)}
+
+/* ── ENDINGS ── */
+#endings-section{margin-top:3rem;display:none}
+.ending-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1.2rem}
+.ending-card{
+  background:var(--box-bg);border:1px solid var(--box-border);
+  padding:1.5rem;display:flex;flex-direction:column;gap:.6rem;
+  transition:all .3s ease;
+}
+.ending-card.good:hover{border-color:rgba(220,20,60,.4);box-shadow:0 8px 20px rgba(220,20,60,.08)}
+.ending-card.bad:hover{border-color:rgba(107,33,168,.4);box-shadow:0 8px 20px rgba(107,33,168,.08)}
+.ending-card-type{font-family:'Cinzel',serif;font-size:.58rem;letter-spacing:.3em;text-transform:uppercase}
+.ending-card.good .ending-card-type{color:var(--crimson)}
+.ending-card.bad .ending-card-type{color:#9333ea}
+.ending-card-title{font-family:'Cinzel',serif;font-size:.95rem;color:var(--silver);letter-spacing:.1em}
+.ending-card-range{font-family:'IM Fell English',serif;font-size:.8rem;color:var(--text-dim);font-style:italic}
+.ending-locked-msg{font-family:'IM Fell English',serif;font-size:.9rem;color:var(--text-dim);font-style:italic;text-align:center;padding:2rem;border:1px dashed rgba(200,160,200,.12)}
+
+/* ── UTILS ── */
+#fade-overlay{position:fixed;inset:0;z-index:40;background:var(--obsidian);opacity:0;pointer-events:none;transition:opacity .5s}
+#fade-overlay.fade-in{opacity:1;pointer-events:all}
+.ripple{position:fixed;border-radius:50%;width:20px;height:20px;background:rgba(220,20,60,.3);pointer-events:none;z-index:9000;transform:translate(-50%,-50%) scale(0);animation:rippleAnim .6s ease forwards}
+@keyframes rippleAnim{to{transform:translate(-50%,-50%) scale(8);opacity:0}}
+
+@media(max-width:600px){
+  main{padding:2rem 1rem 3rem}
+  .back-btn{left:.8rem;top:1.5rem}
+  header{padding:2rem .8rem 1.5rem}
+  #progress-section{padding:0 1rem}
+  #chapters-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-gradient"></div>
+<div id="particles"></div>
+<div id="fade-overlay"></div>
+
+<!-- ══════════════════════════════════════
+     AUDIO — reprend la musique de l'index
+     à la même position dans la piste
+══════════════════════════════════════ -->
+<audio id="bgm" loop></audio>
+
+<header>
+  <a href="index.html" class="back-btn" id="back-btn">&#9666; BACK</a>
+  <div class="header-deco-top"></div>
+  <div class="header-eyebrow" id="header-eyebrow">— chapters —</div>
+  <div class="header-divider"><span>&#10022;</span></div>
+</header>
+
+<div id="progress-section">
+  <div class="progress-header">
+    <span class="progress-label" id="progress-label">YOUR JOURNEY</span>
+    <span class="progress-count" id="progress-count"></span>
+  </div>
+  <div class="progress-rail" id="progress-rail">
+    <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+    <div class="progress-ticks" id="progress-ticks"></div>
+  </div>
+  <div class="progress-endings" id="progress-endings"></div>
+</div>
+
+<main>
+  <div id="status"><div class="spinner"></div><div id="status-text">Loading…</div></div>
+
+  <div id="chapters-section" style="display:none">
+    <div class="section-title" id="chapters-label">CHAPTERS</div>
+    <div id="chapters-grid"></div>
+  </div>
+
+  <div id="endings-section">
+    <div class="section-title" id="endings-label">ENDINGS</div>
+    <div id="endings-container"></div>
+  </div>
+</main>
+
+<script>
+'use strict';
+
+const LS_KEY         = 'lmtd_save_v3';
+const LS_CHAPTERS    = 'lmtd_chapters_v1';
+const LS_ENDINGS_SEEN= 'lmtd_endings_seen_v1';
+
+/* ══ LABELS i18n ══ */
+const LABELS={
+  en:{
+    eyebrow:'— chapters —',
+    backBtn:'◂ BACK',
+    loading:'Loading…',
+    error:'Could not load chapter index.',
+    locked:'Locked — complete the previous chapter to unlock.',
+    chapterNum:'CHAPTER',
+    endings:'ENDINGS',
+    endingsLocked:'Complete chapters to unlock endings.',
+    good:'GOOD ENDING',
+    bad:'BAD ENDING',
+    affRange:'Affinity',
+    noChapters:'No chapters found in chapterIndex.json.',
+    chaptersLabel:'CHAPTERS',
+    journeyLabel:'YOUR JOURNEY',
+    completeMsg:'✦ All stories told ✦',
+  },
+  fr:{
+    eyebrow:'— chapitres —',
+    backBtn:'◂ RETOUR',
+    loading:'Chargement…',
+    error:'Impossible de charger l\'index des chapitres.',
+    locked:'Verrouillé — terminez le chapitre précédent pour débloquer.',
+    chapterNum:'CHAPITRE',
+    endings:'FINS',
+    endingsLocked:'Terminez des chapitres pour débloquer les fins.',
+    good:'BONNE FIN',
+    bad:'MAUVAISE FIN',
+    affRange:'Affinité',
+    noChapters:'Aucun chapitre trouvé dans chapterIndex.json.',
+    chaptersLabel:'CHAPITRES',
+    journeyLabel:'VOTRE PÉRIPLE',
+    completeMsg:'✦ Toutes les histoires racontées ✦',
+  }
+};
+
+/* ══ ÉTAT ══ */
+let currentLang='en';
+let chaptersData=[];
+let goodEndings=[];
+let badEndings=[];
+let unlockedChapters=new Set(['chapter1']);
+let seenEndings=new Set();
+let saveData={};
+
+/* ══ PERSISTENCE ══ */
+function loadSave(){try{const raw=localStorage.getItem(LS_KEY);if(raw)saveData=JSON.parse(raw);}catch(e){}}
+function loadUnlocked(){
+  try{const raw=localStorage.getItem(LS_CHAPTERS);if(raw)JSON.parse(raw).forEach(id=>unlockedChapters.add(id));}catch(e){}
+  unlockedChapters.add('chapter1');
+}
+function loadSeenEndings(){try{const raw=localStorage.getItem(LS_ENDINGS_SEEN);if(raw)JSON.parse(raw).forEach(id=>seenEndings.add(id));}catch(e){}}
+
+window.LMTD_UNLOCK_CHAPTER=function(id){
+  unlockedChapters.add(id);
+  try{localStorage.setItem(LS_CHAPTERS,JSON.stringify([...unlockedChapters]));}catch(e){}
+};
+
+/* ══ LANGUE ══ */
+function detectLang(){
+  const params=new URLSearchParams(window.location.search);
+  if(params.get('lang'))return params.get('lang');
+  if(saveData.lang)return saveData.lang;
+  const nav=navigator.language||'en';
+  return nav.startsWith('fr')?'fr':'en';
+}
+function applyLangUI(){
+  const L=LABELS[currentLang]||LABELS.en;
+  document.getElementById('header-eyebrow').textContent=L.eyebrow;
+  document.getElementById('back-btn').textContent=L.backBtn;
+  document.getElementById('status-text').textContent=L.loading;
+  document.getElementById('progress-label').textContent=L.journeyLabel;
+  document.getElementById('chapters-label').textContent=L.chaptersLabel;
+  document.getElementById('endings-label').textContent=L.endings;
+  document.documentElement.lang=currentLang;
+}
+
+/* ══ MUSIQUE — reprise de la position de l'index ══
+   On lit la clé sessionStorage 'lmtd_music_pos' qui
+   est mise à jour toutes les secondes par index.html.
+   Si la musique était en cours à la seconde X, on
+   reprend exactement à X dans cette page.
+══ */
+function startContinuousMusic(){
+  const bgmEl = document.getElementById('bgm');
+  let targetSrc  = null;
+  let targetPos  = 0;
+
+  try{
+    const saved = JSON.parse(sessionStorage.getItem('lmtd_music_pos') || 'null');
+    if(saved && saved.src){
+      targetSrc = saved.src;
+      targetPos = saved.pos || 0;
+    }
+  }catch(e){}
+
+  // Fallback : musique d'intro par défaut
+  if(!targetSrc){
+    targetSrc = 'music/intro.mp3';
+    targetPos = 0;
+  }
+
+  bgmEl.src = targetSrc;
+  bgmEl.loop = true;
+
+  bgmEl.addEventListener('canplay', function handler(){
+    bgmEl.removeEventListener('canplay', handler);
+    if(targetPos > 0 && targetPos < (bgmEl.duration || Infinity)){
+      bgmEl.currentTime = targetPos;
+    }
+    bgmEl.play().catch(()=>{});
+  }, {once:true});
+
+  bgmEl.load();
+
+  // Continuer à sauvegarder la position pour le retour à index.html
+  setInterval(()=>{
+    if(!bgmEl.paused && bgmEl.src && bgmEl.duration){
+      try{ sessionStorage.setItem('lmtd_music_pos', JSON.stringify({src:bgmEl.src, pos:bgmEl.currentTime})); }catch(e){}
+    }
+  }, 1000);
+}
+
+/* ══ FETCH ══ */
+async function fetchJSON(path){
+  const r=await fetch(path);
+  if(!r.ok)throw new Error('HTTP '+r.status+' — '+path);
+  return r.json();
+}
+
+/* ══ PROGRESS BAR ══ */
+function renderProgressBar(){
+  if(!chaptersData.length)return;
+  const total=chaptersData.length;
+  let completed=0;
+  chaptersData.forEach((ch,idx)=>{
+    const id=ch.id||('chapter'+(idx+1));
+    if(idx===0){
+      if(saveData.sceneIndex>0)completed++;
+      else if(idx+1<chaptersData.length){
+        const nextId=chaptersData[idx+1].id||('chapter'+(idx+2));
+        if(unlockedChapters.has(nextId))completed++;
+      }
+    } else {
+      if(unlockedChapters.has(id)){
+        if(idx+1<chaptersData.length){
+          const nextId=chaptersData[idx+1].id||('chapter'+(idx+2));
+          if(unlockedChapters.has(nextId))completed++;
+        } else {
+          if(seenEndings.size>0)completed++;
+        }
+      }
+    }
+  });
+
+  const pct=total>1?Math.max(0,Math.min(100,(completed/total)*100)):0;
+  document.getElementById('progress-fill').style.width=pct+'%';
+  document.getElementById('progress-count').textContent=completed+' / '+total;
+
+  const ticksEl=document.getElementById('progress-ticks');
+  ticksEl.innerHTML='';
+  chaptersData.forEach((ch,idx)=>{
+    if(idx===0||idx===total-1)return;
+    const tick=document.createElement('div');
+    tick.className='progress-tick';
+    tick.style.left=((idx/total)*100)+'%';
+    if(idx<completed)tick.classList.add('done');
+    else if(idx===completed)tick.classList.add('current');
+    ticksEl.appendChild(tick);
+  });
+
+  const endingsEl=document.getElementById('progress-endings');
+  endingsEl.innerHTML='';
+  const L=LABELS[currentLang]||LABELS.en;
+  const hasGood=goodEndings.length>0, hasBad=badEndings.length>0;
+  const goodSeen=[...seenEndings].some(id=>id.startsWith('good'));
+  const badSeen=[...seenEndings].some(id=>id.startsWith('bad'));
+
+  if(hasGood){
+    const pip=document.createElement('div');pip.className='ending-pip';
+    const dot=document.createElement('div');dot.className='ending-pip-dot'+(goodSeen?' unlocked-good':'');
+    pip.appendChild(dot);
+    const label=document.createElement('span');label.textContent=L.good;
+    pip.appendChild(label);endingsEl.appendChild(pip);
+  }
+  if(hasBad){
+    const pip=document.createElement('div');pip.className='ending-pip';
+    const dot=document.createElement('div');dot.className='ending-pip-dot'+(badSeen?' unlocked-bad':'');
+    pip.appendChild(dot);
+    const label=document.createElement('span');label.textContent=L.bad;
+    pip.appendChild(label);endingsEl.appendChild(pip);
+  }
+
+  const allDone=completed>=total;
+  const allEndingsSeen=(!hasGood||goodSeen)&&(!hasBad||badSeen);
+  if(allDone&&allEndingsSeen){
+    const msg=document.createElement('div');msg.className='progress-complete-msg show';
+    msg.textContent=(LABELS[currentLang]||LABELS.en).completeMsg;
+    endingsEl.appendChild(msg);
+  }
+}
+
+/* ══ RENDER ══ */
+function isUnlocked(chapterId,idx){if(idx===0)return true;return unlockedChapters.has(chapterId);}
+
+function renderAll(){
+  const L=LABELS[currentLang]||LABELS.en;
+  const grid=document.getElementById('chapters-grid');
+  grid.innerHTML='';
+
+  if(!chaptersData.length){
+    document.getElementById('status').style.display='block';
+    document.getElementById('status-text').textContent=L.noChapters;
+    return;
+  }
+
+  document.getElementById('status').style.display='none';
+  document.getElementById('chapters-section').style.display='block';
+  setTimeout(()=>grid.classList.add('visible'),80);
+
+  chaptersData.forEach((ch,idx)=>{
+    const id=ch.id||('chapter'+(idx+1));
+    const unlocked=isUnlocked(id,idx);
+    const isFirst=idx===0;
+    const card=document.createElement('div');
+    card.className='chapter-card'+(unlocked?'':' locked')+(isFirst?' chapter-one':'');
+
+    const thumb=document.createElement('div');
+    thumb.className='card-thumb';
+    if(ch.thumbnail)thumb.style.backgroundImage="url('"+ch.thumbnail+"')";
+
+    const charImg=ch['charImg_'+currentLang]||ch.charImg||null;
+    if(charImg){
+      const cimg=document.createElement('img');
+      cimg.className='card-char-img';
+      cimg.src=charImg;cimg.alt=ch['charName_'+currentLang]||ch.charName||'';
+      cimg.draggable=false;cimg.onerror=function(){this.style.display='none';};
+      thumb.appendChild(cimg);
+    } else {
+      thumb.innerHTML='<div class="card-thumb-placeholder">&#9829;</div>';
+    }
+
+    const numBadge=document.createElement('div');
+    numBadge.className='card-num';
+    numBadge.textContent=L.chapterNum+' '+(ch.number||idx+1);
+    thumb.appendChild(numBadge);
+
+    if(!unlocked){
+      const lb=document.createElement('div');lb.className='card-badge-locked';lb.textContent='🔒';
+      thumb.appendChild(lb);
+    }
+    card.appendChild(thumb);
+
+    const body=document.createElement('div');body.className='card-body';
+    const title=document.createElement('div');title.className='card-title';
+    title.textContent=ch['title_'+currentLang]||ch.title||('Chapter '+(idx+1));
+    const sub=document.createElement('div');sub.className='card-subtitle';
+    sub.textContent=unlocked?(ch['description_'+currentLang]||ch.description||''):L.locked;
+    const meta=document.createElement('div');meta.className='card-meta';
+    const tag=document.createElement('div');tag.className='card-tag';tag.textContent=ch.tag||'';
+    const arrow=document.createElement('div');arrow.className='card-arrow';arrow.textContent='→';
+    meta.appendChild(tag);meta.appendChild(arrow);
+    body.appendChild(title);body.appendChild(sub);body.appendChild(meta);
+    card.appendChild(body);
+
+    if(unlocked)card.addEventListener('click',()=>launchChapter(ch,idx));
+    grid.appendChild(card);
+  });
+
+  renderEndings(L);
+  renderProgressBar();
+}
+
+function renderEndings(L){
+  const section=document.getElementById('endings-section');
+  const container=document.getElementById('endings-container');
+  section.style.display='block';container.innerHTML='';
+  const hasGood=goodEndings.length>0,hasBad=badEndings.length>0;
+  if(!hasGood&&!hasBad){
+    container.innerHTML='<div class="ending-locked-msg">'+L.endingsLocked+'</div>';
+    return;
+  }
+  const wrap=document.createElement('div');wrap.className='ending-cards';
+  const all=[
+    ...goodEndings.map(e=>({...e,_type:'good'})),
+    ...badEndings.map(e=>({...e,_type:'bad'}))
+  ];
+  all.forEach(e=>{
+    const card=document.createElement('div');card.className='ending-card '+e._type;
+    const typeLabel=e._type==='good'?L.good:L.bad;
+    card.innerHTML=
+      '<div class="ending-card-type">'+typeLabel+'</div>'+
+      '<div class="ending-card-title">'+(e['title_'+currentLang]||e.title||'—')+'</div>'+
+      '<div class="ending-card-range">'+L.affRange+': '+e.minAffinity+' → '+e.maxAffinity+'</div>';
+    wrap.appendChild(card);
+  });
+  container.appendChild(wrap);
+}
+
+/* ══ LAUNCH ══ */
+function launchChapter(ch,idx){
+  try{
+    const raw=localStorage.getItem(LS_KEY)||'{}';
+    const d=JSON.parse(raw);
+    d.lang=currentLang;
+    d.firstTime=idx===0?d.firstTime:false;
+    d.targetChapterFile=ch.file||('chapter'+(idx+1)+'.json');
+    d.sceneIndex=0;
+    localStorage.setItem(LS_KEY,JSON.stringify(d));
+  }catch(e){}
+  fadeTransition(()=>{
+    window.location.href='index.html?play=1&chapter='+encodeURIComponent(ch.file||('chapter'+(idx+1)+'.json'));
+  });
+}
+
+function fadeTransition(cb){
+  const fo=document.getElementById('fade-overlay');
+  fo.classList.add('fade-in');
+  setTimeout(cb,500);
+}
+
+/* ══ BOOT ══ */
+async function boot(){
+  loadSave();
+  loadUnlocked();
+  loadSeenEndings();
+  currentLang=detectLang();
+  applyLangUI();
+
+  // Lancer la musique en continu dès que possible
+  startContinuousMusic();
+
+  const L=LABELS[currentLang]||LABELS.en;
+  try{chaptersData=await fetchJSON('json/chapterIndex.json');}
+  catch(e){
+    document.getElementById('status-text').textContent=L.error+' (json/chapterIndex.json)';
+    console.error(e);return;
+  }
+
+  try{goodEndings=await fetchJSON('json/good_ending.json');}catch(e){goodEndings=[];}
+  try{badEndings=await fetchJSON('json/bad_ending.json');}catch(e){badEndings=[];}
+
+  renderAll();
+}
+
+/* Particles */
+(function(){
+  const c=document.getElementById('particles'),colors=['#DC143C','#8B0000','#FF6B8A','#C9A84C'];
+  for(let i=0;i<18;i++){
+    const p=document.createElement('div');p.className='particle';
+    p.style.cssText='left:'+Math.random()*100+'%;animation-duration:'+(7+Math.random()*10)+'s;animation-delay:'+Math.random()*8+'s;width:'+(2+Math.random()*3)+'px;height:'+(2+Math.random()*3)+'px;background:'+colors[i%colors.length]+';';
+    c.appendChild(p);
+  }
+})();
+document.addEventListener('click',e=>{
+  const r=document.createElement('div');r.className='ripple';
+  r.style.left=e.clientX+'px';r.style.top=e.clientY+'px';
+  document.body.appendChild(r);setTimeout(()=>r.remove(),600);
+});
+
+boot();
+</script>
+</body>
+</html>

@@ -29,25 +29,220 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .particle{position:absolute;width:3px;height:3px;border-radius:50%;background:var(--crimson);opacity:0;animation:floatUp linear infinite}
 @keyframes floatUp{0%{transform:translateY(100vh) scale(0);opacity:0}10%{opacity:.6}90%{opacity:.3}100%{transform:translateY(-10vh) scale(1.5);opacity:0}}
 
+/* ══════════════════════════════
+   CODE SECRET — style thème jeu
+══════════════════════════════ */
+#code-screen{
+  background:radial-gradient(ellipse at 50% 30%,#1a0510 0%,var(--obsidian) 70%);
+  z-index:20;
+}
+/* Même décoration verticale que le title screen */
+.code-deco-line{
+  position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:1px;height:30%;
+  background:linear-gradient(to bottom,transparent,var(--blood));
+}
+.code-deco-line::after{
+  content:'\2756';position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);
+  color:var(--blood);font-size:12px;
+}
+.code-inner{
+  position:relative;z-index:2;
+  display:flex;flex-direction:column;align-items:center;
+  gap:2rem;text-align:center;
+}
+
+/* Titre LMTD exactement comme title-screen */
+.code-game-title{
+  font-family:'Cinzel',serif;
+  font-size:clamp(2.5rem,8vw,6rem);
+  font-weight:600;
+  color:var(--silver);
+  line-height:1;
+  text-shadow:0 0 60px rgba(220,20,60,.4),0 0 120px rgba(220,20,60,.2);
+  opacity:0;
+  animation:titleReveal 3s .4s forwards;
+}
+.code-game-title span{color:var(--crimson)}
+
+.code-sub-label{
+  font-family:'Cinzel',serif;
+  font-size:clamp(.55rem,1.5vw,.8rem);
+  letter-spacing:.5em;
+  color:var(--blood);
+  text-transform:uppercase;
+  opacity:0;
+  animation:fadeIn 1s .3s forwards;
+  margin-bottom:-.5rem;
+}
+
+/* Ligne déco entre titre et code */
+.code-divider{
+  display:flex;align-items:center;gap:1rem;
+  width:260px;
+  opacity:0;animation:fadeIn 1s 3.2s forwards;
+}
+.code-divider::before,.code-divider::after{
+  content:'';flex:1;height:1px;
+  background:linear-gradient(to right,transparent,var(--blood));
+}
+.code-divider::after{background:linear-gradient(to left,transparent,var(--blood))}
+.code-divider-icon{color:var(--crimson);font-size:.85rem}
+
+/* Bloc saisie */
+.code-entry-block{
+  display:flex;flex-direction:column;align-items:center;
+  gap:1.4rem;
+  opacity:0;animation:fadeIn 1s 3.5s forwards;
+}
+.code-prompt-label{
+  font-family:'IM Fell English',serif;
+  font-size:clamp(.9rem,2.5vw,1.05rem);
+  color:var(--mist);
+  font-style:italic;
+  letter-spacing:.05em;
+}
+/* Champ de saisie stylé comme une boîte de dialogue */
+.code-field-wrap{
+  display:flex;flex-direction:column;align-items:center;
+  gap:.7rem;
+}
+#code-input{
+  font-family:'Cinzel',serif;
+  font-size:1.6rem;
+  letter-spacing:.6em;
+  text-indent:.6em;/* compenser le décalage du letter-spacing */
+  background:var(--box-bg);
+  border:1px solid var(--box-border);
+  color:var(--silver);
+  text-align:center;
+  outline:none;
+  width:220px;
+  padding:.8rem 1rem;
+  backdrop-filter:blur(12px);
+  border-radius:2px;
+  transition:border-color .3s, box-shadow .3s;
+  caret-color:var(--crimson);
+  -webkit-text-security:disc; /* masque les caractères sur webkit */
+}
+/* fallback pour Firefox : on utilise type=password donc géré nativement */
+#code-input:focus{
+  border-color:rgba(220,20,60,.6);
+  box-shadow:0 0 20px rgba(220,20,60,.15);
+}
+#code-input.shake{animation:codeShake .35s ease}
+@keyframes codeShake{
+  0%,100%{transform:translateX(0)}
+  20%{transform:translateX(-8px)}
+  40%{transform:translateX(8px)}
+  60%{transform:translateX(-5px)}
+  80%{transform:translateX(5px)}
+}
+#code-input.error-flash{
+  border-color:#ff6b6b;
+  box-shadow:0 0 20px rgba(255,107,107,.2);
+}
+
+/* Bouton ENTER — même style que btn-start */
+#btn-code-enter{
+  font-family:'Cinzel',serif;
+  font-size:clamp(.75rem,2vw,.9rem);
+  letter-spacing:.35em;
+  color:var(--silver);
+  background:transparent;
+  border:1px solid rgba(220,20,60,.5);
+  padding:.85rem 2.5rem;
+  cursor:pointer;
+  position:relative;overflow:hidden;
+  transition:all .4s ease;
+}
+#btn-code-enter::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,var(--blood),transparent);
+  opacity:0;transition:opacity .4s;
+}
+#btn-code-enter:hover{
+  border-color:var(--crimson);color:#fff;
+  letter-spacing:.45em;
+  box-shadow:0 0 30px rgba(220,20,60,.3);
+}
+#btn-code-enter:hover::before{opacity:1}
+#btn-code-enter span{position:relative;z-index:1}
+
+.code-error-msg{
+  font-family:'IM Fell English',serif;
+  font-size:.88rem;color:#ff6b6b;
+  font-style:italic;
+  min-height:1.2em;
+  opacity:0;transition:opacity .3s;
+}
+.code-error-msg.show{opacity:1}
+
+/* ── TITLE ── */
 #title-screen{background:radial-gradient(ellipse at 50% 30%,#1a0510 0%,var(--obsidian) 70%)}
 .title-bg-roses{position:absolute;inset:0;background:radial-gradient(circle at 20% 80%,rgba(139,0,0,.15) 0%,transparent 50%),radial-gradient(circle at 80% 20%,rgba(139,0,0,.10) 0%,transparent 40%);pointer-events:none}
 .title-deco{position:absolute;top:0;left:50%;transform:translateX(-50%);width:1px;height:30%;background:linear-gradient(to bottom,transparent,var(--blood))}
 .title-deco::after{content:'\2756';position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);color:var(--blood);font-size:12px}
 .title-wrap{position:relative;text-align:center;z-index:2}
-.title-sub{font-family:'Cinzel',serif;font-size:clamp(.55rem,1.5vw,.8rem);letter-spacing:.5em;color:var(--blood);text-transform:uppercase;margin-bottom:1.2rem;opacity:0;animation:fadeIn 1.5s .5s forwards}
-.title-main{font-family:'Cinzel',serif;font-size:clamp(2.5rem,8vw,6rem);font-weight:600;color:var(--silver);line-height:1;text-shadow:0 0 60px rgba(220,20,60,.4),0 0 120px rgba(220,20,60,.2);opacity:0;animation:titleReveal 5s .8s forwards}
+.title-sub{
+  font-family:'Cinzel',serif;font-size:clamp(.55rem,1.5vw,.8rem);
+  letter-spacing:.5em;color:var(--blood);text-transform:uppercase;
+  margin-bottom:1.2rem;
+  opacity:0;animation:fadeIn 1.5s .5s forwards
+}
+.title-main{
+  font-family:'Cinzel',serif;font-size:clamp(2.5rem,8vw,6rem);
+  font-weight:600;color:var(--silver);line-height:1;
+  text-shadow:0 0 60px rgba(220,20,60,.4),0 0 120px rgba(220,20,60,.2);
+  opacity:0;animation:titleReveal 5s .8s forwards
+}
 .title-main span{color:var(--crimson)}
-@keyframes titleReveal{0%{opacity:0;transform:translateY(30px);filter:blur(12px)}20%{opacity:.3;transform:translateY(15px);filter:blur(6px)}60%{opacity:.85;transform:translateY(4px);filter:blur(1px)}100%{opacity:1;transform:translateY(0);filter:blur(0)}}
+
+@keyframes titleReveal{
+  0%{opacity:0;transform:translateY(30px);filter:blur(12px)}
+  20%{opacity:.3;transform:translateY(15px);filter:blur(6px)}
+  60%{opacity:.85;transform:translateY(4px);filter:blur(1px)}
+  100%{opacity:1;transform:translateY(0);filter:blur(0)}
+}
 @keyframes fadeIn{to{opacity:1}}
-.title-line{display:flex;align-items:center;gap:1rem;margin:1.5rem 0 2.5rem;opacity:0;animation:fadeIn 1.5s 3.5s forwards}
+
+.title-line{
+  display:flex;align-items:center;gap:1rem;
+  margin:1.5rem 0 2.5rem;
+  opacity:0;animation:fadeIn 1.5s 3.5s forwards
+}
 .title-line::before,.title-line::after{content:'';flex:1;height:1px;background:linear-gradient(to right,transparent,var(--blood))}
 .title-line::after{background:linear-gradient(to left,transparent,var(--blood))}
 .title-line-icon{color:var(--crimson);font-size:1rem}
-.btn-start{font-family:'Cinzel',serif;font-size:clamp(.8rem,2vw,1rem);letter-spacing:.3em;color:var(--silver);background:transparent;border:1px solid rgba(220,20,60,.5);padding:1rem 3rem;cursor:pointer;position:relative;overflow:hidden;transition:all .4s ease;opacity:0;animation:fadeIn 1.5s 4.2s forwards}
-.btn-start::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--blood),transparent);opacity:0;transition:opacity .4s}
-.btn-start:hover{border-color:var(--crimson);color:#fff;letter-spacing:.4em;box-shadow:0 0 30px rgba(220,20,60,.3)}
-.btn-start:hover::before{opacity:1}
 
+.title-btns{
+  display:flex;flex-direction:column;gap:.8rem;align-items:center;
+  opacity:0;animation:fadeIn 1.5s 4.2s forwards
+}
+.btn-start,.btn-chapters{
+  font-family:'Cinzel',serif;font-size:clamp(.8rem,2vw,1rem);
+  letter-spacing:.3em;color:var(--silver);background:transparent;
+  border:1px solid rgba(220,20,60,.5);padding:1rem 3rem;
+  cursor:pointer;position:relative;overflow:hidden;
+  transition:all .4s ease;width:260px;text-align:center
+}
+.btn-start::before,.btn-chapters::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,var(--blood),transparent);
+  opacity:0;transition:opacity .4s
+}
+.btn-start:hover,.btn-chapters:hover{
+  border-color:var(--crimson);color:#fff;letter-spacing:.4em;
+  box-shadow:0 0 30px rgba(220,20,60,.3)
+}
+.btn-start:hover::before,.btn-chapters:hover::before{opacity:1}
+.btn-chapters{
+  border-color:rgba(201,168,76,.3);
+  font-size:clamp(.7rem,1.8vw,.85rem);padding:.8rem 3rem
+}
+.btn-chapters:hover{border-color:var(--gold);box-shadow:0 0 30px rgba(201,168,76,.2)}
+
+/* ── LANG ── */
 #lang-screen{background:radial-gradient(ellipse at 50% 50%,#0d0515 0%,var(--obsidian) 80%)}
 .lang-title{font-family:'Cinzel',serif;font-size:clamp(1.2rem,4vw,2rem);color:var(--silver);margin-bottom:.5rem;text-align:center}
 .lang-sub{font-size:clamp(.75rem,2vw,.95rem);color:var(--text-dim);font-style:italic;margin-bottom:3rem;text-align:center}
@@ -57,6 +252,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .lang-flag{font-size:3.5rem;line-height:1}
 .lang-name{font-family:'Cinzel',serif;font-size:.9rem;letter-spacing:.2em;color:var(--silver)}
 
+/* ── POLICY ── */
 #policy-screen{background:var(--obsidian);padding:1rem}
 .policy-container{width:100%;max-width:700px;display:flex;flex-direction:column;height:100vh;max-height:100vh;padding:2rem 1.5rem 1.5rem}
 .policy-header{font-family:'Cinzel',serif;font-size:clamp(1rem,3vw,1.5rem);color:var(--silver);text-align:center;border-bottom:1px solid var(--box-border);padding-bottom:1rem;margin-bottom:1.2rem;flex-shrink:0}
@@ -74,6 +270,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .btn-accept.ready{opacity:1;pointer-events:all}
 .btn-accept.ready:hover{background:var(--crimson);box-shadow:0 0 20px rgba(220,20,60,.4)}
 
+/* ── LOADING ── */
 #loading-screen{background:var(--obsidian);z-index:50}
 .loading-inner{text-align:center}
 .loading-title{font-family:'Cinzel',serif;font-size:1rem;letter-spacing:.4em;color:var(--blood);margin-bottom:2rem;text-transform:uppercase}
@@ -81,6 +278,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .loading-bar-inner{height:100%;background:var(--crimson);width:0%;transition:width .3s ease;border-radius:1px}
 .loading-pct{font-family:'Cinzel',serif;font-size:.7rem;color:var(--text-dim);letter-spacing:.3em}
 
+/* ── GAME ── */
 #game-screen{background:var(--obsidian);padding:0}
 #game-bg{position:absolute;inset:0;background-size:cover;background-position:center;z-index:0}
 #char-wrap{position:absolute;bottom:0;left:50%;transform:translateX(-50%);z-index:2;max-height:85%;display:flex;align-items:flex-end;justify-content:center;transition:opacity .5s ease;pointer-events:none}
@@ -116,6 +314,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .choice-btn:hover{background:var(--choice-hover);border-color:rgba(220,20,60,.5);transform:translateX(4px)}
 .choice-btn:hover::before{transform:scaleY(1)}
 
+/* Overlays */
 #history-overlay{position:fixed;inset:0;z-index:50;background:rgba(5,5,10,.95);display:none;flex-direction:column;backdrop-filter:blur(8px)}
 .history-header{padding:1.2rem 1.5rem;border-bottom:1px solid var(--box-border);display:flex;align-items:center;justify-content:space-between;font-family:'Cinzel',serif;font-size:.9rem;color:var(--mist);letter-spacing:.2em}
 #history-list{flex:1;overflow-y:auto;padding:1rem 1.5rem}
@@ -145,17 +344,10 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .help-key{min-width:80px;color:var(--crimson);font-family:'Cinzel',serif;font-size:.75rem;letter-spacing:.1em}
 .help-val{color:var(--mist)}
 
-/* ── MINIGAME OVERLAY : iframe plein écran ── */
-#minigame-overlay{
-  position:fixed;inset:0;z-index:70;
-  background:var(--obsidian);
-  display:none;
-}
-#minigame-frame{
-  width:100%;height:100%;
-  border:none;display:block;
-}
+#minigame-overlay{position:fixed;inset:0;z-index:70;background:var(--obsidian);display:none}
+#minigame-frame{width:100%;height:100%;border:none;display:block}
 
+/* ── ENDING ── */
 #ending-screen{background:var(--obsidian);flex-direction:column;gap:1.5rem;text-align:center;padding:2rem}
 .ending-type{font-family:'Cinzel',serif;font-size:.7rem;letter-spacing:.5em;color:var(--blood);text-transform:uppercase}
 .ending-title{font-family:'Cinzel',serif;font-size:clamp(1.5rem,5vw,3rem);color:var(--silver);text-shadow:0 0 40px rgba(220,20,60,.4)}
@@ -173,15 +365,16 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .ripple{position:fixed;border-radius:50%;width:20px;height:20px;background:rgba(220,20,60,.3);pointer-events:none;z-index:9000;transform:translate(-50%,-50%) scale(0);animation:rippleAnim .6s ease forwards}
 @keyframes rippleAnim{to{transform:translate(-50%,-50%) scale(8);opacity:0}}
 
-@media(max-width:480px){.pause-panel{padding:1.5rem 1.2rem}#hud{padding:.6rem .8rem}#dialogue-wrap,#choices-wrap{padding:0 .5rem .5rem}#affinity-bar-outer{width:60px}}
-/* GRANDS ÉCRANS (>= 1200px) : personnages plus petits */
-@media (min-width: 1200px) {
-  #char-wrap {
-    max-height: 45% !important;
-  }
-  #char-img {
-    max-width: 25vw !important;
-  }
+@media(max-width:480px){
+  .pause-panel{padding:1.5rem 1.2rem}
+  #hud{padding:.6rem .8rem}
+  #dialogue-wrap,#choices-wrap{padding:0 .5rem .5rem}
+  #affinity-bar-outer{width:60px}
+  #code-input{width:180px;font-size:1.3rem}
+}
+@media(min-width:1200px){
+  #char-wrap{max-height:45%!important}
+  #char-img{max-width:25vw!important}
 }
 </style>
 </head>
@@ -191,6 +384,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 <div id="fade-overlay"></div>
 <div id="affinity-delta"></div>
 
+<!-- ── LOADING ── -->
 <div id="loading-screen" class="screen active">
   <div class="loading-inner">
     <div class="loading-title" id="loading-label">Loading</div>
@@ -199,6 +393,25 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   </div>
 </div>
 
+<!-- ══ CODE SECRET — s'affiche UNE SEULE FOIS par session ══ -->
+<div id="code-screen" class="screen">
+  <div class="code-deco-line"></div>
+  <div class="code-inner">
+    <div class="code-sub-label" id="code-sub-label">— a visual novel —</div>
+    <div class="code-game-title">Love Me<br>To <span>Death</span></div>
+    <div class="code-divider"><span class="code-divider-icon">&#10022;</span></div>
+    <div class="code-entry-block">
+      <div class="code-prompt-label" id="code-prompt-text">Enter the secret code to begin</div>
+      <div class="code-field-wrap">
+        <input type="password" id="code-input" maxlength="10" inputmode="numeric" autocomplete="off" placeholder="····">
+        <div class="code-error-msg" id="code-error"></div>
+      </div>
+      <button id="btn-code-enter"><span>ENTER</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- ── TITLE ── -->
 <div id="title-screen" class="screen">
   <div class="title-bg-roses"></div>
   <div class="title-deco"></div>
@@ -206,10 +419,14 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
     <div class="title-sub" id="title-sub">— a visual novel —</div>
     <div class="title-main">Love Me<br>To <span>Death</span></div>
     <div class="title-line"><span class="title-line-icon">&#10022;</span></div>
-    <button class="btn-start" id="btn-start">BEGIN</button>
+    <div class="title-btns">
+      <button class="btn-start" id="btn-start">BEGIN</button>
+      <button class="btn-chapters" id="btn-chapters">&#9830; CHAPTERS</button>
+    </div>
   </div>
 </div>
 
+<!-- ── LANG ── -->
 <div id="lang-screen" class="screen">
   <div class="lang-title">Choose Your Language</div>
   <div class="lang-sub">Choisissez votre langue</div>
@@ -219,6 +436,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   </div>
 </div>
 
+<!-- ── POLICY ── -->
 <div id="policy-screen" class="screen">
   <div class="policy-container">
     <div class="policy-header" id="policy-header">Terms, Privacy &amp; Credits</div>
@@ -231,6 +449,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   </div>
 </div>
 
+<!-- ── GAME ── -->
 <div id="game-screen" class="screen">
   <div id="game-bg"></div>
   <div id="char-wrap"><img id="char-img" src="" alt="" onerror="this.style.display='none'"></div>
@@ -261,6 +480,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   <div id="choices-wrap"></div>
 </div>
 
+<!-- ── ENDING ── -->
 <div id="ending-screen" class="screen">
   <div class="ending-type" id="ending-type"></div>
   <div class="ending-title" id="ending-title"></div>
@@ -268,6 +488,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   <button class="btn-restart" id="btn-restart-end">RESTART</button>
 </div>
 
+<!-- ── OVERLAYS ── -->
 <div id="history-overlay">
   <div class="history-header">
     <span id="history-title-label">DIALOGUE HISTORY</span>
@@ -298,7 +519,6 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   </div>
 </div>
 
-<!-- MINIGAME : iframe plein écran, sans padding -->
 <div id="minigame-overlay">
   <iframe id="minigame-frame" src="" allowfullscreen></iframe>
 </div>
@@ -309,24 +529,43 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 'use strict';
 
 const GAME_CONFIG = {
+  secretCode: '1234',
   chapterFiles: ['chapter1.json'],
   introMusic: 'music/intro.mp3',
   preloadImages: []
 };
 
+/* ══════════════════════════════════════════════════
+   CLÉ SESSION : le code ne s'affiche qu'une fois
+   par session (ouverture du site). Un rechargement
+   ou un retour depuis chapters.html ne le redemande
+   JAMAIS.
+══════════════════════════════════════════════════ */
+const SESSION_CODE_KEY = 'lmtd_code_ok';
+
+function isCodeValidated() {
+  try { return sessionStorage.getItem(SESSION_CODE_KEY) === '1'; } catch(e) { return false; }
+}
+function markCodeValidated() {
+  try { sessionStorage.setItem(SESSION_CODE_KEY, '1'); } catch(e) {}
+}
+
 // ── I18N ──
 const I18N = {
   en: {
     loading:'Loading', titleSub:'— a visual novel —', btnBegin:'BEGIN', btnContinue:'CONTINUE',
+    btnChapters:'&#9830; CHAPTERS',
     policyHeader:'Terms, Privacy & Credits', policyHint:'Scroll to the bottom to accept',
     btnAccept:'ACCEPT & PLAY', btnBack:'\u25C2 BACK', btnResume:'RESUME', btnSaveQuit:'SAVE & QUIT',
     btnRestart:'RESTART FROM BEGINNING', btnRestartEnd:'RESTART', musicLabel:'MUSIC',
     historyTitle:'DIALOGUE HISTORY', helpTitle:'HOW TO PLAY', helpClose:'CLOSE',
+    codePrompt:'Enter the secret code to begin',
+    codeError:'Incorrect code. Try again.',
     helpRows:[
       ['TAP / CLICK','Advance dialogue. Skips typewriter effect if in progress.'],
       ['CHOICES','Select an option. Your choice may affect affinity.'],
-      ['\u2665 AFFINITY','Your bond with the character. Rises or falls with choices. Determines your ending.'],
-      ['\u25C2 BACK','Return to the previous scene (not during choices). Reverses the affinity delta.'],
+      ['\u2665 AFFINITY','Your bond with the character. Rises or falls with choices.'],
+      ['\u25C2 BACK','Return to the previous scene. Reverses the affinity delta.'],
       ['\u{1F4DC} HISTORY','Review past dialogue at any time.'],
       ['\u23F8 PAUSE','Adjust volume, save, or restart.'],
       ['AUTO-SAVE','Progress is saved automatically at each scene.'],
@@ -335,7 +574,7 @@ const I18N = {
     confirmRestart:'Restart from the beginning? Your progress will be lost.',
     confirmRestartEnd:'Restart the game?',
     youLabel:'You', systemLabel:'— System —',
-    systemFallback:'No JSON file found at json/en/chapter1.json. Place your scene files in the json/en/ folder to begin.',
+    systemFallback:'No JSON file found. Place your scene files in the json/en/ folder to begin.',
     policyContent:`
       <h3>PRIVACY POLICY</h3>
       <p>Love Me To Death is a browser-based visual novel. Progress data is stored locally on your device. No personal data is collected or shared.</p>
@@ -349,25 +588,22 @@ const I18N = {
         <p>Character Art — Original Artists</p>
         <p>Development — Development Team</p>
         <p style="margin-top:1rem;color:var(--crimson)">\u2665 Love Me To Death — Version 1.0 \u2665</p>
-      </div>`,
-    endings:{
-      true_love:{type:'TRUE ENDING',title:'Eternally Yours',text:'He takes your face in his cold hands, and for the first time his eyes hold something other than darkness. "You stayed," he whispers. "All the others fled." You press your hand to his chest — no heartbeat, and yet you have never felt so alive.'},
-      bittersweet:{type:'BITTERSWEET ENDING',title:'A Beautiful Wound',text:'He lets you leave at dawn, pressing a black rose into your hands. "You deserved better than a monster," he murmurs. Some loves are not meant to last — only to transform you.'},
-      bad_end_1:{type:'BAD ENDING',title:'Darkness Wins',text:'The warmth fades from his gaze. "You never understood," he says softly, and he turns toward the endless night. The door closes. You are alone.',isBad:true},
-      bad_end_2:{type:'BAD ENDING — ABYSS',title:'Consumed',text:'He smiles, and it does not reach his eyes. "You thought you could resist me." Your last thought is that you should have heeded the warnings. Too late.',isBad:true}
-    }
+      </div>`
   },
   fr: {
     loading:'Chargement', titleSub:'— un roman visuel —', btnBegin:'COMMENCER', btnContinue:'CONTINUER',
+    btnChapters:'&#9830; CHAPITRES',
     policyHeader:'Conditions, Confidentialit\u00e9 & Cr\u00e9dits', policyHint:"Faites d\u00e9filer jusqu'en bas pour accepter",
     btnAccept:'ACCEPTER & JOUER', btnBack:'\u25C2 RETOUR', btnResume:'REPRENDRE', btnSaveQuit:'SAUVEGARDER & QUITTER',
     btnRestart:'RECOMMENCER DEPUIS LE D\u00c9BUT', btnRestartEnd:'RECOMMENCER', musicLabel:'MUSIQUE',
     historyTitle:'HISTORIQUE DES DIALOGUES', helpTitle:'COMMENT JOUER', helpClose:'FERMER',
+    codePrompt:'Entrez le code secret pour commencer',
+    codeError:'Code incorrect. R\u00e9essayez.',
     helpRows:[
       ['TAP / CLIC',"Avancer le dialogue. Passe l\u2019effet machine \u00e0 \u00e9crire si en cours."],
       ['CHOIX',"S\u00e9lectionnez une option. Votre choix peut affecter l\u2019affinit\u00e9."],
       ['\u2665 AFFINIT\u00c9','Votre lien avec le personnage. Monte ou descend selon vos choix.'],
-      ['\u25C2 RETOUR',"Revenir \u00e0 la sc\u00e8ne pr\u00e9c\u00e9dente (hors choix). Annule le delta d\u2019affinit\u00e9."],
+      ['\u25C2 RETOUR',"Revenir \u00e0 la sc\u00e8ne pr\u00e9c\u00e9dente. Annule le delta d\u2019affinit\u00e9."],
       ['\u{1F4DC} HISTORIQUE','Revoir les dialogues pass\u00e9s \u00e0 tout moment.'],
       ['\u23F8 PAUSE','R\u00e9gler le volume, sauvegarder ou recommencer.'],
       ['SAUVEGARDE AUTO','La progression est sauvegard\u00e9e automatiquement \u00e0 chaque sc\u00e8ne.'],
@@ -376,7 +612,7 @@ const I18N = {
     confirmRestart:'Recommencer depuis le d\u00e9but\u00a0? Votre progression sera perdue.',
     confirmRestartEnd:'Recommencer le jeu\u00a0?',
     youLabel:'Vous', systemLabel:'— Syst\u00e8me —',
-    systemFallback:'Aucun fichier JSON trouv\u00e9 dans json/fr/chapter1.json.',
+    systemFallback:'Aucun fichier JSON trouv\u00e9 dans json/fr/.',
     policyContent:`
       <h3>POLITIQUE DE CONFIDENTIALIT\u00c9</h3>
       <p>Love Me To Death est un roman visuel jouable dans le navigateur. Les donn\u00e9es de progression sont stock\u00e9es localement. Aucune donn\u00e9e personnelle n\u2019est collect\u00e9e.</p>
@@ -390,85 +626,103 @@ const I18N = {
         <p>Art des personnages — Artistes originaux</p>
         <p>D\u00e9veloppement — \u00c9quipe de d\u00e9veloppement</p>
         <p style="margin-top:1rem;color:var(--crimson)">\u2665 Love Me To Death — Version 1.0 \u2665</p>
-      </div>`,
-    endings:{
-      true_love:{type:'FIN VRAIE',title:'\u00c9ternellement V\u00f4tre',text:"Il prend votre visage entre ses mains froides, et pour la premi\u00e8re fois ses yeux portent quelque chose d\u2019autre que les t\u00e9n\u00e8bres. \u00ab\u00a0Vous \u00eates rest\u00e9(e),\u00a0\u00bb murmure-t-il. Cet amour survivra \u00e0 la mort elle-m\u00eame."},
-      bittersweet:{type:'FIN DOUCE-AM\u00c8RE',title:'Une Belle Blessure',text:"Il vous laisse partir \u00e0 l\u2019aube, pressant une rose noire dans vos mains. Certains amours ne sont pas faits pour durer \u2014 seulement pour vous transformer."},
-      bad_end_1:{type:'MAUVAISE FIN',title:"L\u2019Obscurit\u00e9 Gagne",text:"La chaleur s\u2019\u00e9teint dans son regard. La porte se ferme. Vous \u00eates seul(e).",isBad:true},
-      bad_end_2:{type:'MAUVAISE FIN \u2014 AB\u00ceME',title:'Consum\u00e9(e)',text:"Il sourit, et \u00e7a n\u2019atteint pas ses yeux. Trop tard.",isBad:true}
-    }
+      </div>`
   }
 };
 
-const ENDING_RANGES=[{min:51,max:100,endingId:'true_love'},{min:1,max:50,endingId:'bittersweet'},{min:-50,max:0,endingId:'bad_end_1'},{min:-100,max:-51,endingId:'bad_end_2'}];
-const LS_KEY='lmtd_save_v3';
+const LS_KEY = 'lmtd_save_v3';
 
-const state={
+const state = {
   lang:'en', firstTime:true, sceneIndex:0, scenes:[], navStack:[],
   affinity:0, history:[], muted:false, volume:0.7, currentMusic:null,
   isTyping:false, typing:null, awaitingChoice:false,
-  pendingChoices:null
+  pendingChoices:null,
+  endingsData:{good:null,bad:null}
 };
 
-function t(k){return(I18N[state.lang]||I18N.en)[k];}
+function t(k){ return (I18N[state.lang]||I18N.en)[k]; }
 
-// ── APPLIQUER LA LANGUE ──
+/* ══ CODE SECRET ══ */
+function initCodeScreen(){
+  const L = I18N[state.lang]||I18N.en;
+  const input  = document.getElementById('code-input');
+  const errEl  = document.getElementById('code-error');
+  const btnEl  = document.getElementById('btn-code-enter');
+  document.getElementById('code-prompt-text').textContent = L.codePrompt;
+
+  function validateCode(){
+    const val = input.value;
+    if(val === GAME_CONFIG.secretCode){
+      markCodeValidated();
+      startIntroMusic();
+      fadeTransition(()=>showScreen('title-screen'));
+    } else {
+      errEl.textContent = L.codeError;
+      errEl.classList.add('show');
+      input.classList.add('error-flash','shake');
+      setTimeout(()=>{
+        input.classList.remove('error-flash','shake');
+        input.value = '';
+        errEl.classList.remove('show');
+      }, 700);
+    }
+  }
+
+  input.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); validateCode(); } });
+  btnEl.addEventListener('click', validateCode);
+}
+
+/* ══ LANG ══ */
 function applyLang(){
-  const L=I18N[state.lang]||I18N.en;
-  document.getElementById('loading-label').textContent=L.loading;
-  document.getElementById('title-sub').textContent=L.titleSub;
-  document.getElementById('btn-start').textContent=checkHasSave()?L.btnContinue:L.btnBegin;
-  document.getElementById('policy-header').textContent=L.policyHeader;
-  document.getElementById('policy-hint').textContent=L.policyHint;
-  document.getElementById('btn-accept').textContent=L.btnAccept;
-  document.getElementById('policy-scroll').innerHTML=L.policyContent;
-  document.getElementById('btn-back-dialogue').textContent=L.btnBack;
-  document.getElementById('btn-resume').textContent=L.btnResume;
-  document.getElementById('btn-save-quit').textContent=L.btnSaveQuit;
-  document.getElementById('btn-restart-game').textContent=L.btnRestart;
-  document.getElementById('btn-restart-end').textContent=L.btnRestartEnd;
-  document.querySelector('.vol-label').textContent=L.musicLabel;
-  document.getElementById('history-title-label').textContent=L.historyTitle;
-  document.getElementById('help-title').textContent=L.helpTitle;
-  document.getElementById('btn-close-help').textContent=L.helpClose;
-  const hr=document.getElementById('help-rows');
-  hr.innerHTML='';
-  // ── FIX CRITIQUE : vérification que helpRows est bien un tableau de paires ──
+  const L = I18N[state.lang]||I18N.en;
+  document.getElementById('loading-label').textContent = L.loading;
+  document.getElementById('title-sub').textContent     = L.titleSub;
+  document.getElementById('btn-start').textContent     = checkHasSave() ? L.btnContinue : L.btnBegin;
+  document.getElementById('btn-chapters').innerHTML    = L.btnChapters;
+  document.getElementById('policy-header').textContent = L.policyHeader;
+  document.getElementById('policy-hint').textContent   = L.policyHint;
+  document.getElementById('btn-accept').textContent    = L.btnAccept;
+  document.getElementById('btn-back-dialogue').textContent = L.btnBack;
+  document.getElementById('btn-resume').textContent    = L.btnResume;
+  document.getElementById('btn-save-quit').textContent = L.btnSaveQuit;
+  document.getElementById('btn-restart-game').textContent = L.btnRestart;
+  document.getElementById('btn-restart-end').textContent  = L.btnRestartEnd;
+  document.querySelector('.vol-label').textContent     = L.musicLabel;
+  document.getElementById('history-title-label').textContent = L.historyTitle;
+  document.getElementById('help-title').textContent    = L.helpTitle;
+  document.getElementById('btn-close-help').textContent = L.helpClose;
+  document.getElementById('policy-scroll').innerHTML   = L.policyContent;
+  const hr = document.getElementById('help-rows'); hr.innerHTML='';
   const rows = L.helpRows;
   if(Array.isArray(rows)){
     rows.forEach(function(row){
-      if(Array.isArray(row) && row.length >= 2){
+      if(Array.isArray(row)&&row.length>=2)
         hr.innerHTML += '<div class="help-row"><span class="help-key">'+row[0]+'</span><span class="help-val">'+row[1]+'</span></div>';
-      }
     });
   }
 }
 
-// ── PRELOAD ──
-function checkHasSave(){try{const d=JSON.parse(localStorage.getItem(LS_KEY)||'{}');return d.firstTime===false;}catch(e){return false;}}
-
+/* ══ PRELOAD ══ */
+function checkHasSave(){
+  try{const d=JSON.parse(localStorage.getItem(LS_KEY)||'{}');return d.firstTime===false;}catch(e){return false;}
+}
 async function preloadAssets(){
-  const bar=document.getElementById('loading-bar'),label=document.getElementById('loading-pct');
+  const bar=document.getElementById('loading-bar'), label=document.getElementById('loading-pct');
   const imgs=GAME_CONFIG.preloadImages;
   if(!imgs.length){bar.style.width='100%';label.textContent='100%';return;}
   let loaded=0;
   const tick=()=>{loaded++;const p=Math.round(loaded/imgs.length*100);bar.style.width=p+'%';label.textContent=p+'%';};
   await Promise.allSettled(imgs.map(s=>new Promise(r=>{const i=new Image();i.onload=i.onerror=()=>{tick();r();};i.src=s;})));
 }
-
-function preloadImage(src){
-  return new Promise(res=>{if(!src)return res();const i=new Image();i.onload=i.onerror=res;i.src=src;});
-}
+function preloadImage(src){return new Promise(res=>{if(!src)return res();const i=new Image();i.onload=i.onerror=res;i.src=src;});}
 
 async function loadChapters(){
   let all=[];
   for(const file of GAME_CONFIG.chapterFiles){
     const path='json/'+state.lang+'/'+file;
     try{
-      const r=await fetch(path);
-      if(!r.ok)throw new Error('HTTP '+r.status);
-      const d=await r.json();
-      all=all.concat(d);
+      const r=await fetch(path);if(!r.ok)throw new Error('HTTP '+r.status);
+      const d=await r.json();all=all.concat(d);
     }catch(e){console.warn('Cannot load',path,e.message);}
   }
   if(!all.length){
@@ -478,7 +732,15 @@ async function loadChapters(){
   state.scenes=all;
 }
 
-// ── SAVE / LOAD ──
+async function loadEndings(){
+  for(const type of ['good','bad']){
+    const path='json/'+type+'_ending.json';
+    try{const r=await fetch(path);if(!r.ok)throw new Error('HTTP '+r.status);state.endingsData[type]=await r.json();}
+    catch(e){console.warn('Cannot load ending',path,e.message);state.endingsData[type]=null;}
+  }
+}
+
+/* ══ SAVE / LOAD ══ */
 function saveGame(){
   try{
     localStorage.setItem(LS_KEY,JSON.stringify({
@@ -491,28 +753,23 @@ function saveGame(){
 }
 function loadSave(){
   try{
-    const raw=localStorage.getItem(LS_KEY);
-    if(!raw)return false;
+    const raw=localStorage.getItem(LS_KEY);if(!raw)return false;
     const d=JSON.parse(raw);
-    state.lang=d.lang||'en';
-    state.firstTime=d.firstTime!==false;
+    state.lang=d.lang||'en';state.firstTime=d.firstTime!==false;
     state.sceneIndex=d.sceneIndex||0;
     state.navStack=(d.navStack||[]).map(e=>typeof e==='number'?{sceneIndex:e,affinityDelta:0}:e);
-    state.affinity=d.affinity||0;
-    state.history=d.history||[];
-    state.volume=d.volume!==undefined?d.volume:0.7;
-    state.muted=d.muted||false;
-    state.currentMusic=d.currentMusic||null;
-    return true;
+    state.affinity=d.affinity||0;state.history=d.history||[];
+    state.volume=d.volume!==undefined?d.volume:0.7;state.muted=d.muted||false;
+    state.currentMusic=d.currentMusic||null;return true;
   }catch(e){return false;}
 }
 function resetGame(){try{localStorage.removeItem(LS_KEY);}catch(e){}location.reload();}
 
-// ── ÉCRANS ──
+/* ══ SCREENS ══ */
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
 function fadeTransition(cb){const fo=document.getElementById('fade-overlay');fo.classList.add('fade-in');setTimeout(()=>{cb();setTimeout(()=>fo.classList.remove('fade-in'),100);},500);}
 
-// ── AFFINITÉ ──
+/* ══ AFFINITY ══ */
 function updateAffinity(d){if(!d)return;state.affinity=Math.max(-100,Math.min(100,state.affinity+d));renderAffinity();showAffinityDelta(d);}
 function renderAffinity(){
   const aff=state.affinity;
@@ -527,18 +784,36 @@ function renderAffinity(){
 }
 function showAffinityDelta(d){
   const el=document.getElementById('affinity-delta');
-  el.className='';
-  el.textContent=(d>0?'+ ':'\u2212 ')+Math.abs(d);
-  el.style.color=d>0?'var(--crimson)':'#9333ea';
-  void el.offsetWidth;
-  el.className='show';
+  el.className='';el.textContent=(d>0?'+ ':'\u2212 ')+Math.abs(d);
+  el.style.color=d>0?'var(--crimson)':'#9333ea';void el.offsetWidth;el.className='show';
 }
 
-// ── AUDIO ──
+/* ══ AUDIO ══
+   On sauvegarde la position de la musique dans sessionStorage
+   pour que chapters.html puisse reprendre au même endroit.
+══ */
 const bgm=document.getElementById('bgm');
+
+// Synchroniser la position toutes les secondes
+setInterval(()=>{
+  if(!bgm.paused && bgm.src && bgm.duration){
+    try{ sessionStorage.setItem('lmtd_music_pos', JSON.stringify({src:bgm.src, pos:bgm.currentTime})); }catch(e){}
+  }
+},1000);
+
 function startIntroMusic(){
+  // Si la musique est déjà en cours (retour depuis chapters), ne pas repartir de 0
+  if(bgm.src && !bgm.paused && bgm.currentSrc.includes(GAME_CONFIG.introMusic.split('/').pop())) return;
   bgm.src=GAME_CONFIG.introMusic;bgm.loop=true;bgm.muted=false;
-  bgm.volume=state.muted?0:state.volume;bgm.play().catch(()=>{});
+  bgm.volume=state.muted?0:state.volume;
+  // Restaurer la position si on revient de chapters
+  try{
+    const saved=JSON.parse(sessionStorage.getItem('lmtd_music_pos')||'null');
+    if(saved && saved.src && saved.src.includes(GAME_CONFIG.introMusic.split('/').pop()) && saved.pos>0){
+      bgm.currentTime=saved.pos;
+    }
+  }catch(e){}
+  bgm.play().catch(()=>{});
   state.currentMusic=GAME_CONFIG.introMusic;
 }
 function playMusic(src){
@@ -550,21 +825,16 @@ function playMusic(src){
 function stopMusic(){bgm.pause();bgm.src='';state.currentMusic=null;}
 function applyVolume(){bgm.volume=state.muted?0:state.volume;}
 
-// ── BACKGROUND ──
+/* ══ BG / CHAR ══ */
 let lastBg=null;
-async function setBg(src){
-  if(!src||src===lastBg)return;
-  await preloadImage(src);
-  document.getElementById('game-bg').style.backgroundImage="url('"+src+"')";
-  lastBg=src;
-}
+async function setBg(src){if(!src||src===lastBg)return;await preloadImage(src);document.getElementById('game-bg').style.backgroundImage="url('"+src+"')";lastBg=src;}
 function setCharacter(img){
   const wrap=document.getElementById('char-wrap'),el=document.getElementById('char-img');
   if(!img){wrap.style.opacity='0';return;}
   el.src=img;el.style.display='';wrap.style.opacity='1';
 }
 
-// ── TYPEWRITER ──
+/* ══ TYPEWRITER ══ */
 const DEFAULT_TYPE_SPEED=22;
 function typeText(el,text,speed,onDone){
   el.textContent='';state.isTyping=true;let i=0;
@@ -577,21 +847,19 @@ function typeText(el,text,speed,onDone){
 }
 function skipTyping(text){if(state.typing){clearInterval(state.typing);state.typing=null;}state.isTyping=false;document.getElementById('dialogue-text').textContent=text;}
 
-// ── HISTORIQUE ──
+/* ══ HISTORY ══ */
 function addToHistory(sp,tx,ic){state.history.push({speaker:sp,text:tx,isChoice:ic});}
 function renderHistory(){
   const list=document.getElementById('history-list');list.innerHTML='';
   state.history.forEach(e=>{
     const d=document.createElement('div');d.className='history-entry';
-    d.innerHTML=e.isChoice
-      ?'<div class="h-choice">\u25B8 '+e.text+'</div>'
-      :'<div class="h-name">'+e.speaker+'</div><div>'+e.text+'</div>';
+    d.innerHTML=e.isChoice?'<div class="h-choice">\u25B8 '+e.text+'</div>':'<div class="h-name">'+e.speaker+'</div><div>'+e.text+'</div>';
     list.appendChild(d);
   });
   list.scrollTop=list.scrollHeight;
 }
 
-// ── BOUTON RETOUR ──
+/* ══ BACK ══ */
 function updateBackBtn(){
   const b=document.getElementById('btn-back-dialogue');
   state.navStack.length>0&&!state.awaitingChoice?b.classList.add('visible'):b.classList.remove('visible');
@@ -604,63 +872,49 @@ document.getElementById('btn-back-dialogue').addEventListener('click',()=>{
   state.sceneIndex=entry.sceneIndex;renderScene(state.scenes[entry.sceneIndex],true);
 });
 
-// ── SCÈNES ──
+/* ══ SCENES ══ */
 function getSceneIndex(id){return state.scenes.findIndex(s=>s.id===id);}
-
 function renderScene(scene,fromBack){
   if(!scene){triggerEnding();return;}
-
-  // ══ FIX CRITIQUE : gestion des mini-jeux ══
   if(scene.type==='minigame'){
     triggerMinigame(scene,function(){
-      if(scene.next&&scene.next!=='__ending__') navigateTo(scene.next);
+      if(scene.next&&scene.next!=='__ending__')navigateTo(scene.next);
       else triggerEnding();
     });
     return;
   }
-
   if(scene.bg)setBg(scene.bg);
   setCharacter(scene.charImg||null);
   if(scene.music)playMusic(scene.music);
-
   document.getElementById('speaker-name').textContent=scene.speaker||'';
   const cw=document.getElementById('choices-wrap');
   cw.style.display='none';cw.innerHTML='';
   document.getElementById('dialogue-wrap').style.display='';
   document.getElementById('dialogue-continue').style.display='';
-  state.awaitingChoice=false;
-  state.pendingChoices=scene.choices||null;
-
+  state.awaitingChoice=false;state.pendingChoices=scene.choices||null;
   addToHistory(scene.speaker||'',scene.text||'',false);
   typeText(document.getElementById('dialogue-text'),scene.text||'',scene.typeSpeed,null);
-  updateBackBtn();
-  saveGame();
-
+  updateBackBtn();saveGame();
   if(scene.next&&scene.next!=='__ending__'){
     const ni=getSceneIndex(scene.next);
     if(ni!==-1&&state.scenes[ni]&&state.scenes[ni].bg)preloadImage(state.scenes[ni].bg);
   }
 }
-
 function advance(){
   if(state.awaitingChoice)return;
-  const scene=state.scenes[state.sceneIndex];
-  if(!scene)return;
+  const scene=state.scenes[state.sceneIndex];if(!scene)return;
   if(state.isTyping){skipTyping(scene.text||'');return;}
   if(state.pendingChoices){renderChoices(state.pendingChoices);state.pendingChoices=null;return;}
   if(scene.next==='__ending__'){triggerEnding();return;}
   if(scene.next)navigateTo(scene.next);
 }
-
 function navigateTo(id,affinityDelta){
   affinityDelta=affinityDelta||0;
   if(!id||id==='__ending__'){triggerEnding();return;}
-  const idx=getSceneIndex(id);
-  if(idx===-1){triggerEnding();return;}
+  const idx=getSceneIndex(id);if(idx===-1){triggerEnding();return;}
   state.navStack.push({sceneIndex:state.sceneIndex,affinityDelta:affinityDelta});
   state.sceneIndex=idx;renderScene(state.scenes[idx]);
 }
-
 function renderChoices(choices){
   state.awaitingChoice=true;updateBackBtn();
   const cw=document.getElementById('choices-wrap');
@@ -681,87 +935,82 @@ function renderChoices(choices){
   });
 }
 
-// ── FIN ──
-function triggerEnding(){
-  const aff=state.affinity;let endingId='bad_end_2';
-  for(const r of ENDING_RANGES){if(aff>=r.min&&aff<=r.max){endingId=r.endingId;break;}}
-  const ending=(I18N[state.lang]||I18N.en).endings[endingId];
-  document.getElementById('ending-type').textContent=ending.type;
-  document.getElementById('ending-title').textContent=ending.title;
-  document.getElementById('ending-text').textContent=ending.text;
-  document.getElementById('ending-type').style.color=ending.isBad?'#ff6b6b':'var(--blood)';
+/* ══ ENDING ══ */
+async function triggerEnding(){
+  const aff=state.affinity;
+  const endingType=aff>=0?'good':'bad';
+  const data=state.endingsData[endingType];
+  let ending=null;
+  if(data&&Array.isArray(data)){
+    ending=data.find(e=>aff>=e.minAffinity&&aff<=e.maxAffinity);
+    if(!ending)ending=data[data.length-1];
+  }
+  if(!ending){
+    ending=aff>=0
+      ?{type:'ENDING',title:'The End',text:'Your story comes to a close.',music:'music/true_ending.mp3'}
+      :{type:'BAD ENDING',title:'The End',text:'Darkness falls.',music:'music/bad_ending.mp3'};
+  }
+  document.getElementById('ending-type').textContent=ending.type||'';
+  document.getElementById('ending-title').textContent=ending.title||'';
+  document.getElementById('ending-text').textContent=ending.text||'';
+  document.getElementById('ending-type').style.color=endingType==='bad'?'#ff6b6b':'var(--blood)';
   fadeTransition(()=>showScreen('ending-screen'));
-  playMusic(ending.isBad?'music/bad_ending.mp3':'music/true_ending.mp3');
+  if(ending.music)playMusic(ending.music);
+  else playMusic(endingType==='bad'?'music/bad_ending.mp3':'music/true_ending.mp3');
 }
 
-// ══════════════════════════════════════════════════════════
-// MINIGAME — système iframe
-// Le minigame est chargé dans une iframe plein écran.
-// Pour terminer, le minigame appelle :
-//   window.parent.LMTD_MINIGAME_DONE({ affinity: N })
-// depuis son propre JS.
-// ══════════════════════════════════════════════════════════
+/* ══ MINIGAME ══ */
 function triggerMinigame(scene,onComplete){
-  const file = scene.minigameFile || ('minigames/'+(scene.name||scene.minigame)+'.html');
-  const ov  = document.getElementById('minigame-overlay');
-  const frm = document.getElementById('minigame-frame');
-
-  // Passer le config glutamate à l'iframe via l'URL ou via postMessage après chargement
-  // On utilise sessionStorage comme pont cross-frame (même origine)
-  try{
-    // Détecter si le joueur a choisi le glutamate (scène précédente)
-    const glutamate = state.history.some(h => h.text && h.text.toLowerCase().includes('glutamate') && h.isChoice===false && h.speaker==='Dazai');
-    sessionStorage.setItem('LMTD_CFG', JSON.stringify({ glutamate: glutamate, affinity: state.affinity }));
-  }catch(e){}
-
-  // Callback appelé par l'iframe
-  window.LMTD_MINIGAME_DONE = function(result){
-    ov.style.display='none';
-    frm.src='';
-    window.LMTD_MINIGAME_DONE=null;
-    // Appliquer le delta d'affinité éventuel du mini-jeu
-    if(result && result.affinity){
-      updateAffinity(result.affinity);
-    }
-    onComplete();
+  const file=scene.minigameFile||('minigames/'+(scene.name||scene.minigame)+'.html');
+  const ov=document.getElementById('minigame-overlay'),frm=document.getElementById('minigame-frame');
+  try{sessionStorage.setItem('LMTD_CFG',JSON.stringify({affinity:state.affinity}));}catch(e){}
+  window.LMTD_MINIGAME_DONE=function(result){
+    ov.style.display='none';frm.src='';window.LMTD_MINIGAME_DONE=null;
+    if(result&&result.affinity)updateAffinity(result.affinity);onComplete();
   };
-
-  frm.src=file;
-  ov.style.display='block';
+  frm.src=file;ov.style.display='block';
 }
 
-// ── DÉMARRAGE ──
+/* ══ START ══ */
 function startGame(fromIdx){
-  fromIdx=fromIdx||0;
-  stopMusic();
-  state.sceneIndex=fromIdx;
-  lastBg=null;
-  showScreen('game-screen');
-  renderAffinity();
-  renderScene(state.scenes[fromIdx]);
+  fromIdx=fromIdx||0;stopMusic();
+  state.sceneIndex=fromIdx;lastBg=null;
+  showScreen('game-screen');renderAffinity();renderScene(state.scenes[fromIdx]);
 }
 
+/* ══ BOOT ══
+   Logique :
+   1. Si le code est déjà validé pour cette session → passer directement au titre
+   2. Sinon → afficher l'écran code
+══ */
 async function boot(){
   state.lang='en';
   applyLang();
   await preloadAssets();
-  fadeTransition(()=>showScreen('title-screen'));
+
+  if(isCodeValidated()){
+    // Session déjà validée : on saute le code et on lance la musique intro si besoin
+    initCodeScreen(); // initialise quand même les listeners (au cas où)
+    startIntroMusic();
+    fadeTransition(()=>showScreen('title-screen'));
+  } else {
+    initCodeScreen();
+    fadeTransition(()=>{
+      showScreen('code-screen');
+      setTimeout(()=>{ const inp=document.getElementById('code-input'); if(inp)inp.focus(); }, 700);
+    });
+  }
 }
 
-// ── ÉVÉNEMENTS ──
+/* ══ EVENTS — TITLE ══ */
 document.getElementById('btn-start').addEventListener('click',()=>{
-  startIntroMusic();
   const saved=loadSave();
   if(saved&&!state.firstTime){
     applyLang();
-    loadChapters().then(()=>{
+    Promise.all([loadChapters(),loadEndings()]).then(()=>{
       fadeTransition(()=>{
-        stopMusic();
-        showScreen('game-screen');
-        renderAffinity();
-        lastBg=null;
-        const scene=state.scenes[state.sceneIndex]||state.scenes[0];
-        renderScene(scene);
+        stopMusic();showScreen('game-screen');renderAffinity();lastBg=null;
+        const scene=state.scenes[state.sceneIndex]||state.scenes[0];renderScene(scene);
       });
     });
   }else{
@@ -769,16 +1018,23 @@ document.getElementById('btn-start').addEventListener('click',()=>{
   }
 });
 
+document.getElementById('btn-chapters').addEventListener('click',()=>{
+  let langToPass=state.lang||'en';
+  try{const d=JSON.parse(localStorage.getItem(LS_KEY)||'{}');if(d.lang)langToPass=d.lang;}catch(e){}
+  window.open('chapters.html?lang='+langToPass,'_self');
+});
+
+/* ══ EVENTS — LANG ══ */
 document.querySelectorAll('.lang-btn').forEach(btn=>{
   btn.addEventListener('click',()=>{
-    state.lang=btn.dataset.lang;
-    applyLang();
+    state.lang=btn.dataset.lang;applyLang();
     document.getElementById('policy-bar').style.width='0%';
     document.getElementById('btn-accept').classList.remove('ready');
     fadeTransition(()=>showScreen('policy-screen'));
   });
 });
 
+/* ══ EVENTS — POLICY ══ */
 const policyScroll=document.getElementById('policy-scroll');
 policyScroll.addEventListener('scroll',()=>{
   const{scrollTop,scrollHeight,clientHeight}=policyScroll;
@@ -786,26 +1042,23 @@ policyScroll.addEventListener('scroll',()=>{
   document.getElementById('policy-bar').style.width=Math.min(100,pct*100)+'%';
   if(pct>=0.98)document.getElementById('btn-accept').classList.add('ready');
 });
-
 document.getElementById('btn-accept').addEventListener('click',async()=>{
   if(!document.getElementById('btn-accept').classList.contains('ready'))return;
   state.firstTime=false;
-  await loadChapters();
-  saveGame();
-  fadeTransition(()=>startGame(0));
+  await Promise.all([loadChapters(),loadEndings()]);
+  saveGame();fadeTransition(()=>startGame(0));
 });
 
+/* ══ EVENTS — GAME ══ */
 document.getElementById('dialogue-box').addEventListener('click',e=>{if(e.target.id==='btn-back-dialogue')return;advance();});
 document.getElementById('game-bg').addEventListener('click',advance);
 document.getElementById('char-wrap').addEventListener('click',advance);
-
 document.getElementById('btn-history').addEventListener('click',()=>{renderHistory();document.getElementById('history-overlay').style.display='flex';});
 document.getElementById('btn-close-history').addEventListener('click',()=>{document.getElementById('history-overlay').style.display='none';});
 document.getElementById('btn-help').addEventListener('click',()=>{document.getElementById('help-overlay').style.display='flex';});
 document.getElementById('btn-close-help').addEventListener('click',()=>{document.getElementById('help-overlay').style.display='none';});
 document.getElementById('btn-pause').addEventListener('click',()=>{saveGame();document.getElementById('pause-modal').style.display='flex';});
 document.getElementById('btn-resume').addEventListener('click',()=>{document.getElementById('pause-modal').style.display='none';});
-
 document.getElementById('btn-save-quit').addEventListener('click',()=>{
   saveGame();
   fadeTransition(()=>{
@@ -815,7 +1068,6 @@ document.getElementById('btn-save-quit').addEventListener('click',()=>{
     startIntroMusic();
   });
 });
-
 document.getElementById('btn-restart-game').addEventListener('click',()=>{if(confirm(t('confirmRestart')))resetGame();});
 document.getElementById('btn-restart-end').addEventListener('click',()=>{if(confirm(t('confirmRestartEnd')))resetGame();});
 
@@ -824,6 +1076,7 @@ volSlider.value=state.volume;
 volSlider.addEventListener('input',()=>{state.volume=parseFloat(volSlider.value);applyVolume();saveGame();});
 btnMute.addEventListener('click',()=>{state.muted=!state.muted;btnMute.textContent=state.muted?'\u{1F507}':'\u{1F50A}';applyVolume();saveGame();});
 
+/* ══ PARTICLES + RIPPLE + KEYBOARD ══ */
 (function(){
   const c=document.getElementById('particles'),colors=['#DC143C','#8B0000','#FF6B8A','#C9A84C'];
   for(let i=0;i<20;i++){
@@ -832,14 +1085,14 @@ btnMute.addEventListener('click',()=>{state.muted=!state.muted;btnMute.textConte
     c.appendChild(p);
   }
 })();
-
 document.addEventListener('click',e=>{
   const r=document.createElement('div');r.className='ripple';
   r.style.left=e.clientX+'px';r.style.top=e.clientY+'px';
   document.body.appendChild(r);setTimeout(()=>r.remove(),600);
 });
-
 document.addEventListener('keydown',e=>{
+  // Bloquer les raccourcis si l'écran code est actif
+  if(document.getElementById('code-screen').classList.contains('active'))return;
   if(e.key===' '||e.key==='Enter'){e.preventDefault();advance();}
   if(e.key==='Backspace'&&!state.awaitingChoice)document.getElementById('btn-back-dialogue').click();
   if(e.key==='Escape'){
