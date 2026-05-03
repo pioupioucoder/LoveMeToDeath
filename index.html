@@ -8,6 +8,18 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
 <style>
+  /* EFFET GLITCH */
+.glitch {
+  animation: glitch 0.3s infinite alternate;
+}
+@keyframes glitch {
+  0% { transform: translate(0); text-shadow: -1px 0 red, 1px 0 blue; }
+  20% { transform: translate(-2px, 1px); text-shadow: -2px 0 red, 2px 0 cyan; }
+  40% { transform: translate(2px, -1px); text-shadow: 2px 0 magenta, -2px 0 lime; }
+  60% { transform: translate(-1px, 2px); text-shadow: -1px 0 orange, 1px 0 purple; }
+  80% { transform: translate(1px, -2px); text-shadow: 1px 0 pink, -1px 0 yellow; }
+  100% { transform: translate(0); text-shadow: -1px 0 red, 1px 0 blue; }
+}
 :root {
   --blood:#8B0000;--crimson:#DC143C;--rose:#FF6B8A;--petal:#FFD6E0;
   --obsidian:#0A0A0F;--midnight:#12121A;--dusk:#1E1E2E;--twilight:#2A2A3E;
@@ -30,13 +42,12 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 @keyframes floatUp{0%{transform:translateY(100vh) scale(0);opacity:0}10%{opacity:.6}90%{opacity:.3}100%{transform:translateY(-10vh) scale(1.5);opacity:0}}
 
 /* ══════════════════════════════
-   CODE SECRET — style thème jeu
+   CODE SECRET — sans titre du jeu
 ══════════════════════════════ */
 #code-screen{
   background:radial-gradient(ellipse at 50% 30%,#1a0510 0%,var(--obsidian) 70%);
   z-index:20;
 }
-/* Même décoration verticale que le title screen */
 .code-deco-line{
   position:absolute;top:0;left:50%;transform:translateX(-50%);
   width:1px;height:30%;
@@ -46,41 +57,35 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   content:'\2756';position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);
   color:var(--blood);font-size:12px;
 }
+/* Ligne déco bas de page */
+.code-deco-line-bottom{
+  position:absolute;bottom:0;left:50%;transform:translateX(-50%);
+  width:1px;height:25%;
+  background:linear-gradient(to top,transparent,var(--blood));
+}
+
 .code-inner{
   position:relative;z-index:2;
   display:flex;flex-direction:column;align-items:center;
   gap:2rem;text-align:center;
 }
 
-/* Titre LMTD exactement comme title-screen */
-.code-game-title{
-  font-family:'Cinzel',serif;
-  font-size:clamp(2.5rem,8vw,6rem);
-  font-weight:600;
-  color:var(--silver);
-  line-height:1;
-  text-shadow:0 0 60px rgba(220,20,60,.4),0 0 120px rgba(220,20,60,.2);
-  opacity:0;
-  animation:titleReveal 3s .4s forwards;
-}
-.code-game-title span{color:var(--crimson)}
-
-.code-sub-label{
-  font-family:'Cinzel',serif;
-  font-size:clamp(.55rem,1.5vw,.8rem);
-  letter-spacing:.5em;
+/* Symbole mystérieux à la place du titre */
+.code-mystery-symbol{
+  font-size:clamp(2.5rem,8vw,4.5rem);
   color:var(--blood);
-  text-transform:uppercase;
+  text-shadow:0 0 40px rgba(139,0,0,.6), 0 0 80px rgba(139,0,0,.3);
   opacity:0;
-  animation:fadeIn 1s .3s forwards;
-  margin-bottom:-.5rem;
+  animation:fadeIn 2s .4s forwards;
+  line-height:1;
+  letter-spacing:.3em;
 }
 
-/* Ligne déco entre titre et code */
+/* Divider */
 .code-divider{
   display:flex;align-items:center;gap:1rem;
   width:260px;
-  opacity:0;animation:fadeIn 1s 3.2s forwards;
+  opacity:0;animation:fadeIn 1s 2s forwards;
 }
 .code-divider::before,.code-divider::after{
   content:'';flex:1;height:1px;
@@ -93,7 +98,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .code-entry-block{
   display:flex;flex-direction:column;align-items:center;
   gap:1.4rem;
-  opacity:0;animation:fadeIn 1s 3.5s forwards;
+  opacity:0;animation:fadeIn 1s 2.3s forwards;
 }
 .code-prompt-label{
   font-family:'IM Fell English',serif;
@@ -102,7 +107,6 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   font-style:italic;
   letter-spacing:.05em;
 }
-/* Champ de saisie stylé comme une boîte de dialogue */
 .code-field-wrap{
   display:flex;flex-direction:column;align-items:center;
   gap:.7rem;
@@ -111,7 +115,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   font-family:'Cinzel',serif;
   font-size:1.6rem;
   letter-spacing:.6em;
-  text-indent:.6em;/* compenser le décalage du letter-spacing */
+  text-indent:.6em;
   background:var(--box-bg);
   border:1px solid var(--box-border);
   color:var(--silver);
@@ -123,9 +127,8 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   border-radius:2px;
   transition:border-color .3s, box-shadow .3s;
   caret-color:var(--crimson);
-  -webkit-text-security:disc; /* masque les caractères sur webkit */
+  -webkit-text-security:disc;
 }
-/* fallback pour Firefox : on utilise type=password donc géré nativement */
 #code-input:focus{
   border-color:rgba(220,20,60,.6);
   box-shadow:0 0 20px rgba(220,20,60,.15);
@@ -143,7 +146,6 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   box-shadow:0 0 20px rgba(255,107,107,.2);
 }
 
-/* Bouton ENTER — même style que btn-start */
 #btn-code-enter{
   font-family:'Cinzel',serif;
   font-size:clamp(.75rem,2vw,.9rem);
@@ -219,28 +221,28 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   display:flex;flex-direction:column;gap:.8rem;align-items:center;
   opacity:0;animation:fadeIn 1.5s 4.2s forwards
 }
-.btn-start,.btn-chapters{
+.btn-start,.btn-chapters,.btn-settings-title{
   font-family:'Cinzel',serif;font-size:clamp(.8rem,2vw,1rem);
   letter-spacing:.3em;color:var(--silver);background:transparent;
   border:1px solid rgba(220,20,60,.5);padding:1rem 3rem;
   cursor:pointer;position:relative;overflow:hidden;
   transition:all .4s ease;width:260px;text-align:center
 }
-.btn-start::before,.btn-chapters::before{
+.btn-start::before,.btn-chapters::before,.btn-settings-title::before{
   content:'';position:absolute;inset:0;
   background:linear-gradient(135deg,var(--blood),transparent);
   opacity:0;transition:opacity .4s
 }
-.btn-start:hover,.btn-chapters:hover{
+.btn-start:hover,.btn-chapters:hover,.btn-settings-title:hover{
   border-color:var(--crimson);color:#fff;letter-spacing:.4em;
   box-shadow:0 0 30px rgba(220,20,60,.3)
 }
-.btn-start:hover::before,.btn-chapters:hover::before{opacity:1}
-.btn-chapters{
+.btn-start:hover::before,.btn-chapters:hover::before,.btn-settings-title:hover::before{opacity:1}
+.btn-chapters,.btn-settings-title{
   border-color:rgba(201,168,76,.3);
   font-size:clamp(.7rem,1.8vw,.85rem);padding:.8rem 3rem
 }
-.btn-chapters:hover{border-color:var(--gold);box-shadow:0 0 30px rgba(201,168,76,.2)}
+.btn-chapters:hover,.btn-settings-title:hover{border-color:var(--gold);box-shadow:0 0 30px rgba(201,168,76,.2)}
 
 /* ── LANG ── */
 #lang-screen{background:radial-gradient(ellipse at 50% 50%,#0d0515 0%,var(--obsidian) 80%)}
@@ -277,6 +279,46 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .loading-bar-outer{width:280px;height:2px;background:rgba(255,255,255,.08);border-radius:1px;overflow:hidden;margin:0 auto 1rem}
 .loading-bar-inner{height:100%;background:var(--crimson);width:0%;transition:width .3s ease;border-radius:1px}
 .loading-pct{font-family:'Cinzel',serif;font-size:.7rem;color:var(--text-dim);letter-spacing:.3em}
+
+/* ── SETTINGS SCREEN ── */
+#settings-screen{background:radial-gradient(ellipse at 50% 50%,#0d0515 0%,var(--obsidian) 80%);z-index:20}
+.settings-container{
+  background:rgba(15,10,20,.95);
+  border:1px solid var(--box-border);
+  padding:2.5rem 3rem;
+  min-width:300px;max-width:420px;width:90%;
+  display:flex;flex-direction:column;gap:1.2rem;
+}
+.settings-title{
+  font-family:'Cinzel',serif;font-size:1.1rem;color:var(--silver);
+  text-align:center;letter-spacing:.3em;
+  border-bottom:1px solid var(--box-border);padding-bottom:.8rem;
+}
+.settings-section-label{
+  font-family:'Cinzel',serif;font-size:.7rem;color:var(--blood);
+  letter-spacing:.3em;text-transform:uppercase;
+  margin-top:.3rem;
+}
+.settings-row{
+  display:flex;align-items:center;gap:.8rem;
+}
+.settings-row .vol-label{
+  font-family:'Cinzel',serif;font-size:.75rem;color:var(--text-dim);
+  letter-spacing:.15em;min-width:70px;
+}
+#settings-vol-slider{flex:1;accent-color:var(--crimson);cursor:pointer}
+#settings-mute-btn{
+  background:none;border:1px solid var(--box-border);color:var(--mist);
+  cursor:pointer;padding:.3rem .6rem;font-size:.85rem;transition:all .2s;
+}
+#settings-mute-btn:hover{border-color:var(--crimson);color:var(--silver)}
+.settings-close-btn{
+  font-family:'Cinzel',serif;font-size:.8rem;letter-spacing:.2em;
+  background:transparent;border:1px solid var(--box-border);
+  color:var(--mist);padding:.9rem;cursor:pointer;transition:all .2s;
+  text-align:center;margin-top:.4rem;
+}
+.settings-close-btn:hover{border-color:var(--crimson);color:var(--silver);background:rgba(139,0,0,.15)}
 
 /* ── GAME ── */
 #game-screen{background:var(--obsidian);padding:0}
@@ -371,10 +413,11 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   #dialogue-wrap,#choices-wrap{padding:0 .5rem .5rem}
   #affinity-bar-outer{width:60px}
   #code-input{width:180px;font-size:1.3rem}
+  .settings-container{padding:1.5rem 1.2rem}
 }
 @media(min-width:1200px){
-  #char-wrap{max-height:45%!important}
-  #char-img{max-width:25vw!important}
+  #char-wrap{max-height:100%!important}
+  #char-img{max-width:100vw!important}
 }
 </style>
 </head>
@@ -393,12 +436,13 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
   </div>
 </div>
 
-<!-- ══ CODE SECRET — s'affiche UNE SEULE FOIS par session ══ -->
+<!-- ══ CODE SECRET — sans titre du jeu ══ -->
 <div id="code-screen" class="screen">
   <div class="code-deco-line"></div>
+  <div class="code-deco-line-bottom"></div>
   <div class="code-inner">
-    <div class="code-sub-label" id="code-sub-label">— a visual novel —</div>
-    <div class="code-game-title">Love Me<br>To <span>Death</span></div>
+    <!-- Symbole mystérieux à la place du titre -->
+    <div class="code-mystery-symbol">&#10022; &#10022; &#10022;</div>
     <div class="code-divider"><span class="code-divider-icon">&#10022;</span></div>
     <div class="code-entry-block">
       <div class="code-prompt-label" id="code-prompt-text">Enter the secret code to begin</div>
@@ -422,7 +466,22 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
     <div class="title-btns">
       <button class="btn-start" id="btn-start">BEGIN</button>
       <button class="btn-chapters" id="btn-chapters">&#9830; CHAPTERS</button>
+      <button class="btn-settings-title" id="btn-settings-title">&#9881; SETTINGS</button>
     </div>
+  </div>
+</div>
+
+<!-- ── SETTINGS SCREEN ── -->
+<div id="settings-screen" class="screen">
+  <div class="settings-container">
+    <div class="settings-title" id="settings-screen-title">— SETTINGS —</div>
+    <div class="settings-section-label" id="settings-audio-label">AUDIO</div>
+    <div class="settings-row">
+      <span class="vol-label" id="settings-vol-label">MUSIC</span>
+      <input type="range" id="settings-vol-slider" min="0" max="1" step="0.01" value="0.7">
+      <button id="settings-mute-btn">&#128266;</button>
+    </div>
+    <button class="settings-close-btn" id="btn-settings-close" style="margin-top:.8rem">&#9664; BACK</button>
   </div>
 </div>
 
@@ -504,7 +563,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
     <button class="pause-btn" id="btn-save-quit">SAVE &amp; QUIT</button>
     <button class="pause-btn danger" id="btn-restart-game">RESTART FROM BEGINNING</button>
     <div class="volume-row">
-      <span class="vol-label">MUSIC</span>
+      <span class="vol-label" id="pause-vol-label">MUSIC</span>
       <input type="range" id="vol-slider" min="0" max="1" step="0.01" value="0.7">
       <button class="vol-mute" id="btn-mute">&#128266;</button>
     </div>
@@ -537,9 +596,7 @@ const GAME_CONFIG = {
 
 /* ══════════════════════════════════════════════════
    CLÉ SESSION : le code ne s'affiche qu'une fois
-   par session (ouverture du site). Un rechargement
-   ou un retour depuis chapters.html ne le redemande
-   JAMAIS.
+   par session.
 ══════════════════════════════════════════════════ */
 const SESSION_CODE_KEY = 'lmtd_code_ok';
 
@@ -554,13 +611,14 @@ function markCodeValidated() {
 const I18N = {
   en: {
     loading:'Loading', titleSub:'— a visual novel —', btnBegin:'BEGIN', btnContinue:'CONTINUE',
-    btnChapters:'&#9830; CHAPTERS',
+    btnChapters:'&#9830; CHAPTERS', btnSettings:'&#9881; SETTINGS',
     policyHeader:'Terms, Privacy & Credits', policyHint:'Scroll to the bottom to accept',
     btnAccept:'ACCEPT & PLAY', btnBack:'\u25C2 BACK', btnResume:'RESUME', btnSaveQuit:'SAVE & QUIT',
     btnRestart:'RESTART FROM BEGINNING', btnRestartEnd:'RESTART', musicLabel:'MUSIC',
     historyTitle:'DIALOGUE HISTORY', helpTitle:'HOW TO PLAY', helpClose:'CLOSE',
     codePrompt:'Enter the secret code to begin',
     codeError:'Incorrect code. Try again.',
+    settingsTitle:'— SETTINGS —', settingsAudio:'AUDIO', settingsBack:'\u25C4 BACK',
     helpRows:[
       ['TAP / CLICK','Advance dialogue. Skips typewriter effect if in progress.'],
       ['CHOICES','Select an option. Your choice may affect affinity.'],
@@ -592,13 +650,14 @@ const I18N = {
   },
   fr: {
     loading:'Chargement', titleSub:'— un roman visuel —', btnBegin:'COMMENCER', btnContinue:'CONTINUER',
-    btnChapters:'&#9830; CHAPITRES',
+    btnChapters:'&#9830; CHAPITRES', btnSettings:'&#9881; PARAM\u00c8TRES',
     policyHeader:'Conditions, Confidentialit\u00e9 & Cr\u00e9dits', policyHint:"Faites d\u00e9filer jusqu'en bas pour accepter",
     btnAccept:'ACCEPTER & JOUER', btnBack:'\u25C2 RETOUR', btnResume:'REPRENDRE', btnSaveQuit:'SAUVEGARDER & QUITTER',
     btnRestart:'RECOMMENCER DEPUIS LE D\u00c9BUT', btnRestartEnd:'RECOMMENCER', musicLabel:'MUSIQUE',
     historyTitle:'HISTORIQUE DES DIALOGUES', helpTitle:'COMMENT JOUER', helpClose:'FERMER',
     codePrompt:'Entrez le code secret pour commencer',
     codeError:'Code incorrect. R\u00e9essayez.',
+    settingsTitle:'— PARAM\u00c8TRES —', settingsAudio:'AUDIO', settingsBack:'\u25C4 RETOUR',
     helpRows:[
       ['TAP / CLIC',"Avancer le dialogue. Passe l\u2019effet machine \u00e0 \u00e9crire si en cours."],
       ['CHOIX',"S\u00e9lectionnez une option. Votre choix peut affecter l\u2019affinit\u00e9."],
@@ -630,17 +689,68 @@ const I18N = {
   }
 };
 
-const LS_KEY = 'lmtd_save_v3';
+const LS_KEY      = 'lmtd_save_v3';
+const LS_VOL_KEY  = 'lmtd_volume';   // clé dédiée au volume (synchro globale)
+const LS_MUTE_KEY = 'lmtd_muted';    // clé dédiée au mute (synchro globale)
 
 const state = {
   lang:'en', firstTime:true, sceneIndex:0, scenes:[], navStack:[],
   affinity:0, history:[], muted:false, volume:0.7, currentMusic:null,
   isTyping:false, typing:null, awaitingChoice:false,
   pendingChoices:null,
-  endingsData:{good:null,bad:null}
+  endingsData:{good:null,bad:null},
+  _settingsFrom:'title-screen'  // pour savoir où revenir depuis les settings
 };
 
 function t(k){ return (I18N[state.lang]||I18N.en)[k]; }
+
+/* ══════════════════════════════════════════════════
+   VOLUME — SOURCE UNIQUE DE VÉRITÉ
+   Toutes les lectures/écritures passent par ces fonctions.
+   Le localStorage est la référence partagée.
+══════════════════════════════════════════════════ */
+function loadVolumeFromStorage(){
+  try{
+    const v = parseFloat(localStorage.getItem(LS_VOL_KEY));
+    if(!isNaN(v)) state.volume = Math.max(0, Math.min(1, v));
+    state.muted = localStorage.getItem(LS_MUTE_KEY) === '1';
+  }catch(e){}
+}
+
+function saveVolumeToStorage(){
+  try{
+    localStorage.setItem(LS_VOL_KEY, String(state.volume));
+    localStorage.setItem(LS_MUTE_KEY, state.muted ? '1' : '0');
+  }catch(e){}
+}
+
+/** Applique le volume à l'audio et synchronise TOUS les sliders / boutons mute de la page */
+function applyVolumeEverywhere(){
+  const bgm = document.getElementById('bgm');
+  bgm.volume = state.muted ? 0 : state.volume;
+
+  // Sliders
+  ['vol-slider','settings-vol-slider'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.value = state.volume;
+  });
+  // Boutons mute
+  ['btn-mute','settings-mute-btn'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.textContent = state.muted ? '\u{1F507}' : '\u{1F50A}';
+  });
+
+  saveVolumeToStorage();
+}
+
+function setVolume(v){
+  state.volume = Math.max(0, Math.min(1, v));
+  applyVolumeEverywhere();
+}
+function toggleMute(){
+  state.muted = !state.muted;
+  applyVolumeEverywhere();
+}
 
 /* ══ CODE SECRET ══ */
 function initCodeScreen(){
@@ -675,23 +785,29 @@ function initCodeScreen(){
 /* ══ LANG ══ */
 function applyLang(){
   const L = I18N[state.lang]||I18N.en;
-  document.getElementById('loading-label').textContent = L.loading;
-  document.getElementById('title-sub').textContent     = L.titleSub;
-  document.getElementById('btn-start').textContent     = checkHasSave() ? L.btnContinue : L.btnBegin;
-  document.getElementById('btn-chapters').innerHTML    = L.btnChapters;
-  document.getElementById('policy-header').textContent = L.policyHeader;
-  document.getElementById('policy-hint').textContent   = L.policyHint;
-  document.getElementById('btn-accept').textContent    = L.btnAccept;
+  document.getElementById('loading-label').textContent     = L.loading;
+  document.getElementById('title-sub').textContent         = L.titleSub;
+  document.getElementById('btn-start').textContent         = checkHasSave() ? L.btnContinue : L.btnBegin;
+  document.getElementById('btn-chapters').innerHTML        = L.btnChapters;
+  document.getElementById('btn-settings-title').innerHTML  = L.btnSettings;
+  document.getElementById('policy-header').textContent     = L.policyHeader;
+  document.getElementById('policy-hint').textContent       = L.policyHint;
+  document.getElementById('btn-accept').textContent        = L.btnAccept;
   document.getElementById('btn-back-dialogue').textContent = L.btnBack;
-  document.getElementById('btn-resume').textContent    = L.btnResume;
-  document.getElementById('btn-save-quit').textContent = L.btnSaveQuit;
-  document.getElementById('btn-restart-game').textContent = L.btnRestart;
-  document.getElementById('btn-restart-end').textContent  = L.btnRestartEnd;
-  document.querySelector('.vol-label').textContent     = L.musicLabel;
-  document.getElementById('history-title-label').textContent = L.historyTitle;
-  document.getElementById('help-title').textContent    = L.helpTitle;
-  document.getElementById('btn-close-help').textContent = L.helpClose;
-  document.getElementById('policy-scroll').innerHTML   = L.policyContent;
+  document.getElementById('btn-resume').textContent        = L.btnResume;
+  document.getElementById('btn-save-quit').textContent     = L.btnSaveQuit;
+  document.getElementById('btn-restart-game').textContent  = L.btnRestart;
+  document.getElementById('btn-restart-end').textContent   = L.btnRestartEnd;
+  document.querySelector('#pause-modal .vol-label').textContent      = L.musicLabel;
+  document.getElementById('pause-vol-label').textContent             = L.musicLabel;
+  document.getElementById('settings-vol-label').textContent          = L.musicLabel;
+  document.getElementById('history-title-label').textContent         = L.historyTitle;
+  document.getElementById('help-title').textContent                   = L.helpTitle;
+  document.getElementById('btn-close-help').textContent              = L.helpClose;
+  document.getElementById('policy-scroll').innerHTML                  = L.policyContent;
+  document.getElementById('settings-screen-title').textContent       = L.settingsTitle;
+  document.getElementById('settings-audio-label').textContent        = L.settingsAudio;
+  document.getElementById('btn-settings-close').textContent          = L.settingsBack;
   const hr = document.getElementById('help-rows'); hr.innerHTML='';
   const rows = L.helpRows;
   if(Array.isArray(rows)){
@@ -746,8 +862,9 @@ function saveGame(){
     localStorage.setItem(LS_KEY,JSON.stringify({
       lang:state.lang,firstTime:false,sceneIndex:state.sceneIndex,
       navStack:state.navStack.slice(-30),affinity:state.affinity,
-      history:state.history.slice(-60),volume:state.volume,
-      muted:state.muted,currentMusic:state.currentMusic
+      history:state.history.slice(-60),
+      // volume stocké séparément via LS_VOL_KEY / LS_MUTE_KEY
+      currentMusic:state.currentMusic
     }));
   }catch(e){}
 }
@@ -759,8 +876,10 @@ function loadSave(){
     state.sceneIndex=d.sceneIndex||0;
     state.navStack=(d.navStack||[]).map(e=>typeof e==='number'?{sceneIndex:e,affinityDelta:0}:e);
     state.affinity=d.affinity||0;state.history=d.history||[];
-    state.volume=d.volume!==undefined?d.volume:0.7;state.muted=d.muted||false;
-    state.currentMusic=d.currentMusic||null;return true;
+    state.currentMusic=d.currentMusic||null;
+    // volume chargé depuis ses propres clés
+    loadVolumeFromStorage();
+    return true;
   }catch(e){return false;}
 }
 function resetGame(){try{localStorage.removeItem(LS_KEY);}catch(e){}location.reload();}
@@ -788,10 +907,7 @@ function showAffinityDelta(d){
   el.style.color=d>0?'var(--crimson)':'#9333ea';void el.offsetWidth;el.className='show';
 }
 
-/* ══ AUDIO ══
-   On sauvegarde la position de la musique dans sessionStorage
-   pour que chapters.html puisse reprendre au même endroit.
-══ */
+/* ══ AUDIO ══ */
 const bgm=document.getElementById('bgm');
 
 // Synchroniser la position toutes les secondes
@@ -802,11 +918,9 @@ setInterval(()=>{
 },1000);
 
 function startIntroMusic(){
-  // Si la musique est déjà en cours (retour depuis chapters), ne pas repartir de 0
   if(bgm.src && !bgm.paused && bgm.currentSrc.includes(GAME_CONFIG.introMusic.split('/').pop())) return;
   bgm.src=GAME_CONFIG.introMusic;bgm.loop=true;bgm.muted=false;
   bgm.volume=state.muted?0:state.volume;
-  // Restaurer la position si on revient de chapters
   try{
     const saved=JSON.parse(sessionStorage.getItem('lmtd_music_pos')||'null');
     if(saved && saved.src && saved.src.includes(GAME_CONFIG.introMusic.split('/').pop()) && saved.pos>0){
@@ -823,7 +937,6 @@ function playMusic(src){
   bgm.volume=state.muted?0:state.volume;bgm.play().catch(()=>{});
 }
 function stopMusic(){bgm.pause();bgm.src='';state.currentMusic=null;}
-function applyVolume(){bgm.volume=state.muted?0:state.volume;}
 
 /* ══ BG / CHAR ══ */
 let lastBg=null;
@@ -892,6 +1005,12 @@ function renderScene(scene,fromBack){
   document.getElementById('dialogue-wrap').style.display='';
   document.getElementById('dialogue-continue').style.display='';
   state.awaitingChoice=false;state.pendingChoices=scene.choices||null;
+  const dialogueDiv = document.getElementById('dialogue-text');
+  if (scene.glitch) {
+    dialogueDiv.classList.add('glitch');
+  } else {
+    dialogueDiv.classList.remove('glitch');
+  }
   addToHistory(scene.speaker||'',scene.text||'',false);
   typeText(document.getElementById('dialogue-text'),scene.text||'',scene.typeSpeed,null);
   updateBackBtn();saveGame();
@@ -971,6 +1090,13 @@ function triggerMinigame(scene,onComplete){
   frm.src=file;ov.style.display='block';
 }
 
+/* ══ OPEN SETTINGS (accessible depuis le titre et la pause) ══ */
+function openSettings(fromScreenId){
+  state._settingsFrom = fromScreenId || 'title-screen';
+  applyVolumeEverywhere(); // s'assure que les sliders sont à jour
+  fadeTransition(()=>showScreen('settings-screen'));
+}
+
 /* ══ START ══ */
 function startGame(fromIdx){
   fromIdx=fromIdx||0;stopMusic();
@@ -978,19 +1104,18 @@ function startGame(fromIdx){
   showScreen('game-screen');renderAffinity();renderScene(state.scenes[fromIdx]);
 }
 
-/* ══ BOOT ══
-   Logique :
-   1. Si le code est déjà validé pour cette session → passer directement au titre
-   2. Sinon → afficher l'écran code
-══ */
+/* ══ BOOT ══ */
 async function boot(){
+  // Charger le volume depuis le localStorage EN PREMIER
+  loadVolumeFromStorage();
+
   state.lang='en';
   applyLang();
+  applyVolumeEverywhere(); // initialise les sliders au bon niveau dès le départ
   await preloadAssets();
 
   if(isCodeValidated()){
-    // Session déjà validée : on saute le code et on lance la musique intro si besoin
-    initCodeScreen(); // initialise quand même les listeners (au cas où)
+    initCodeScreen();
     startIntroMusic();
     fadeTransition(()=>showScreen('title-screen'));
   } else {
@@ -1022,6 +1147,31 @@ document.getElementById('btn-chapters').addEventListener('click',()=>{
   let langToPass=state.lang||'en';
   try{const d=JSON.parse(localStorage.getItem(LS_KEY)||'{}');if(d.lang)langToPass=d.lang;}catch(e){}
   window.open('chapters.html?lang='+langToPass,'_self');
+});
+
+// Bouton Settings dans le menu titre
+document.getElementById('btn-settings-title').addEventListener('click',()=>{
+  openSettings('title-screen');
+});
+
+// Bouton retour depuis settings
+document.getElementById('btn-settings-close').addEventListener('click',()=>{
+  saveVolumeToStorage();
+  fadeTransition(()=>{
+    const target = state._settingsFrom || 'title-screen';
+    showScreen(target);
+    // si on revient au jeu, rien de spécial ; sinon on s'assure que la musique joue
+    if(target === 'title-screen') startIntroMusic();
+  });
+});
+
+// Slider volume dans settings
+document.getElementById('settings-vol-slider').addEventListener('input', e=>{
+  setVolume(parseFloat(e.target.value));
+});
+// Bouton mute dans settings
+document.getElementById('settings-mute-btn').addEventListener('click', ()=>{
+  toggleMute();
 });
 
 /* ══ EVENTS — LANG ══ */
@@ -1071,10 +1221,14 @@ document.getElementById('btn-save-quit').addEventListener('click',()=>{
 document.getElementById('btn-restart-game').addEventListener('click',()=>{if(confirm(t('confirmRestart')))resetGame();});
 document.getElementById('btn-restart-end').addEventListener('click',()=>{if(confirm(t('confirmRestartEnd')))resetGame();});
 
-const volSlider=document.getElementById('vol-slider'),btnMute=document.getElementById('btn-mute');
+// Slider volume dans la pause
+const volSlider=document.getElementById('vol-slider');
 volSlider.value=state.volume;
-volSlider.addEventListener('input',()=>{state.volume=parseFloat(volSlider.value);applyVolume();saveGame();});
-btnMute.addEventListener('click',()=>{state.muted=!state.muted;btnMute.textContent=state.muted?'\u{1F507}':'\u{1F50A}';applyVolume();saveGame();});
+volSlider.addEventListener('input',()=>{ setVolume(parseFloat(volSlider.value)); });
+
+// Bouton mute dans la pause
+const btnMute=document.getElementById('btn-mute');
+btnMute.addEventListener('click',()=>{ toggleMute(); });
 
 /* ══ PARTICLES + RIPPLE + KEYBOARD ══ */
 (function(){
@@ -1091,7 +1245,6 @@ document.addEventListener('click',e=>{
   document.body.appendChild(r);setTimeout(()=>r.remove(),600);
 });
 document.addEventListener('keydown',e=>{
-  // Bloquer les raccourcis si l'écran code est actif
   if(document.getElementById('code-screen').classList.contains('active'))return;
   if(e.key===' '||e.key==='Enter'){e.preventDefault();advance();}
   if(e.key==='Backspace'&&!state.awaitingChoice)document.getElementById('btn-back-dialogue').click();
