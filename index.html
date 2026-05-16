@@ -765,7 +765,14 @@ function initCodeScreen(){
     if(val === GAME_CONFIG.secretCode){
       markCodeValidated();
       startIntroMusic();
-      fadeTransition(()=>showScreen('title-screen'));
+      if(!checkHasSave()){
+        // Première fois : choisir la langue d'abord
+        fadeTransition(()=>showScreen('lang-screen'));
+      } else {
+        // Save existante : aller au menu avec animation
+        resetTitleAnimations();
+        fadeTransition(()=>showScreen('title-screen'));
+      }
     } else {
       errEl.textContent = L.codeError;
       errEl.classList.add('show');
@@ -885,6 +892,18 @@ function loadSave(){
 function resetGame(){try{localStorage.removeItem(LS_KEY);}catch(e){}location.reload();}
 
 /* ══ SCREENS ══ */
+function resetTitleAnimations(){
+  const screen=document.getElementById('title-screen');
+  ['.title-sub','.title-main','.title-line','.title-btns'].forEach(sel=>{
+    const node=screen.querySelector(sel);
+    if(!node)return;
+    node.style.animation='none';
+    node.style.opacity='0';
+    void node.offsetWidth; // force reflow
+    node.style.animation='';
+    node.style.opacity='';
+  });
+}
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
 function fadeTransition(cb){const fo=document.getElementById('fade-overlay');fo.classList.add('fade-in');setTimeout(()=>{cb();setTimeout(()=>fo.classList.remove('fade-in'),100);},500);}
 
@@ -1159,6 +1178,7 @@ document.getElementById('btn-settings-close').addEventListener('click',()=>{
   saveVolumeToStorage();
   fadeTransition(()=>{
     const target = state._settingsFrom || 'title-screen';
+    if(target === 'title-screen') resetTitleAnimations();
     showScreen(target);
     // si on revient au jeu, rien de spécial ; sinon on s'assure que la musique joue
     if(target === 'title-screen') startIntroMusic();
@@ -1196,7 +1216,9 @@ document.getElementById('btn-accept').addEventListener('click',async()=>{
   if(!document.getElementById('btn-accept').classList.contains('ready'))return;
   state.firstTime=false;
   await Promise.all([loadChapters(),loadEndings()]);
-  saveGame();fadeTransition(()=>startGame(0));
+  saveGame();
+  resetTitleAnimations();
+  fadeTransition(()=>showScreen('title-screen'));
 });
 
 /* ══ EVENTS — GAME ══ */
@@ -1213,6 +1235,7 @@ document.getElementById('btn-save-quit').addEventListener('click',()=>{
   saveGame();
   fadeTransition(()=>{
     document.getElementById('pause-modal').style.display='none';
+    resetTitleAnimations();
     showScreen('title-screen');
     document.getElementById('btn-start').textContent=t('btnContinue');
     startIntroMusic();
